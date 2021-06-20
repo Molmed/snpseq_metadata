@@ -36,11 +36,15 @@ class NGIResultFile(NGIMetadataModel):
 
 class NGIFastqFile(NGIResultFile):
     def __init__(
-        self, filepath: str, checksum: str = None, checksum_method: str = None
+        self,
+        filepath: str,
+        filetype: str = "fastq",
+        checksum: str = None,
+        checksum_method: str = None,
     ) -> None:
         super().__init__(
             filepath=filepath,
-            filetype="fastq",
+            filetype=filetype,
             checksum=checksum,
             checksum_method=checksum_method,
         )

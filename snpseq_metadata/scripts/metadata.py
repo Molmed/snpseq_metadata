@@ -8,9 +8,6 @@ from snpseq_metadata.models.converter import Converter
 
 
 def common_options(function):
-    function = click.argument(
-        "runfolder", nargs=1, type=click.Path(exists=True, dir_okay=True)
-    )(function)
     function = click.option(
         "-o",
         "--outdir",
@@ -28,15 +25,13 @@ def metadata():
 
 @click.group(chain=True)
 @common_options
-def extract(runfolder, outdir):
-    ngi_flowcell = NGIFlowcell(runfolder_path=runfolder)
-    outfile = os.path.join(outdir, f"{ngi_flowcell.runfolder_name}.json")
-    with open(outfile, "w") as fh:
-        json.dump(ngi_flowcell.to_json(), fh, indent=2)
+@click.argument("runfolder", nargs=1, type=click.Path(exists=True, dir_okay=True))
+def extract(outdir, runfolder):
+    pass
 
 
 @extract.result_callback()
-def extract_pipeline(processors, runfolder, outdir):
+def extract_pipeline(processors, outdir, runfolder):
     ngi_flowcell = NGIFlowcell(runfolder_path=runfolder)
     outfile_prefix = os.path.join(outdir, ngi_flowcell.runfolder_name)
     for processor in processors:
@@ -55,14 +50,15 @@ def extract_to_json():
 
 @click.group(chain=True)
 @common_options
+@click.argument("runfolder", nargs=1, type=click.File("rb"))
 @click.argument("data", nargs=1, type=click.File("rb"))
-def export(runfolder, outdir, data):
+def export(outdir, runfolder, data):
     pass
 
 
 @export.result_callback()
-def export_pipeline(processors, runfolder, outdir, data):
-    ngi_flowcell = NGIFlowcell(runfolder_path=runfolder)
+def export_pipeline(processors, outdir, runfolder, data):
+    ngi_flowcell = NGIFlowcell.from_json(json_obj=json.load(runfolder))
     lims_experiments = LIMSSequencingContainer.from_json(json.load(data))
     ngi_experiments = Converter.lims_to_ngi(lims_model=lims_experiments)
     sra_run_set = Converter.ngi_to_sra(ngi_model=ngi_flowcell)

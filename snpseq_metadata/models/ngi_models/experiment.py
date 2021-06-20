@@ -64,7 +64,7 @@ class NGIExperimentRef(NGIExperimentBase):
         return cls(
             alias=json_obj.get("alias"),
             project=NGIStudyRef.from_json(json_obj.get("project")),
-            sample_id=NGISampleDescriptor.from_json(json_obj.get("sample")),
+            sample=NGISampleDescriptor.from_json(json_obj.get("sample")),
         )
 
     def get_reference(self) -> TR:

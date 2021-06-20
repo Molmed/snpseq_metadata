@@ -37,9 +37,39 @@ Commands:
   extract
 ``` 
 
+### extract
+The `extract` subcommand is used to parse a runfolder and extract the metadata:
+```
+$ snpseq_metadata extract --help
+Usage: snpseq_metadata extract [OPTIONS] RUNFOLDER COMMAND1 [ARGS]...
+                               [COMMAND2 [ARGS]...]...
+
+Options:
+  -o, --outdir PATH  [default: current working directory]
+  --help             Show this message and exit.
+
+Commands:
+  json
+```
+Here, `RUNFOLDER` is the path to the sequencing runfolder for which metadata should be exported.
+Some test data are available under `tests/resources` and extracting metadata to json can be accomplished by:
+```
+$ snpseq_metadata export \
+  -o /tmp/ \
+  tests/resources/210415_A00001_0123_BXYZ321XY
+  json
+```
+This will parse the runfolder into the python NGI models and serialize the models to json, saved under the specified 
+output directory:
+```
+/tmp
+└── 210415_A00001_0123_BXYZ321XY.json
+``` 
+
 ### export
 
-The `export` subcommand is used to parse and export metadata:
+The `export` subcommand is used to parse metadata into python SRA models and serialize the models into the desired 
+formats:
 ```
 $ snpseq_metadata export
 Usage: snpseq_metadata export [OPTIONS] RUNFOLDER DATA COMMAND1 [ARGS]...
@@ -55,9 +85,9 @@ Commands:
   xml
 ``` 
 
-Here, `RUNFOLDER` is the path to the sequencing runfolder for which metadata should be exported and `DATA` is the path 
-to a json-file with project metadata, exported by the 
-[snpseq_data](https://gitlab.snpseq.medsci.uu.se/shared/snpseq-data) service.
+Here, `RUNFOLDER` is the path to a json file with serialized NGI runfolder metadata (created with the `extract` 
+subcommand above), for which metadata should be exported and `DATA` is the path to a json-file with project metadata, 
+exported by the [snpseq_data](https://gitlab.snpseq.medsci.uu.se/shared/snpseq-data) service.
 
 Some test data are available under `tests/resources` and exporting metadata compatible with the SRA XML submission 
 format and also to a human-friendly manifest (compatible with SRA submissions) can be accomplished by:
@@ -65,7 +95,7 @@ format and also to a human-friendly manifest (compatible with SRA submissions) c
 ```
 $ snpseq_metadata export \
   -o /tmp/ \
-  tests/resources/210415_A00001_0123_BXYZ321XY \
+  tests/resources/210415_A00001_0123_BXYZ321XY.ngi.json \
   tests/resources/snpseq_data_XYZ321XY.json \
   xml manifest
 ```
