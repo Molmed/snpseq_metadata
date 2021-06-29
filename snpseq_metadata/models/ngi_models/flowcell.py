@@ -56,7 +56,7 @@ class NGIFlowcell(NGIMetadataModel):
 
     def get_sequencing_platform(self) -> NGIIlluminaSequencingPlatform:
         model_name = NGIIlluminaSequencingPlatform.model_name_from_id(
-            id=self.runfolder_name.split("_")[1]
+            model_id=self.runfolder_name.split("_")[1]
         )
         return NGIIlluminaSequencingPlatform(model_name=model_name)
 
@@ -103,7 +103,7 @@ class NGIFlowcell(NGIMetadataModel):
                         )
                     ),
                 )
-        except IndexError:
+        except (IndexError, StopIteration):
             raise FastqFileLocationNotFoundException(
                 sample_project=experiment_ref.project.project_id,
                 sample_id=experiment_ref.sample.sample_id,

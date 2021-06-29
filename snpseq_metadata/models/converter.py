@@ -193,9 +193,7 @@ class ConvertSequencingPlatform(Converter):
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
         if lims_model:
-            return cls.ngi_model_class(
-                model_name=lims_model.udf.get("udf_sequencing_instrument")
-            )
+            return cls.ngi_model_class(model_name=lims_model.udf_sequencing_instrument)
 
 
 class ConvertRunSet(Converter):
@@ -337,17 +335,13 @@ class ConvertLibrary(Converter):
     ) -> Optional[ngi_model_class]:
         if lims_model:
             sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
-            application = lims_model.udf.get("udf_application")
-            sample_type = lims_model.udf.get("udf_sample_type")
-            library_kit = lims_model.udf.get("udf_library_preparation_kit")
+            application = lims_model.udf_application
+            sample_type = lims_model.udf_sample_type
+            library_kit = lims_model.udf_library_preparation_kit
             description = (
                 f"{sample.sample_id} - {application} - {sample_type} - {library_kit}"
             )
-            is_paired = (
-                True
-                if lims_model.udf.get("udf_read_length", "").endswith("x2")
-                else None
-            )
+            is_paired = True if lims_model.udf_read_length.endswith("x2") else None
             return cls.ngi_model_class(
                 sample=sample,
                 description=description,

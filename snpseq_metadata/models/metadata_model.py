@@ -49,4 +49,4 @@ class MetadataModel:
         try:
             return haystack[needle.lower()]
         except KeyError:
-            on_error(needle, list(haystack.keys()))
+            raise on_error(needle, list(haystack.keys()))

@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional, Type, TypeVar
+from typing import ClassVar, List, Dict, Optional, Type, TypeVar
 import datetime
 
 from snpseq_metadata.models.ngi_models.metadata_model import NGIMetadataModel
@@ -12,6 +12,9 @@ T = TypeVar("T", bound="NGIRun")
 
 
 class NGIRun(NGIMetadataModel):
+
+    run_center: ClassVar[str] = "National Genomics Infrastructure, Uppsala"
+
     def __init__(
         self,
         run_alias: str,
@@ -21,11 +24,11 @@ class NGIRun(NGIMetadataModel):
         fastqfiles: Optional[List[NGIFastqFile]] = None,
     ) -> None:
         self.run_alias = run_alias
-        self.run_center = "National Genomics Infrastructure, Uppsala"
         self.experiment = experiment
         self.platform = platform
         self.run_date = run_date
         self.fastqfiles = fastqfiles
+        self.run_center = NGIRun.run_center
 
     @classmethod
     def from_json(cls: Type[T], json_obj: Dict) -> T:

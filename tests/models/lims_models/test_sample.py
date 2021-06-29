@@ -19,9 +19,9 @@ class TestLIMSSample:
         sample = LIMSSample.from_json(json_obj=sample_json)
         assert sample.sample_id == sample_json["name"]
         assert sample.project_id == sample_json["project"]
-        assert sample.udf == {
-            k: v for k, v in sample_json.items() if k not in ["name", "project"]
-        }
+        for k, v in sample_json.items():
+            if k not in ["name", "project"]:
+                assert getattr(sample, k) == v
 
     def test_to_json(self, sample_json):
         sample = LIMSSample.from_json(json_obj=sample_json)
