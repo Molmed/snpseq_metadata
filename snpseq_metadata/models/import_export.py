@@ -15,7 +15,11 @@ ME = TypeVar("ME", bound="ModelExporter")
 class ModelExporter(Generic[T]):
     @staticmethod
     def filter_none_empty(x: Tuple) -> Dict:
-        return {k: v for k, v in DictFactory.FILTER_NONE(x).items() if v}
+        return {
+            k: v
+            for k, v in DictFactory.FILTER_NONE(x).items()
+            if v is not None and (type(v) is not list or len(v) > 0)
+        }
 
     @classmethod
     def to_json(cls: Type[ME], obj: T) -> Dict:
