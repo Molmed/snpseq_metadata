@@ -35,15 +35,15 @@ class SRALibrary(SRAMetadataModel):
     def object_from_paired(
         cls: Type[T], is_paired: bool
     ) -> LibraryDescriptorType.LibraryLayout:
-        return (
-            LibraryDescriptorType.LibraryLayout(
+        if is_paired:
+            layout = LibraryDescriptorType.LibraryLayout(
                 paired=LibraryDescriptorType.LibraryLayout.Paired()
             )
-            if is_paired
-            else LibraryDescriptorType.LibraryLayout(
+        else:
+            layout = LibraryDescriptorType.LibraryLayout(
                 single=LibraryDescriptorType.LibraryLayout.Single()
             )
-        )
+        return layout
 
     @classmethod
     def object_from_source(cls: Type[T], source: str) -> TypeLibrarySource:
@@ -110,7 +110,7 @@ class SRALibrary(SRAMetadataModel):
             manifest.append(
                 (
                     field.metadata["name"],
-                    getattr(self.model_object.library_descriptor, field.name).name,
+                    getattr(self.model_object.library_descriptor, field.name).value,
                 )
             )
         manifest.extend(self.sample.to_manifest())

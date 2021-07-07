@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Type, TypeVar
+from typing import ClassVar, Dict, Type, TypeVar
 
 from snpseq_metadata.models.ngi_models.metadata_model import NGIMetadataModel
 from snpseq_metadata.exceptions import InstrumentModelNotRecognizedException
@@ -17,20 +17,26 @@ class NGISequencingPlatform(NGIMetadataModel):
 
 
 class NGIIlluminaSequencingPlatform(NGISequencingPlatform):
+
+    model_dict: ClassVar[Dict[str, str]] = {
+        "a": "NovaSeq",
+        "m": "MiSeq",
+        "fs": "iSeq",
+        "st-e": "HiSeqX",
+        "d": "HiSeq2500",
+        "sn": "HiSeq",
+    }
+
     @classmethod
-    def model_name_from_id(cls: Type[T], id: str) -> str:
-        m = re.match(r"^(\D+)\d+", id)
-        model_prefix = m.group(1)
-        model_dict = {
-            "a": "NovaSeq",
-            "m": "MiSeq",
-            "fs": "iSeq",
-            "st-e": "HiSeqX",
-            "d": "HiSeq2500",
-            "sn": "HiSeq",
-        }
+    def model_name_from_id(cls: Type[T], model_id: str) -> str:
+        try:
+            m = re.match(r"^(\D+)\d+", model_id)
+            model_prefix = m.group(1)
+        except AttributeError:
+            model_prefix = model_id
+
         return cls._object_from_something(
             needle=model_prefix,
-            haystack=model_dict,
+            haystack=cls.model_dict,
             on_error=InstrumentModelNotRecognizedException,
         )

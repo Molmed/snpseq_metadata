@@ -1,144 +1,220 @@
 import os
+import pytest
+import uuid
 
 import snpseq_metadata.utilities
+from snpseq_metadata.exceptions import FastqFileLocationNotFoundException
+from snpseq_metadata.models.ngi_models import (
+    NGIFlowcell,
+    NGIIlluminaSequencingPlatform,
+    NGIRun,
+    NGIFastqFile,
+)
 
 
-class TestFlowcell:
-    @staticmethod
-    def _return_none(*args):
-        return None
+class TestNGIFlowcell:
+    def test_from_json(self, flowcell_obj, flowcell_json):
+        flowcell = NGIFlowcell.from_json(json_obj=flowcell_json)
+        assert flowcell == flowcell_obj
 
-    @staticmethod
-    def _return_true(*args):
-        return True
+    def test_to_json(self, flowcell_obj, flowcell_json):
+        obs_json = flowcell_obj.to_json()
+        assert {k: obs_json.get(k) for k in flowcell_json.keys()} == flowcell_json
 
-    @staticmethod
-    def _return_samplesheet(*args):
-        return ["this-is-a-samplesheet"]
+    def test_get_run_date(self, flowcell_obj, run_date):
+        flowcell_obj.runfolder_name = f"{run_date.strftime('%y%m%d')}_whatever..."
+        assert flowcell_obj.get_run_date() == run_date
 
-    @staticmethod
-    def _return_alt_samplesheet(*args):
-        return ["this-is-another-samplesheet"]
+        flowcell_obj.runfolder_name = f"{run_date.strftime('%Y%m%d')}_whatever..."
+        assert flowcell_obj.get_run_date() == run_date
 
-    @staticmethod
-    def _return_samplesheet_data(*args):
-        required_fields = ["sample_project", "sample_id"]
-        additional_fields = [f"field_{i}" for i in range(3)]
-        samplesheet_data = []
-        for i in range(5):
-            for j in range(2):
-                samplesheet_data.append(
-                    dict(zip(required_fields, [f"project_{i}{j}", f"sample_{i}{j}"]))
+        flowcell_obj.runfolder_name = "this-can-not-be-parsed-as-a-date"
+        assert flowcell_obj.get_run_date() is None
+
+    def test_get_sequencing_platform(self, flowcell_obj, model_prefixes):
+        (model_id, model_name) = model_prefixes.popitem()
+        flowcell_obj.runfolder_name = f"datestring_{model_id}_whatever..."
+        platform = flowcell_obj.get_sequencing_platform()
+        assert isinstance(platform, NGIIlluminaSequencingPlatform)
+        assert platform.model_name == model_name
+
+    def test_get_checksumfile(self, flowcell_obj, monkeypatch):
+        assert flowcell_obj.get_checksumfile() is None
+        monkeypatch.setattr(os.path, "exists", lambda x: True)
+        exp_checksum_file = os.path.join(
+            flowcell_obj.runfolder_path, flowcell_obj.checksum_method, "checksums.md5"
+        )
+        assert flowcell_obj.get_checksumfile() == exp_checksum_file
+
+    def test_get_sequencing_run_for_experiment(
+        self, flowcell_obj, experiment_obj, run_obj
+    ):
+        obs_run_obj = flowcell_obj.get_sequencing_run_for_experiment(
+            experiment=experiment_obj
+        )
+        assert obs_run_obj == run_obj
+
+        flowcell_obj.sequencing_runs = []
+        assert (
+            flowcell_obj.get_sequencing_run_for_experiment(experiment=experiment_obj)
+            is None
+        )
+
+    def test_get_sequencing_run_for_experiment_ref(
+        self, flowcell_obj, experiment_ref_obj, fastq_file_obj, monkeypatch
+    ):
+        def fastqfiles(**kwargs):
+            return [fastq_file_obj, fastq_file_obj]
+
+        exp_run_obj = NGIRun(
+            run_alias=f"{experiment_ref_obj.project.project_id}-{experiment_ref_obj.sample.sample_id}-{flowcell_obj.flowcell_id}",
+            experiment=experiment_ref_obj,
+            platform=flowcell_obj.platform,
+            run_date=flowcell_obj.run_date,
+            fastqfiles=fastqfiles(),
+        )
+
+        monkeypatch.setattr(
+            flowcell_obj,
+            "get_files_for_experiment_ref",
+            fastqfiles,
+        )
+        obs_run_obj = flowcell_obj.get_sequencing_run_for_experiment_ref(
+            experiment_ref=experiment_ref_obj
+        )
+        assert obs_run_obj == exp_run_obj
+
+    def test_get_fastqdir_for_experiment_ref(
+        self, flowcell_obj, experiment_ref_obj, tmpdir
+    ):
+        def _fastqdir_helper(l1, l2, l3, should_fail=False):
+            runfolder = os.path.join(tmpdir, str(uuid.uuid4()))
+            flowcell_obj.runfolder_path = runfolder
+            fastqdir = os.path.join(runfolder, l1, l2, l3)
+            os.makedirs(fastqdir)
+            if should_fail:
+                with pytest.raises(FastqFileLocationNotFoundException):
+                    flowcell_obj.get_fastqdir_for_experiment_ref(experiment_ref_obj)
+            else:
+                assert (
+                    flowcell_obj.get_fastqdir_for_experiment_ref(experiment_ref_obj)
+                    == fastqdir
                 )
-                samplesheet_data[-1]["description"] = f"some-data:experiment-name-{i}"
-                samplesheet_data[-1].update(
-                    {k: f"{k}_{i}{j}" for k in additional_fields}
+
+        project_id = experiment_ref_obj.project.project_id
+        sample_id = experiment_ref_obj.sample.sample_id
+        for level_1 in ["Unaligned", "Demultiplexing"]:
+            for level_2 in [project_id, f"Project_{project_id}"]:
+                for level_3 in [sample_id, f"Sample_{sample_id}"]:
+                    _fastqdir_helper(l1=level_1, l2=level_2, l3=level_3)
+                _fastqdir_helper(
+                    l1=level_1, l2=level_2, l3="not-recognized", should_fail=True
                 )
-        return samplesheet_data
+            _fastqdir_helper(
+                l1=level_1, l2="not-recognized", l3=sample_id, should_fail=True
+            )
+        _fastqdir_helper(
+            l1="not-recognized", l2=project_id, l3=sample_id, should_fail=True
+        )
 
-    @staticmethod
-    def _return_os_listdir(dir, *args):
-        return_values = {
-            "Unaligned": [
-                "a-directory",
-                "AnotherProject",
-                "Project_SampleProject",
-            ],
-            "Project_SampleProject": [
-                "a-directory",
-                "Sample_AnotherSampleID",
-                "SampleID",
-            ],
-            "AnotherProject": ["a-directory", "Sample_AnotherSampleID", "SampleID"],
-        }
-        return return_values.get(os.path.basename(dir), ["some-directory", "Unaligned"])
+    def test_get_files_for_experiment_ref(
+        self, flowcell_obj, experiment_ref_obj, tmpdir, monkeypatch
+    ):
+        def _fastqdir(*args, **kwargs):
+            return os.path.join(tmpdir, "fastq")
 
-    def test_get_experiments(self, monkeypatch):
+        def _checksum(checksumfile, querypath):
+            return querypath
+
+        # set up the test
+        monkeypatch.setattr(flowcell_obj, "get_fastqdir_for_experiment_ref", _fastqdir)
+        monkeypatch.setattr(
+            snpseq_metadata.utilities, "lookup_checksum_from_file", _checksum
+        )
+        flowcell_obj.runfolder_path = tmpdir
+
+        # define and touch files expected to be found and not to be found
+        exp_fastqfiles = [
+            os.path.join(_fastqdir(), fqfile)
+            for fqfile in [
+                "a-file.fastq",
+                "b-file.fastq.gz",
+                "c-file.fq",
+                "d-file.fq.gz",
+            ]
+        ]
+        nonexp_files = [
+            os.path.join(_fastqdir(), nonfqfile)
+            for nonfqfile in [
+                "e-file.fasta",
+                "f-file.fasta.gz",
+                "g-file.fastq.zip",
+                "h-file.fastq.gz.",
+            ]
+        ]
+        os.makedirs(_fastqdir())
+        for f in exp_fastqfiles + nonexp_files:
+            open(f, "w").close()
+
+        # sort the lists before comparison
+        exp_objs = sorted(
+            [
+                NGIFastqFile(
+                    filepath=fqfile,
+                    checksum=os.path.join(
+                        os.path.basename(tmpdir), "fastq", os.path.basename(fqfile)
+                    ),
+                    checksum_method=flowcell_obj.checksum_method,
+                )
+                for fqfile in exp_fastqfiles
+            ],
+            key=lambda x: x.filepath,
+        )
+        obs_objs = sorted(
+            flowcell_obj.get_files_for_experiment_ref(
+                experiment_ref=experiment_ref_obj
+            ),
+            key=lambda x: x.filepath,
+        )
+        assert obs_objs == exp_objs
+
+    def test_get_experiments(
+        self, flowcell_obj, samplesheet_rows, samplesheet_experiment_refs, monkeypatch
+    ):
+        def _samplesheet_rows(*args, **kwargs):
+            return samplesheet_rows
+
+        def _samplesheet_duplicate_rows(*args, **kwargs):
+            return samplesheet_rows + samplesheet_rows
+
+        monkeypatch.setattr(
+            snpseq_metadata.utilities, "parse_samplesheet_data", _samplesheet_rows
+        )
+        assert flowcell_obj.get_experiments() == samplesheet_experiment_refs
+
+        # assert that only unique experiments are returned
         monkeypatch.setattr(
             snpseq_metadata.utilities,
             "parse_samplesheet_data",
-            self._return_samplesheet_data,
+            _samplesheet_duplicate_rows,
         )
-        monkeypatch.setattr(Flowcell, "get_run_set", self._return_none)
+        assert flowcell_obj.get_experiments() == samplesheet_experiment_refs
 
-        runfolder_name = "this-is-a-runfolder-name"
-        runfolder_path = os.path.join(
-            "/this", "is", "a", "runfolder", "path", runfolder_name
+        # assert that experiments can be restricted by project
+        project_id = samplesheet_rows[0]["sample_project"]
+        exp_experiments = list(
+            filter(
+                lambda x: x.project.project_id == project_id,
+                samplesheet_experiment_refs,
+            )
         )
-        samplesheet_name = "this-is-a-supplied-samplesheet"
-        run_parameters_name = "this-is-a-supplied-run_parameters"
+        flowcell_obj.project_id = project_id
+        assert flowcell_obj.get_experiments() == exp_experiments
 
-        fc = Flowcell(
-            runfolder_path=runfolder_path,
-            samplesheet=samplesheet_name,
-            run_parameters=run_parameters_name,
+        # assert that experiments can be restricted by sample
+        sample_id = samplesheet_rows[0]["sample_id"]
+        exp_experiments = list(
+            filter(lambda x: x.sample.sample_id == sample_id, exp_experiments)
         )
-        experiments = fc.get_experiments()
-
-        samplesheet_data = self._return_samplesheet_data()
-        experiment_names = list(
-            set([row["description"].split(":")[-1] for row in samplesheet_data])
-        )
-        assert sorted(
-            [experiment.experiment_name for experiment in experiments]
-        ) == sorted(experiment_names)
-
-    def test_get_checksumfile(self, monkeypatch):
-        runfolder_path = os.path.join(".", "resources")
-        monkeypatch.setattr(Flowcell, "get_run_set", self._return_none)
-        fc = Flowcell(
-            runfolder_path=runfolder_path,
-            samplesheet="this-is-a-samplesheet",
-            run_parameters="this-is-run-parameters",
-        )
-        assert fc.get_checksumfile() == os.path.join(
-            runfolder_path, "MD5", "checksums.md5"
-        )
-
-    def test_get_fastqdir_for_experiment(self, monkeypatch):
-        runfolder_name = "this-is-a-runfolder-name"
-        runfolder_path = os.path.join(
-            "/this", "is", "a", "runfolder", "path", runfolder_name
-        )
-        samplesheet_name = "this-is-a-supplied-samplesheet"
-        run_parameters_name = "this-is-a-supplied-run_parameters"
-        monkeypatch.setattr(Flowcell, "get_run_set", self._return_none)
-
-        fc = Flowcell(
-            runfolder_path=runfolder_path,
-            samplesheet=samplesheet_name,
-            run_parameters=run_parameters_name,
-        )
-        monkeypatch.setattr(os.path, "isdir", self._return_true)
-        monkeypatch.setattr(os, "listdir", self._return_os_listdir)
-
-        experiment_ref = ExperimentRef(
-            experiment_name="this-is-an-experiment-name",
-            sample_project="SampleProject",
-            sample_id="SampleID",
-        )
-        fastq_dir = fc.get_fastqdir_for_experiment(experiment=experiment_ref)
-        assert fastq_dir == os.path.join(
-            runfolder_path,
-            "Unaligned",
-            f"Project_{experiment_ref.sample_project}",
-            experiment_ref.sample_id,
-        )
-
-        experiment_ref = ExperimentRef(
-            experiment_name="this-is-another-experiment-name",
-            sample_project="AnotherProject",
-            sample_id="AnotherSampleID",
-        )
-        fastq_dir = fc.get_fastqdir_for_experiment(experiment=experiment_ref)
-        assert fastq_dir == os.path.join(
-            runfolder_path,
-            "Unaligned",
-            experiment_ref.sample_project,
-            f"Sample_{experiment_ref.sample_id}",
-        )
-
-    def test_integration(self):
-        runfolder_path = os.path.join(".", "resources", "210415_A00001_0123_BXYZ321XY")
-        fc = Flowcell(runfolder_path=runfolder_path)
-        print(fc.to_xml())
+        flowcell_obj.sample_id = sample_id
+        assert flowcell_obj.get_experiments() == exp_experiments

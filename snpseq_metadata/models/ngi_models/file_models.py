@@ -25,7 +25,7 @@ class NGIResultFile(NGIMetadataModel):
         )
 
     @classmethod
-    def from_json(cls: Type[T], json_obj: Dict) -> T:
+    def from_json(cls: Type[T], json_obj: Dict[str, str]) -> T:
         return cls(
             filepath=json_obj.get("filepath"),
             filetype=json_obj.get("filetype"),

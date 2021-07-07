@@ -1,16 +1,10 @@
-from snpseq_metadata.models.ngi_models import NGIRun, NGIExperimentRef
+from snpseq_metadata.models.ngi_models import NGIRun
 
 
 class TestNGIRun:
-    def test_to_json(self):
-        run_alias = "this-is-a-run-alias"
-        run_center = "National Genomics Infrastructure, Uppsala"
-        experiment_name = "this-is-an-experiment-ref"
-        sample_project = "this-is-a-sample-project"
-        sample_id = "this-is-a-sample-id"
-        experiment_ref = NGIExperimentRef(
-            experiment_name=experiment_name,
-            project_id=sample_project,
-            sample_id=sample_id,
-        )
-        run = NGIRun(run_alias=run_alias, experiment_ref=experiment_ref)
+    def test_from_json(self, run_obj, run_json):
+        run = NGIRun.from_json(json_obj=run_json)
+        assert run == run_obj
+
+    def test_to_json(self, run_obj, run_json):
+        assert run_obj.to_json() == run_json
