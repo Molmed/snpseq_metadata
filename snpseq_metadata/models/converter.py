@@ -35,7 +35,11 @@ from snpseq_metadata.models.lims_models import (
 from snpseq_metadata.models.ngi_to_sra_library_mapping import (
     ApplicationSampleTypeMapping,
 )
-from snpseq_metadata.exceptions import LibraryStrategyNotRecognizedException
+from snpseq_metadata.exceptions import (
+    LibraryStrategyNotRecognizedException,
+    InstrumentModelNotRecognizedException,
+    SomethingNotRecognizedException,
+)
 
 T = TypeVar("T", bound="Converter")
 
@@ -193,7 +197,12 @@ class ConvertSequencingPlatform(Converter):
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
         if lims_model:
-            return cls.ngi_model_class(model_name=lims_model.udf_sequencing_instrument)
+            try:
+                return cls.ngi_model_class(
+                    model_name=lims_model.udf_sequencing_instrument
+                )
+            except AttributeError:
+                raise InstrumentModelNotRecognizedException(needle="None")
 
 
 class ConvertRunSet(Converter):
@@ -281,7 +290,7 @@ class ConvertExperimentSet(Converter):
                 experiments=[
                     Converter.ngi_to_sra(ngi_experiment)
                     for ngi_experiment in ngi_model.experiments or []
-                ],
+                ]
             )
 
     @classmethod
@@ -290,10 +299,15 @@ class ConvertExperimentSet(Converter):
     ) -> Optional[ngi_model_class]:
         if lims_model:
             return cls.ngi_model_class(
-                [
-                    ConvertExperiment.lims_to_ngi(lims_model=lims_sample)
-                    for lims_sample in lims_model.samples or []
-                ]
+                list(
+                    filter(
+                        lambda e: e is not None,
+                        [
+                            ConvertExperiment.lims_to_ngi(lims_model=lims_sample)
+                            for lims_sample in lims_model.samples or []
+                        ],
+                    )
+                )
             )
 
 
@@ -378,9 +392,9 @@ class ConvertLibrary(Converter):
                 needle=f"{application}:{sample_type}:{library_kit}"
             )
         return (
-            mapping_obj.sra_library_selection.name,
-            mapping_obj.sra_library_source.name,
-            mapping_obj.sra_library_strategy.name,
+            mapping_obj.sra_library_selection.value,
+            mapping_obj.sra_library_source.value,
+            mapping_obj.sra_library_strategy.value,
         )
 
 
@@ -411,12 +425,16 @@ class ConvertExperiment(Converter):
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
         if lims_model:
-            sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
-            project = ConvertStudyRef.lims_to_ngi(lims_model=lims_model)
-            platform = ConvertSequencingPlatform.lims_to_ngi(lims_model=lims_model)
-            alias = f"{project.project_id}-{sample.sample_id}-{platform.model_name}"
-            library = ConvertLibrary.lims_to_ngi(lims_model=lims_model)
-            title = f"{project.project_id} - {library.description}"
+            try:
+                sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
+                project = ConvertStudyRef.lims_to_ngi(lims_model=lims_model)
+                platform = ConvertSequencingPlatform.lims_to_ngi(lims_model=lims_model)
+                alias = f"{project.project_id}-{sample.sample_id}-{platform.model_name}"
+                library = ConvertLibrary.lims_to_ngi(lims_model=lims_model)
+                title = f"{project.project_id} - {library.description}"
+            except SomethingNotRecognizedException as ex:
+                print(ex)
+                return None
             return cls.ngi_model_class(
                 alias=alias,
                 title=title,

@@ -71,7 +71,7 @@ class SRALibrary(SRAMetadataModel):
 
     @staticmethod
     def _dict_from_enum(enum_cls: TLS) -> Dict[str, TLS]:
-        return {e.name.lower(): e for e in list(enum_cls)}
+        return {e.value.lower(): e for e in list(enum_cls)}
 
     @classmethod
     def create_object(
@@ -110,7 +110,7 @@ class SRALibrary(SRAMetadataModel):
             manifest.append(
                 (
                     field.metadata["name"],
-                    getattr(self.model_object.library_descriptor, field.name).value,
+                    getattr(self.model_object.library_descriptor, field.name).name,
                 )
             )
         manifest.extend(self.sample.to_manifest())

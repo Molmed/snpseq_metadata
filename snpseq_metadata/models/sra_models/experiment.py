@@ -8,7 +8,7 @@ from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.sra_models.study import SRAStudyRef
 from snpseq_metadata.models.xsdata import (
     Run,
-    Experiment as XSDExperiment,
+    ExperimentType as XSDExperiment,
     ExperimentSet as XSDExperimentSet,
 )
 
@@ -34,14 +34,6 @@ class SRAExperimentBase(SRAMetadataModel):
 
 class SRAExperimentRef(SRAExperimentBase):
     model_object_class: ClassVar[Type] = Run.ExperimentRef
-
-    def __eq__(self, other: TR) -> bool:
-        return all(
-            [
-                isinstance(other, SRAExperimentRef),
-                self.model_object.refname == other.model_object.refname,
-            ]
-        )
 
     def __str__(self) -> str:
         return self.model_object.refname

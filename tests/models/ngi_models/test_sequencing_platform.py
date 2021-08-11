@@ -8,17 +8,17 @@ from snpseq_metadata.models.ngi_models import (
 
 
 class TestNGISequencingPlatform:
-    def test_from_json(self, platform_obj, platform_json):
-        platform = NGISequencingPlatform.from_json(json_obj=platform_json)
-        assert platform == platform_obj
+    def test_from_json(self, ngi_platform_obj, ngi_platform_json):
+        platform = NGISequencingPlatform.from_json(json_obj=ngi_platform_json)
+        assert platform == ngi_platform_obj
 
-    def test_to_json(self, platform_obj, platform_json):
-        assert platform_obj.to_json() == platform_json
+    def test_to_json(self, ngi_platform_obj, ngi_platform_json):
+        assert ngi_platform_obj.to_json() == ngi_platform_json
 
 
 class TestNGIIlluminaSequencingPlatform:
-    def test_model_name_from_id(self, model_prefixes):
-        for model_id, model_name in model_prefixes.items():
+    def test_model_name_from_id(self, illumina_model_prefixes):
+        for model_id, model_name in illumina_model_prefixes.items():
             assert (
                 NGIIlluminaSequencingPlatform.model_name_from_id(model_id=model_id)
                 == model_name
