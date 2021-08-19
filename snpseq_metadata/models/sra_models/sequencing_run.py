@@ -52,7 +52,7 @@ class SRARun(SRAMetadataModel):
         )
 
     def to_manifest(self) -> List[Tuple[str, str]]:
-        manifest = self.experiment.get_reference().to_manifest()
-        for fastq in self.fastqfiles:
-            manifest.extend(fastq.to_manifest())
+        manifest = []
+        for fastqfile in self.fastqfiles:
+            manifest.extend(fastqfile.to_manifest())
         return manifest

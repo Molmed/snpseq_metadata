@@ -584,8 +584,8 @@ def sra_sequencing_run_json(test_values, sra_experiment_ref_json, sra_result_fil
 
 
 @pytest.fixture
-def sra_sequencing_run_manifest(sra_experiment_ref_manifest, sra_result_file_manifest):
-    return sra_experiment_ref_manifest + sra_result_file_manifest
+def sra_sequencing_run_manifest(sra_result_file_manifest):
+    return sra_result_file_manifest
 
 
 @pytest.fixture

@@ -35,14 +35,29 @@ Options:
 Commands:
   export
   extract
-``` 
+```
 
 ### extract
-The `extract` subcommand is used to parse a runfolder and extract the metadata:
+The `extract` subcommand is used to parse a runfolder from disk and extract the metadata, or parse data from
+ the [snpseq_data](https://gitlab.snpseq.medsci.uu.se/shared/snpseq-data) service and export to the specified format:
 ```
 $ snpseq_metadata extract --help
-Usage: snpseq_metadata extract [OPTIONS] RUNFOLDER COMMAND1 [ARGS]...
-                               [COMMAND2 [ARGS]...]...
+Usage: snpseq_metadata extract [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  runfolder
+  snpseq-data
+```
+#### runfolder
+The `runfolder` subcommand is used to parse a runfolder from disk, extract the necessary metadata and export to the
+specified format.
+```
+$ snpseq_metadata extract runfolder --help
+Usage: snpseq_metadata extract runfolder [OPTIONS] RUNFOLDER_PATH COMMAND1
+                                         [ARGS]... [COMMAND2 [ARGS]...]...
 
 Options:
   -o, --outdir PATH  [default: current working directory]
@@ -51,29 +66,60 @@ Options:
 Commands:
   json
 ```
-Here, `RUNFOLDER` is the path to the sequencing runfolder for which metadata should be exported.
+Here, `RUNFOLDER_PATH` is the path to the sequencing runfolder for which metadata should be exported.
 Some test data are available under `tests/resources` and extracting metadata to json can be accomplished by:
 ```
-$ snpseq_metadata export \
+$ snpseq_metadata extract runfolder \
   -o /tmp/ \
   tests/resources/210415_A00001_0123_BXYZ321XY
   json
 ```
-This will parse the runfolder into the python NGI models and serialize the models to json, saved under the specified 
+This will parse the runfolder into the python NGI models and serialize the models to json, saved under the specified
 output directory:
 ```
 /tmp
-└── 210415_A00001_0123_BXYZ321XY.json
-``` 
+└── 210415_A00001_0123_BXYZ321XY.ngi.json
+```
+
+#### snpseq-data
+The `snpseq-data` subcommand is used to parse data exported from the
+[snpseq_data](https://gitlab.snpseq.medsci.uu.se/shared/snpseq-data) service and export to the specified format.
+```
+$ snpseq_metadata extract snpseq-data --help
+Usage: snpseq_metadata extract snpseq-data [OPTIONS] SNPSEQ_DATA_FILE COMMAND1
+                                           [ARGS]... [COMMAND2 [ARGS]...]...
+
+Options:
+  -o, --outdir PATH  [default: current working directory]
+  --help             Show this message and exit.
+
+Commands:
+  json
+```
+Here, `SNPSEQ_DATA_FILE` is the path to a json-file containing metadata for a flowcell obtained from the
+[snpseq_data](https://gitlab.snpseq.medsci.uu.se/shared/snpseq-data) service. Some test data are available under
+`tests/resources` and extracting metadata to json can be accomplished by:
+```
+$ snpseq_metadata extract snpseq-data \
+  -o /tmp/ \
+  tests/resources/snpseq_data_XYZ321XY.json
+  json
+```
+This will parse the metadata into the python NGI models and serialize the models to json, saved under the specified
+output directory:
+```
+/tmp
+└── /snpseq_data_XYZ321XY.ngi.json
+```
 
 ### export
 
-The `export` subcommand is used to parse metadata into python SRA models and serialize the models into the desired 
-formats:
+The `export` subcommand is used to parse the extracted NGI model metadata from json into python SRA models and
+serialize the models into the specified formats:
 ```
 $ snpseq_metadata export
-Usage: snpseq_metadata export [OPTIONS] RUNFOLDER DATA COMMAND1 [ARGS]...
-                              [COMMAND2 [ARGS]...]...
+Usage: snpseq_metadata export [OPTIONS] RUNFOLDER_DATA SNPSEQ_DATA COMMAND1
+                              [ARGS]... [COMMAND2 [ARGS]...]...
 
 Options:
   -o, --outdir PATH  [default: current working directory]
@@ -83,24 +129,24 @@ Commands:
   json
   manifest
   xml
-``` 
+```
 
-Here, `RUNFOLDER` is the path to a json file with serialized NGI runfolder metadata (created with the `extract` 
-subcommand above), for which metadata should be exported and `DATA` is the path to a json-file with project metadata, 
-exported by the [snpseq_data](https://gitlab.snpseq.medsci.uu.se/shared/snpseq-data) service.
+Here, `RUNFOLDER_DATA` is the path to a json file with serialized NGI runfolder metadata (created with the
+`extract runfolder` subcommand above), for which metadata should be exported and `SNPSEQ_DATA` is the path to a
+json-file with serialized NGI experiment metadata (created with the `extract snpseq-data` subcommand above).
 
-Some test data are available under `tests/resources` and exporting metadata compatible with the SRA XML submission 
+Some test data are available under `tests/resources` and exporting metadata compatible with the SRA XML submission
 format and also to a human-friendly manifest (compatible with SRA submissions) can be accomplished by:
 
 ```
 $ snpseq_metadata export \
   -o /tmp/ \
   tests/resources/210415_A00001_0123_BXYZ321XY.ngi.json \
-  tests/resources/snpseq_data_XYZ321XY.json \
+  tests/resources/snpseq_data_XYZ321XY.ngi.json \
   xml manifest
 ```
-For each unique project, this will export a pair of XML-files representing metadata for the RUN and EXPERIMENT objects 
-and one manifest file for each sample. For the test data set, the command above will create:
+For each unique project, this will export a pair of XML-files representing metadata for the RUN and EXPERIMENT objects
+and one manifest file for each unique experiment. For the test data set, the command above will create:
 ```
 /tmp/
 ├── AB-1234-experiment.xml
@@ -109,29 +155,29 @@ and one manifest file for each sample. For the test data set, the command above 
 ├── CD-5678-run.xml
 ├── EF-9012-experiment.xml
 ├── EF-9012-run.xml
-├── AB-1234-Sample_AB-1234-SampleA-1.manifest
-├── AB-1234-Sample_AB-1234-SampleA-2.manifest
-├── AB-1234-Sample_AB-1234-SampleB.manifest
-├── CD-5678-CD-5678-SampleA-1.manifest
-├── CD-5678-CD-5678-SampleA-2.manifest
-└── CD-5678-CD-5678-SampleB.manifest
+├── AB-1234-Sample_AB-1234-SampleA-1-NovaSeq.manifest
+├── AB-1234-Sample_AB-1234-SampleA-2-NovaSeq.manifest
+├── AB-1234-Sample_AB-1234-SampleB-NovaSeq.manifest
+├── CD-5678-CD-5678-SampleA-1-NovaSeq.manifest
+├── CD-5678-CD-5678-SampleA-2-NovaSeq.manifest
+└── CD-5678-CD-5678-SampleB-NovaSeq.manifest
 ```
 ## Package structure
-The code is built around the concept of having a set of classes represent metadata and provide internal logic, 
-functionality for serializing and de-serializing etc. Such a set of classes can then represent metadata from a specific 
-source (e.g. LIMS, SRA) and are collected as a separate module under `snpseq_metadata/models/[source]_models`. 
+The code is built around the concept of having a set of classes represent metadata and provide internal logic,
+functionality for serializing and de-serializing etc. Such a set of classes can then represent metadata from a specific
+source (e.g. LIMS, NGI, SRA) and are collected as a separate module under `snpseq_metadata/models/[source]_models`.
 
-A conversion layer that provide functionality to convert between metadata models is provided in 
-`snpseq_metadata/models/converter.py`, with the help of library mappings from NGI to SRA terminologies in 
+A conversion layer that provide functionality to convert between metadata models is provided in
+`snpseq_metadata/models/converter.py`, with the help of library mappings from NGI to SRA terminologies in
 `snpseq_metadata/models/ngi_to_sra_library_mapping.py`.
 
 
 ### xsdata
-The [xsdata](https://xsdata.readthedocs.io/en/latest/) library was used to create python dataclasses from the XML 
+The [xsdata](https://xsdata.readthedocs.io/en/latest/) library was used to create python dataclasses from the XML
 schemas provided by SRA. The `snpseq_metadata` package contains wrappers around these dataclasses and functionality for
 converting between different data models.
 
-This is the typical command for creating the python dataclasses for the XML schema files located in `resources/schema` 
+This is the typical command for creating the python dataclasses for the XML schema files located in `resources/schema`
 using xsdata:
 ```
 $ cd snpseq_metadata/models && \
@@ -140,28 +186,28 @@ $ cd snpseq_metadata/models && \
 ```
 
 ### NGI to SRA library mapping
-The SRA model have a terminology for 
-[Library selection](https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#permitted-values-for-library-selection), 
-[Library source](https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#permitted-values-for-library-source) and 
-[Library strategy](https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#permitted-values-for-library-strategy) that 
-is not directly translatable from the fields stored in e.g. Clarity LIMS. Therefore, the file 
+The SRA model have a terminology for
+[Library selection](https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#permitted-values-for-library-selection),
+[Library source](https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#permitted-values-for-library-source) and
+[Library strategy](https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#permitted-values-for-library-strategy) that
+is not directly translatable from the fields stored in e.g. Clarity LIMS. Therefore, the file
 `snpseq_metadata/models/ngi_to_sra_library_mapping.py` contains functionality for mapping the NGI terminology to the SRA
 terminology.
 
-To add a new mapping for a application, sample type and sample prep kit, create a class that is a subclass of 
-`ApplicationSampleTypeMapping` and has class variables 
+To add a new mapping for a application, sample type and sample prep kit, create a class that is a subclass of
+`ApplicationSampleTypeMapping` and has class variables
 ```
 ngi_application
 ngi_sample_type
 ngi_sample_prep_kit
-``` 
-containing the possible values (in lower case) stored in Clarity LIMS. Use the class variables 
 ```
-sra_library_strategy 
+containing the possible values (in lower case) stored in Clarity LIMS. Use the class variables
+```
+sra_library_strategy
 sra_library_source
 sra_library_source
 ```
-to specify the corresponding SRA values. 
+to specify the corresponding SRA values.
 Here is an example for bisulfite sequencing libraries:
 ```
 class Bisulphite(ApplicationSampleTypeMapping):
@@ -178,5 +224,5 @@ class Bisulphite(ApplicationSampleTypeMapping):
     sra_library_selection = TypeLibrarySelection.RANDOM
 
 ```
-The `ApplicationSampleTypeMapping` class contains logic for finding the 
+The `ApplicationSampleTypeMapping` class contains logic for finding the
 correct mapping from a NGI model. If needed, this logic can be overridden in the subclass.
