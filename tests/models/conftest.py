@@ -90,13 +90,15 @@ def lims_sample_obj(lims_sample_json):
 
 @pytest.fixture
 def lims_sequencing_container_json(test_values, lims_sample_json):
-    return {"name": test_values["container_name"], "samples": [lims_sample_json]}
+    return {
+        "result": {"name": test_values["container_name"], "samples": [lims_sample_json]}
+    }
 
 
 @pytest.fixture
 def lims_sequencing_container_obj(lims_sequencing_container_json, lims_sample_obj):
     return LIMSSequencingContainer(
-        name=lims_sequencing_container_json["name"], samples=[lims_sample_obj]
+        name=lims_sequencing_container_json["result"]["name"], samples=[lims_sample_obj]
     )
 
 

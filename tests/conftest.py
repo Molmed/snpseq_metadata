@@ -92,12 +92,12 @@ def runfolder_sra_manifest(runfolder_sra_manifest_file):
 
 @pytest.fixture
 def experiment_set_name(experiment_set_lims_json):
-    return experiment_set_lims_json["name"]
+    return experiment_set_lims_json["result"]["name"]
 
 
 @pytest.fixture
 def experiment_set_samples(experiment_set_lims_json):
-    return experiment_set_lims_json["samples"]
+    return experiment_set_lims_json["result"]["samples"]
 
 
 @pytest.fixture
