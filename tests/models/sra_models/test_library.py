@@ -2,29 +2,31 @@ from snpseq_metadata.models.sra_models import SRALibrary
 
 
 class TestSRALibrary:
-    def test_from_json(self, library_obj, library_json):
-        library = SRALibrary.from_json(json_obj=library_json)
-        assert library == library_obj.model_object
+    def test_from_json(self, sra_library_obj, sra_library_json):
+        library = SRALibrary.from_json(json_obj=sra_library_json)
+        assert library == sra_library_obj.model_object
 
-    def test_to_json(self, library_obj, library_json):
-        assert library_obj.to_json() == library_json
+    def test_to_json(self, sra_library_obj, sra_library_json):
+        assert sra_library_obj.to_json() == sra_library_json
 
-    def test_to_manifest(self, library_obj, library_manifest):
-        assert library_obj.to_manifest() == library_manifest
+    def test_to_manifest(self, sra_library_obj, sra_library_manifest):
+        assert sra_library_obj.to_manifest() == sra_library_manifest
 
-    def test_to_xml(self, library_obj, library_xml):
-        assert "".join(library_xml.split()) in "".join(library_obj.to_xml().split())
+    def test_to_xml(self, sra_library_obj, sra_library_xml):
+        assert "".join(sra_library_xml.split()) in "".join(
+            sra_library_obj.to_xml().split()
+        )
 
-    def test_create_object(self, library_obj, library_json, sample_obj):
+    def test_create_object(self, sra_library_obj, sra_library_json, sra_sample_obj):
         library = SRALibrary.create_object(
-            sample=sample_obj,
-            description=library_json["DESIGN_DESCRIPTION"],
-            strategy=library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_STRATEGY"],
-            source=library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SOURCE"],
-            selection=library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SELECTION"],
-            is_paired=list(library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_LAYOUT"].keys())[
-                0
-            ]
+            sample=sra_sample_obj,
+            description=sra_library_json["DESIGN_DESCRIPTION"],
+            strategy=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_STRATEGY"],
+            source=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SOURCE"],
+            selection=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SELECTION"],
+            is_paired=list(
+                sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_LAYOUT"].keys()
+            )[0]
             == "PAIRED",
         )
-        assert library == library_obj
+        assert library == sra_library_obj

@@ -1,22 +1,16 @@
-import pytest
 from snpseq_metadata.models.lims_models import LIMSSequencingContainer
 
 
-@pytest.fixture
-def sequencing_container_json():
-    return {"name": "this-is-a-sequencing-container-name", "samples": []}
-
-
 class TestLIMSSequencingContainer:
-    def test_from_json(self, sequencing_container_json):
+    def test_from_json(
+        self, lims_sequencing_container_json, lims_sequencing_container_obj
+    ):
         sequencing_container = LIMSSequencingContainer.from_json(
-            json_obj=sequencing_container_json
+            json_obj=lims_sequencing_container_json
         )
-        assert sequencing_container.name == sequencing_container_json["name"]
-        assert sequencing_container.samples == sequencing_container_json["samples"]
+        assert sequencing_container == lims_sequencing_container_obj
 
-    def test_to_json(self, sequencing_container_json):
-        sequencing_container = LIMSSequencingContainer.from_json(
-            json_obj=sequencing_container_json
-        )
-        assert sequencing_container.to_json() == sequencing_container_json
+    def test_to_json(
+        self, lims_sequencing_container_json, lims_sequencing_container_obj
+    ):
+        assert lims_sequencing_container_obj.to_json() == lims_sequencing_container_json

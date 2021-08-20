@@ -114,7 +114,7 @@ class UnspecifiedLibrary(ApplicationSampleTypeMapping):
 
     sra_library_strategy = TypeLibraryStrategy.OTHER
     sra_library_source = TypeLibrarySource.OTHER
-    sra_library_selection = TypeLibrarySelection.UNSPECIFIED
+    sra_library_selection = TypeLibrarySelection.OTHER
 
 
 class RNASeqApplication(ApplicationSampleTypeMapping):

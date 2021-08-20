@@ -13,96 +13,106 @@ from snpseq_metadata.models.ngi_models import (
 
 
 class TestNGIFlowcell:
-    def test_from_json(self, flowcell_obj, flowcell_json):
-        flowcell = NGIFlowcell.from_json(json_obj=flowcell_json)
-        assert flowcell == flowcell_obj
+    def test_from_json(self, ngi_flowcell_obj, ngi_flowcell_json):
+        flowcell = NGIFlowcell.from_json(json_obj=ngi_flowcell_json)
+        assert flowcell == ngi_flowcell_obj
 
-    def test_to_json(self, flowcell_obj, flowcell_json):
-        obs_json = flowcell_obj.to_json()
-        assert {k: obs_json.get(k) for k in flowcell_json.keys()} == flowcell_json
+    def test_to_json(self, ngi_flowcell_obj, ngi_flowcell_json):
+        obs_json = ngi_flowcell_obj.to_json()
+        assert {
+            k: obs_json.get(k) for k in ngi_flowcell_json.keys()
+        } == ngi_flowcell_json
 
-    def test_get_run_date(self, flowcell_obj, run_date):
-        flowcell_obj.runfolder_name = f"{run_date.strftime('%y%m%d')}_whatever..."
-        assert flowcell_obj.get_run_date() == run_date
+    def test_get_run_date(self, ngi_flowcell_obj, run_date):
+        ngi_flowcell_obj.runfolder_name = f"{run_date.strftime('%y%m%d')}_whatever..."
+        assert ngi_flowcell_obj.get_run_date() == run_date
 
-        flowcell_obj.runfolder_name = f"{run_date.strftime('%Y%m%d')}_whatever..."
-        assert flowcell_obj.get_run_date() == run_date
+        ngi_flowcell_obj.runfolder_name = f"{run_date.strftime('%Y%m%d')}_whatever..."
+        assert ngi_flowcell_obj.get_run_date() == run_date
 
-        flowcell_obj.runfolder_name = "this-can-not-be-parsed-as-a-date"
-        assert flowcell_obj.get_run_date() is None
+        ngi_flowcell_obj.runfolder_name = "this-can-not-be-parsed-as-a-date"
+        assert ngi_flowcell_obj.get_run_date() is None
 
-    def test_get_sequencing_platform(self, flowcell_obj, model_prefixes):
-        (model_id, model_name) = model_prefixes.popitem()
-        flowcell_obj.runfolder_name = f"datestring_{model_id}_whatever..."
-        platform = flowcell_obj.get_sequencing_platform()
+    def test_get_sequencing_platform(self, ngi_flowcell_obj, illumina_model_prefixes):
+        (model_id, model_name) = illumina_model_prefixes.popitem()
+        ngi_flowcell_obj.runfolder_name = f"datestring_{model_id}_whatever..."
+        platform = ngi_flowcell_obj.get_sequencing_platform()
         assert isinstance(platform, NGIIlluminaSequencingPlatform)
         assert platform.model_name == model_name
 
-    def test_get_checksumfile(self, flowcell_obj, monkeypatch):
-        assert flowcell_obj.get_checksumfile() is None
+    def test_get_checksumfile(self, ngi_flowcell_obj, monkeypatch):
+        assert ngi_flowcell_obj.get_checksumfile() is None
         monkeypatch.setattr(os.path, "exists", lambda x: True)
         exp_checksum_file = os.path.join(
-            flowcell_obj.runfolder_path, flowcell_obj.checksum_method, "checksums.md5"
+            ngi_flowcell_obj.runfolder_path,
+            ngi_flowcell_obj.checksum_method,
+            "checksums.md5",
         )
-        assert flowcell_obj.get_checksumfile() == exp_checksum_file
+        assert ngi_flowcell_obj.get_checksumfile() == exp_checksum_file
 
     def test_get_sequencing_run_for_experiment(
-        self, flowcell_obj, experiment_obj, run_obj
+        self, ngi_flowcell_obj, ngi_experiment_obj, ngi_sequencing_run_obj
     ):
-        obs_run_obj = flowcell_obj.get_sequencing_run_for_experiment(
-            experiment=experiment_obj
+        obs_run_obj = ngi_flowcell_obj.get_sequencing_run_for_experiment(
+            experiment=ngi_experiment_obj
         )
-        assert obs_run_obj == run_obj
+        assert obs_run_obj == ngi_sequencing_run_obj
 
-        flowcell_obj.sequencing_runs = []
+        ngi_flowcell_obj.sequencing_runs = []
         assert (
-            flowcell_obj.get_sequencing_run_for_experiment(experiment=experiment_obj)
+            ngi_flowcell_obj.get_sequencing_run_for_experiment(
+                experiment=ngi_experiment_obj
+            )
             is None
         )
 
     def test_get_sequencing_run_for_experiment_ref(
-        self, flowcell_obj, experiment_ref_obj, fastq_file_obj, monkeypatch
+        self, ngi_flowcell_obj, ngi_experiment_ref_obj, ngi_fastq_file_obj, monkeypatch
     ):
         def fastqfiles(**kwargs):
-            return [fastq_file_obj, fastq_file_obj]
+            return [ngi_fastq_file_obj, ngi_fastq_file_obj]
 
         exp_run_obj = NGIRun(
-            run_alias=f"{experiment_ref_obj.project.project_id}-{experiment_ref_obj.sample.sample_id}-{flowcell_obj.flowcell_id}",
-            experiment=experiment_ref_obj,
-            platform=flowcell_obj.platform,
-            run_date=flowcell_obj.run_date,
+            run_alias=f"{ngi_experiment_ref_obj.project.project_id}-{ngi_experiment_ref_obj.sample.sample_id}-{ngi_flowcell_obj.flowcell_id}",
+            experiment=ngi_experiment_ref_obj,
+            platform=ngi_flowcell_obj.platform,
+            run_date=ngi_flowcell_obj.run_date,
             fastqfiles=fastqfiles(),
         )
 
         monkeypatch.setattr(
-            flowcell_obj,
+            ngi_flowcell_obj,
             "get_files_for_experiment_ref",
             fastqfiles,
         )
-        obs_run_obj = flowcell_obj.get_sequencing_run_for_experiment_ref(
-            experiment_ref=experiment_ref_obj
+        obs_run_obj = ngi_flowcell_obj.get_sequencing_run_for_experiment_ref(
+            experiment_ref=ngi_experiment_ref_obj
         )
         assert obs_run_obj == exp_run_obj
 
     def test_get_fastqdir_for_experiment_ref(
-        self, flowcell_obj, experiment_ref_obj, tmpdir
+        self, ngi_flowcell_obj, ngi_experiment_ref_obj, tmpdir
     ):
         def _fastqdir_helper(l1, l2, l3, should_fail=False):
             runfolder = os.path.join(tmpdir, str(uuid.uuid4()))
-            flowcell_obj.runfolder_path = runfolder
+            ngi_flowcell_obj.runfolder_path = runfolder
             fastqdir = os.path.join(runfolder, l1, l2, l3)
             os.makedirs(fastqdir)
             if should_fail:
                 with pytest.raises(FastqFileLocationNotFoundException):
-                    flowcell_obj.get_fastqdir_for_experiment_ref(experiment_ref_obj)
+                    ngi_flowcell_obj.get_fastqdir_for_experiment_ref(
+                        ngi_experiment_ref_obj
+                    )
             else:
                 assert (
-                    flowcell_obj.get_fastqdir_for_experiment_ref(experiment_ref_obj)
+                    ngi_flowcell_obj.get_fastqdir_for_experiment_ref(
+                        ngi_experiment_ref_obj
+                    )
                     == fastqdir
                 )
 
-        project_id = experiment_ref_obj.project.project_id
-        sample_id = experiment_ref_obj.sample.sample_id
+        project_id = ngi_experiment_ref_obj.project.project_id
+        sample_id = ngi_experiment_ref_obj.sample.sample_id
         for level_1 in ["Unaligned", "Demultiplexing"]:
             for level_2 in [project_id, f"Project_{project_id}"]:
                 for level_3 in [sample_id, f"Sample_{sample_id}"]:
@@ -118,7 +128,7 @@ class TestNGIFlowcell:
         )
 
     def test_get_files_for_experiment_ref(
-        self, flowcell_obj, experiment_ref_obj, tmpdir, monkeypatch
+        self, ngi_flowcell_obj, ngi_experiment_ref_obj, tmpdir, monkeypatch
     ):
         def _fastqdir(*args, **kwargs):
             return os.path.join(tmpdir, "fastq")
@@ -127,11 +137,13 @@ class TestNGIFlowcell:
             return querypath
 
         # set up the test
-        monkeypatch.setattr(flowcell_obj, "get_fastqdir_for_experiment_ref", _fastqdir)
+        monkeypatch.setattr(
+            ngi_flowcell_obj, "get_fastqdir_for_experiment_ref", _fastqdir
+        )
         monkeypatch.setattr(
             snpseq_metadata.utilities, "lookup_checksum_from_file", _checksum
         )
-        flowcell_obj.runfolder_path = tmpdir
+        ngi_flowcell_obj.runfolder_path = tmpdir
 
         # define and touch files expected to be found and not to be found
         exp_fastqfiles = [
@@ -164,22 +176,26 @@ class TestNGIFlowcell:
                     checksum=os.path.join(
                         os.path.basename(tmpdir), "fastq", os.path.basename(fqfile)
                     ),
-                    checksum_method=flowcell_obj.checksum_method,
+                    checksum_method=ngi_flowcell_obj.checksum_method,
                 )
                 for fqfile in exp_fastqfiles
             ],
             key=lambda x: x.filepath,
         )
         obs_objs = sorted(
-            flowcell_obj.get_files_for_experiment_ref(
-                experiment_ref=experiment_ref_obj
+            ngi_flowcell_obj.get_files_for_experiment_ref(
+                experiment_ref=ngi_experiment_ref_obj
             ),
             key=lambda x: x.filepath,
         )
         assert obs_objs == exp_objs
 
     def test_get_experiments(
-        self, flowcell_obj, samplesheet_rows, samplesheet_experiment_refs, monkeypatch
+        self,
+        ngi_flowcell_obj,
+        samplesheet_rows,
+        samplesheet_experiment_refs,
+        monkeypatch,
     ):
         def _samplesheet_rows(*args, **kwargs):
             return samplesheet_rows
@@ -190,7 +206,7 @@ class TestNGIFlowcell:
         monkeypatch.setattr(
             snpseq_metadata.utilities, "parse_samplesheet_data", _samplesheet_rows
         )
-        assert flowcell_obj.get_experiments() == samplesheet_experiment_refs
+        assert ngi_flowcell_obj.get_experiments() == samplesheet_experiment_refs
 
         # assert that only unique experiments are returned
         monkeypatch.setattr(
@@ -198,7 +214,7 @@ class TestNGIFlowcell:
             "parse_samplesheet_data",
             _samplesheet_duplicate_rows,
         )
-        assert flowcell_obj.get_experiments() == samplesheet_experiment_refs
+        assert ngi_flowcell_obj.get_experiments() == samplesheet_experiment_refs
 
         # assert that experiments can be restricted by project
         project_id = samplesheet_rows[0]["sample_project"]
@@ -208,13 +224,13 @@ class TestNGIFlowcell:
                 samplesheet_experiment_refs,
             )
         )
-        flowcell_obj.project_id = project_id
-        assert flowcell_obj.get_experiments() == exp_experiments
+        ngi_flowcell_obj.project_id = project_id
+        assert ngi_flowcell_obj.get_experiments() == exp_experiments
 
         # assert that experiments can be restricted by sample
         sample_id = samplesheet_rows[0]["sample_id"]
         exp_experiments = list(
             filter(lambda x: x.sample.sample_id == sample_id, exp_experiments)
         )
-        flowcell_obj.sample_id = sample_id
-        assert flowcell_obj.get_experiments() == exp_experiments
+        ngi_flowcell_obj.sample_id = sample_id
+        assert ngi_flowcell_obj.get_experiments() == exp_experiments

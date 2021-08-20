@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <RUN_SET>
-  <RUN xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala" xsi:type="RUN">
+  <RUN center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala">
     <TITLE>AB-1234-Sample_AB-1234-SampleA-1-BXYZ321XY</TITLE>
     <EXPERIMENT_REF refname="AB-1234-Sample_AB-1234-SampleA-1-NovaSeq"/>
     <DATA_BLOCK>
@@ -12,7 +12,7 @@
       </FILES>
     </DATA_BLOCK>
   </RUN>
-  <RUN xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala" xsi:type="RUN">
+  <RUN center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala">
     <TITLE>AB-1234-Sample_AB-1234-SampleA-2-BXYZ321XY</TITLE>
     <EXPERIMENT_REF refname="AB-1234-Sample_AB-1234-SampleA-2-NovaSeq"/>
     <DATA_BLOCK>
@@ -24,7 +24,7 @@
       </FILES>
     </DATA_BLOCK>
   </RUN>
-  <RUN xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala" xsi:type="RUN">
+  <RUN center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala">
     <TITLE>AB-1234-Sample_AB-1234-SampleB-BXYZ321XY</TITLE>
     <EXPERIMENT_REF refname="AB-1234-Sample_AB-1234-SampleB-NovaSeq"/>
     <DATA_BLOCK>
@@ -36,7 +36,7 @@
       </FILES>
     </DATA_BLOCK>
   </RUN>
-  <RUN xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala" xsi:type="RUN">
+  <RUN center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala">
     <TITLE>CD-5678-CD-5678-SampleA-1-BXYZ321XY</TITLE>
     <EXPERIMENT_REF refname="CD-5678-CD-5678-SampleA-1-NovaSeq"/>
     <DATA_BLOCK>
@@ -48,7 +48,7 @@
       </FILES>
     </DATA_BLOCK>
   </RUN>
-  <RUN xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala" xsi:type="RUN">
+  <RUN center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala">
     <TITLE>CD-5678-CD-5678-SampleA-2-BXYZ321XY</TITLE>
     <EXPERIMENT_REF refname="CD-5678-CD-5678-SampleA-2-NovaSeq"/>
     <DATA_BLOCK>
@@ -60,7 +60,7 @@
       </FILES>
     </DATA_BLOCK>
   </RUN>
-  <RUN xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala" xsi:type="RUN">
+  <RUN center_name="National Genomics Infrastructure, Uppsala" run_date="2021-04-15T00:00:00" run_center="National Genomics Infrastructure, Uppsala">
     <TITLE>CD-5678-CD-5678-SampleB-BXYZ321XY</TITLE>
     <EXPERIMENT_REF refname="CD-5678-CD-5678-SampleB-NovaSeq"/>
     <DATA_BLOCK>

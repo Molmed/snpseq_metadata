@@ -14,6 +14,9 @@ class SRAMetadataModel(MetadataModel):
         self.model_object = model_object
         self.exporter = ModelExporter[X]
 
+    def __eq__(self, other: object):
+        return super().__eq__(other) and self.to_json() == other.to_json()
+
     def to_json(self) -> Dict:
         return self.exporter.to_json(self.model_object)
 

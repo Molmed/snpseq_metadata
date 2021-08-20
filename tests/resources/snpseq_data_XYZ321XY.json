@@ -1,4 +1,4 @@
-{
+{"result": {
     "name": "XYZ321XY",
     "samples": [
         {
@@ -195,4 +195,4 @@
             "udf_volume_ul": 30
         }
     ]
-}
+}}

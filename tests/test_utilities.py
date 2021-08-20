@@ -5,49 +5,21 @@ from snpseq_metadata.exceptions import SampleSheetNotFoundException
 import snpseq_metadata.utilities
 
 
-def test_calculate_checksum_from_file():
-    for testfile in filter(lambda f: f.endswith(".md5"), os.listdir("resources")):
-        checksum = testfile.split(".")[0]
-        method = "MD5"
+def test_calculate_checksum_from_file(file_checksums):
+    for testfile, checksum in file_checksums.items():
         assert (
             snpseq_metadata.utilities.calculate_checksum_from_file(
-                queryfile=os.path.join("resources", testfile), method=method
+                queryfile=testfile, method=testfile.split(".")[-1].upper()
             )
             == checksum
         )
 
 
-def test_parse_samplesheet_data():
-    samplesheet = os.path.join(".", "resources", "test_samplesheet.csv")
-    expected_rows = 38
-    expected_fields = [
-        "lane",
-        "sample_id",
-        "sample_name",
-        "sample_plate",
-        "sample_well",
-        "i7_index_id",
-        "index",
-        "i5_index_id",
-        "index2",
-        "sample_project",
-        "description",
-    ]
-    expected_projects = ["AB-2755", "AB-2769"]
-    expected_samples_per_lane = {1: 6, 2: 6, 3: 13, 4: 13}
-
-    samplesheet_data = snpseq_metadata.utilities.parse_samplesheet_data(samplesheet)
-    assert len(samplesheet_data) == expected_rows
-    assert sorted(list(samplesheet_data[0].keys())) == sorted(expected_fields)
-    assert sorted(list(set([d["sample_project"] for d in samplesheet_data]))) == sorted(
-        expected_projects
+def test_parse_samplesheet_data(samplesheet_file, samplesheet_data):
+    assert (
+        snpseq_metadata.utilities.parse_samplesheet_data(samplesheet_file)
+        == samplesheet_data
     )
-
-    samples_per_lane = {
-        lane: len(list(filter(lambda d: d["lane"] == str(lane), samplesheet_data)))
-        for lane in range(1, 5)
-    }
-    assert samples_per_lane == expected_samples_per_lane
 
 
 def test_find_samplesheet(monkeypatch):
@@ -86,17 +58,14 @@ def test_find_samplesheet(monkeypatch):
     ]
 
 
-def test_find_existing_samplesheet():
+def test_find_existing_samplesheet(test_resources_path, samplesheet_file):
     # assert that an existing samplesheet can be found on disk
-    runfolder = os.path.join(".", "resources")
-    assert snpseq_metadata.utilities.find_samplesheet(runfolder) == [
-        "test_samplesheet.csv"
+    assert snpseq_metadata.utilities.find_samplesheet(test_resources_path) == [
+        os.path.basename(samplesheet_file)
     ]
 
 
-def test_lookup_checksum_from_file():
-    runfolder = os.path.join(".", "resources")
-    checksumfile = os.path.join(runfolder, "MD5", "checksums.md5")
+def test_lookup_checksum_from_file(test_resources_path, checksum_file, file_checksums):
 
     # if a checksum file is missing, the method will throw an exception
     with pytest.raises(OSError):
@@ -105,11 +74,11 @@ def test_lookup_checksum_from_file():
         )
 
     # for files having checksums in a file, assert that they can be retrieved
-    for testfile in filter(lambda f: f.endswith(".md5"), os.listdir(runfolder)):
-        expected_checksum = testfile.split(".")[0]
-        queryfile = os.path.join(runfolder, testfile)
-        querypath = os.path.relpath(queryfile, os.path.dirname(runfolder))
-        observed_checksum = snpseq_metadata.utilities.lookup_checksum_from_file(
-            checksumfile=checksumfile, querypath=querypath
+    for testfile, expected_checksum in file_checksums.items():
+        querypath = os.path.relpath(testfile, os.path.dirname(test_resources_path))
+        assert (
+            snpseq_metadata.utilities.lookup_checksum_from_file(
+                checksumfile=checksum_file, querypath=querypath
+            )
+            == expected_checksum
         )
-        assert observed_checksum == expected_checksum

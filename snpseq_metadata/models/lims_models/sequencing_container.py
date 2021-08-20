@@ -13,9 +13,13 @@ class LIMSSequencingContainer(LIMSMetadataModel):
 
     @classmethod
     def from_json(cls: Type[L], json_obj: Dict) -> L:
-        name = json_obj.get("name")
+        result_json = json_obj.get("result")
+        name = result_json.get("name")
         samples = [
             LIMSSample.from_json(json_obj=sample_json)
-            for sample_json in json_obj.get("samples", [])
+            for sample_json in result_json.get("samples", [])
         ]
         return cls(name=name, samples=samples)
+
+    def to_json(self) -> Dict:
+        return {"result": super().to_json()}

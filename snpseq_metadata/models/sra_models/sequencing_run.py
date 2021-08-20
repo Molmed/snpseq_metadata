@@ -5,13 +5,13 @@ from xsdata.models.datatype import XmlDateTime
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.sra_models.experiment import SRAExperimentBase
 from snpseq_metadata.models.sra_models.file_models import SRAFastqFile
-from snpseq_metadata.models.xsdata import Run
+from snpseq_metadata.models.xsdata import RunType
 
 T = TypeVar("T", bound="SRARun")
 
 
 class SRARun(SRAMetadataModel):
-    model_object_class: ClassVar[Type] = Run
+    model_object_class: ClassVar[Type] = RunType
 
     def __init__(
         self,
@@ -32,12 +32,12 @@ class SRARun(SRAMetadataModel):
         fastqfiles: List[SRAFastqFile],
         run_date: Optional[datetime.datetime] = None,
     ) -> T:
-        xsd_files = Run.DataBlock.Files(
+        xsd_files = RunType.DataBlock.Files(
             file=list(map(lambda f: f.model_object, fastqfiles))
         )
-        xsd_data_block = Run.DataBlock(files=xsd_files)
+        xsd_data_block = RunType.DataBlock(files=xsd_files)
         xsd_run_date = XmlDateTime.from_datetime(run_date) if run_date else None
-        model_object = Run(
+        model_object = RunType(
             title=run_alias,
             run_center=run_center,
             run_date=xsd_run_date,
@@ -53,7 +53,6 @@ class SRARun(SRAMetadataModel):
 
     def to_manifest(self) -> List[Tuple[str, str]]:
         manifest = []
-        for fastq in self.fastqfiles:
-            manifest.extend(fastq.to_manifest())
-        manifest.extend(self.experiment.to_manifest())
+        for fastqfile in self.fastqfiles:
+            manifest.extend(fastqfile.to_manifest())
         return manifest

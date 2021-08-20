@@ -9,10 +9,12 @@ T = TypeVar("T")
 
 class MetadataModel:
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, type(self)) and all(
+        return type(other) is type(self) and all(
             map(
                 lambda k: getattr(other, k, None) == getattr(self, k, None),
-                vars(self).keys(),
+                filter(
+                    lambda k: k not in ["model_object", "exporter"], vars(self).keys()
+                ),
             )
         )
 
@@ -37,7 +39,7 @@ class MetadataModel:
         if isinstance(item, Iterable):
             return [cls._item_to_json(i) for i in item]
         if isinstance(item, datetime.datetime):
-            return item.isoformat(" ")
+            return item.isoformat()
         return item
 
     @staticmethod
