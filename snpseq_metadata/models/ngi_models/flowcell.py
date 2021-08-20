@@ -162,7 +162,7 @@ class NGIFlowcell(NGIMetadataModel):
                     checksum_method=self.checksum_method,
                 )
             )
-        return fastqfiles
+        return sorted(fastqfiles, key=lambda f: f.filepath)
 
     def get_sequencing_runs(self) -> List[NGIRun]:
         return [

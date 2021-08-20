@@ -1,4 +1,5 @@
 # snpseq_metadata
+[![Build Status](https://app.travis-ci.com/b97pla/snpseq_metadata.svg?branch=main)](https://app.travis-ci.com/b97pla/snpseq_metadata)
 
 This is a Python project that allows parsing of metadata associated with sequencing projects and export to various formats.
 

@@ -1,0 +1,14 @@
+language: python
+python:
+  - '3.7'
+services:
+  - docker
+before_install:
+  - docker build -t snpseq_metadata .
+  - docker run -v $TRAVIS_BUILD_DIR:/mnt/metadata snpseq_metadata pytest /mnt/metadata/tests/
+install:
+  - pip install -r requirements.txt -e .
+script:
+- pytest tests/
+notifications:
+  email: false
