@@ -166,6 +166,25 @@ and one manifest file for each unique experiment. For the test data set, the com
 ├── CD-5678-CD-5678-SampleA-2-NovaSeq.manifest
 └── CD-5678-CD-5678-SampleB-NovaSeq.manifest
 ```
+## Test data
+As mentioned above, test data is available under `tests/resources` and the package include a pytest suite that can be
+run with 
+```
+pytest tests/
+``` 
+In addition, a python script for validating a XML file against an XSD schema is provided:
+```
+$ python tests/validate_xml_file.py --help
+Usage: validate_xml_file.py [OPTIONS] XML_FILE XSD_FILE
+
+Options:
+  --help  Show this message and exit.
+```
+For integration tests, a bash script is provided which runs through the test data and validates the generated XML files
+against the corresponding schema:
+```
+bash tests/validate_test_data.sh $(pwd) /tmp/test_output
+```
 ## Package structure
 The code is built around the concept of having a set of classes represent metadata and provide internal logic,
 functionality for serializing and de-serializing etc. Such a set of classes can then represent metadata from a specific
@@ -178,7 +197,8 @@ A conversion layer that provide functionality to convert between metadata models
 
 ### xsdata
 The [xsdata](https://xsdata.readthedocs.io/en/latest/) library was used to create python dataclasses from the XML
-schemas provided by SRA. The `snpseq_metadata` package contains wrappers around these dataclasses and functionality for
+schemas provided by SRA. These dataclasses are used to export the modeled metadata into XML format, corresponding to
+the SRA schemas. The `snpseq_metadata` package contains wrappers around the dataclasses and functionality for
 converting between different data models.
 
 This is the typical command for creating the python dataclasses for the XML schema files located in `resources/schema`
