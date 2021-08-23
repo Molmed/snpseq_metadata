@@ -5,21 +5,15 @@ services:
   - docker
 # run through the test suite and usage examples in a docker container as well
 before_install:
-  - mkdir -p $TRAVIS_BUILD_DIR/docker_out/resources
+  - mkdir -p $TRAVIS_BUILD_DIR/docker_out
   - docker build -t snpseq_metadata .
   - docker run -v $TRAVIS_BUILD_DIR:/mnt/metadata snpseq_metadata pytest /mnt/metadata/tests/
-  - docker run -v $TRAVIS_BUILD_DIR:/mnt/metadata snpseq_metadata snpseq_metadata extract runfolder -o /mnt/metadata/docker_out /mnt/metadata/tests/resources/210415_A00001_0123_BXYZ321XY json
-  - docker run -v $TRAVIS_BUILD_DIR:/mnt/metadata snpseq_metadata snpseq_metadata extract snpseq-data -o /mnt/metadata/docker_out /mnt/metadata/tests/resources/snpseq_data_XYZ321XY.json json
-  - docker run -v $TRAVIS_BUILD_DIR:/mnt/metadata snpseq_metadata snpseq_metadata export -o /mnt/metadata/docker_out /mnt/metadata/docker_out/210415_A00001_0123_BXYZ321XY.ngi.json /mnt/metadata/docker_out/snpseq_data_XYZ321XY.ngi.json json xml manifest
-  - docker run -v $TRAVIS_BUILD_DIR:/mnt/metadata snpseq_metadata snpseq_metadata export -o /mnt/metadata/docker_out/resources /mnt/metadata/tests/resources/210415_A00001_0123_BXYZ321XY.ngi.json /mnt/metadata/tests/resources/snpseq_data_XYZ321XY.ngi.json json xml manifest
+  - docker run -v $TRAVIS_BUILD_DIR:/mnt/metadata snpseq_metadata bash /mnt/metadata/tests/validate_test_data.sh /mnt/metadata /mnt/metadata/docker_out
 install:
-  - pip install -r requirements.txt -e .
+  - pip install -r requirements_dev.txt -e .
 script:
 - pytest tests/
-- mkdir -p python_out/resources
-- snpseq_metadata extract runfolder -o python_out tests/resources/210415_A00001_0123_BXYZ321XY json
-- snpseq_metadata extract snpseq-data -o python_out tests/resources/snpseq_data_XYZ321XY.json json
-- snpseq_metadata export -o python_out python_out/210415_A00001_0123_BXYZ321XY.ngi.json python_out/snpseq_data_XYZ321XY.ngi.json json xml manifest
-- snpseq_metadata export -o python_out/resources tests/resources/210415_A00001_0123_BXYZ321XY.ngi.json tests/resources/snpseq_data_XYZ321XY.ngi.json json xml manifest
+- mkdir -p python_out
+- bash tests/validate_test_data.sh "$(pwd)" "python_out"
 notifications:
   email: false
