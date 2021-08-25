@@ -1,2 +1,2 @@
-xsdata==21.4
+xsdata[cli]==21.4
 click

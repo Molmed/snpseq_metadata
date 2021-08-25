@@ -12,10 +12,15 @@ This is a Python project that allows parsing of metadata associated with sequenc
 - [xsdata](https://xsdata.readthedocs.io/en/latest/)
 
 ## Installation
-
-Clone the repo to your local machine and run
-
-```pip install -r requirements.txt -e .```
+Clone the repo to your local machine and deploy the code
+```
+git clone https://github.com/Molmed/snpseq_metadata && cd snpseq_metadata
+pip install -r requirements.txt -e .
+```
+Download the [ENA/SRA XML schema](#enasra-xml-schema) and generate python models (can be skipped if these are already available)
+``` 
+bash snpseq_metadata/scripts/generate_python_models.sh xsdata
+```
 
 ## Docker
 
@@ -194,7 +199,13 @@ A conversion layer that provide functionality to convert between metadata models
 `snpseq_metadata/models/converter.py`, with the help of library mappings from NGI to SRA terminologies in
 `snpseq_metadata/models/ngi_to_sra_library_mapping.py`.
 
-
+### ENA/SRA XML schema
+[ENA/SRA](https://www.ebi.ac.uk/ena/browser/home) provide 
+[XML schema](ftp://ftp.ebi.ac.uk/pub/databases/ena/doc/xsd/sra_1_5/) (in XSD format), specifying the format for the 
+metadata XML files used for 
+[programmatic submission](https://ena-docs.readthedocs.io/en/latest/submit/general-guide/programmatic.html) of raw 
+sequences to the repository.
+ 
 ### xsdata
 The [xsdata](https://xsdata.readthedocs.io/en/latest/) library was used to create python dataclasses from the XML
 schemas provided by SRA. These dataclasses are used to export the modeled metadata into XML format, corresponding to
