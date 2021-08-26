@@ -2,7 +2,7 @@
     "name": "XYZ321XY",
     "samples": [
         {
-            "name": "Sample_AB-1234-SampleA-1",
+            "name": "AB-1234-SampleA-1",
             "project": "AB-1234",
             "udf_application": "WG re-seq Human",
             "udf_conc_fc": "150 pM",
@@ -33,7 +33,7 @@
             "project": ""
         },
         {
-            "name": "Sample_AB-1234-SampleA-2",
+            "name": "AB-1234-SampleA-2",
             "project": "AB-1234",
             "udf_application": "WG re-seq",
             "udf_conc_fc": "150 pM",
@@ -60,7 +60,7 @@
             "udf_volume_ul": 50
         },
         {
-            "name": "Sample_AB-1234-SampleB",
+            "name": "AB-1234-SampleB",
             "project": "AB-1234",
             "udf_application": "olink explore",
             "udf_conc_fc": "150 pM",

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EXPERIMENT_SET>
-  <EXPERIMENT alias="AB-1234-Sample_AB-1234-SampleA-1-NovaSeq">
-    <TITLE>AB-1234 - Sample_AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT</TITLE>
+  <EXPERIMENT alias="AB-1234-AB-1234-SampleA-1-NovaSeq">
+    <TITLE>AB-1234 - AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT</TITLE>
     <STUDY_REF refname="AB-1234"/>
     <DESIGN>
-      <DESIGN_DESCRIPTION>Sample_AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT</DESIGN_DESCRIPTION>
-      <SAMPLE_DESCRIPTOR refname="Sample_AB-1234-SampleA-1"/>
+      <SAMPLE_DESCRIPTOR refname="AB-1234-SampleA-1"/>
       <LIBRARY_DESCRIPTOR>
         <LIBRARY_STRATEGY>WGS</LIBRARY_STRATEGY>
         <LIBRARY_SOURCE>GENOMIC</LIBRARY_SOURCE>
@@ -21,12 +20,11 @@
       </ILLUMINA>
     </PLATFORM>
   </EXPERIMENT>
-  <EXPERIMENT alias="AB-1234-Sample_AB-1234-SampleA-2-NovaSeq">
-    <TITLE>AB-1234 - Sample_AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit</TITLE>
+  <EXPERIMENT alias="AB-1234-AB-1234-SampleA-2-NovaSeq">
+    <TITLE>AB-1234 - AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit</TITLE>
     <STUDY_REF refname="AB-1234"/>
     <DESIGN>
-      <DESIGN_DESCRIPTION>Sample_AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit</DESIGN_DESCRIPTION>
-      <SAMPLE_DESCRIPTOR refname="Sample_AB-1234-SampleA-2"/>
+      <SAMPLE_DESCRIPTOR refname="AB-1234-SampleA-2"/>
       <LIBRARY_DESCRIPTOR>
         <LIBRARY_STRATEGY>WGS</LIBRARY_STRATEGY>
         <LIBRARY_SOURCE>GENOMIC</LIBRARY_SOURCE>
@@ -42,12 +40,11 @@
       </ILLUMINA>
     </PLATFORM>
   </EXPERIMENT>
-  <EXPERIMENT alias="AB-1234-Sample_AB-1234-SampleB-NovaSeq">
-    <TITLE>AB-1234 - Sample_AB-1234-SampleB - olink explore - serum - olink explore 1536</TITLE>
+  <EXPERIMENT alias="AB-1234-AB-1234-SampleB-NovaSeq">
+    <TITLE>AB-1234 - AB-1234-SampleB - olink explore - serum - olink explore 1536</TITLE>
     <STUDY_REF refname="AB-1234"/>
     <DESIGN>
-      <DESIGN_DESCRIPTION>Sample_AB-1234-SampleB - olink explore - serum - olink explore 1536</DESIGN_DESCRIPTION>
-      <SAMPLE_DESCRIPTOR refname="Sample_AB-1234-SampleB"/>
+      <SAMPLE_DESCRIPTOR refname="AB-1234-SampleB"/>
       <LIBRARY_DESCRIPTOR>
         <LIBRARY_STRATEGY>OTHER</LIBRARY_STRATEGY>
         <LIBRARY_SOURCE>OTHER</LIBRARY_SOURCE>
@@ -67,7 +64,6 @@
     <TITLE>CD-5678 - CD-5678-SampleA-1 - target re-seq - gDNA - twist human core exome</TITLE>
     <STUDY_REF refname="CD-5678"/>
     <DESIGN>
-      <DESIGN_DESCRIPTION>CD-5678-SampleA-1 - target re-seq - gDNA - twist human core exome</DESIGN_DESCRIPTION>
       <SAMPLE_DESCRIPTOR refname="CD-5678-SampleA-1"/>
       <LIBRARY_DESCRIPTOR>
         <LIBRARY_STRATEGY>Targeted-Capture</LIBRARY_STRATEGY>
@@ -88,7 +84,6 @@
     <TITLE>CD-5678 - CD-5678-SampleA-2 - epigenetics - gDNA - nebnext enzymatic methyl-seq kit</TITLE>
     <STUDY_REF refname="CD-5678"/>
     <DESIGN>
-      <DESIGN_DESCRIPTION>CD-5678-SampleA-2 - epigenetics - gDNA - nebnext enzymatic methyl-seq kit</DESIGN_DESCRIPTION>
       <SAMPLE_DESCRIPTOR refname="CD-5678-SampleA-2"/>
       <LIBRARY_DESCRIPTOR>
         <LIBRARY_STRATEGY>Bisulfite-Seq</LIBRARY_STRATEGY>
@@ -109,7 +104,6 @@
     <TITLE>CD-5678 - CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT</TITLE>
     <STUDY_REF refname="CD-5678"/>
     <DESIGN>
-      <DESIGN_DESCRIPTION>CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT</DESIGN_DESCRIPTION>
       <SAMPLE_DESCRIPTOR refname="CD-5678-SampleB"/>
       <LIBRARY_DESCRIPTOR>
         <LIBRARY_STRATEGY>WGS</LIBRARY_STRATEGY>
@@ -130,7 +124,6 @@
     <TITLE>EF-9012 - EF-9012-608 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT</TITLE>
     <STUDY_REF refname="EF-9012"/>
     <DESIGN>
-      <DESIGN_DESCRIPTION>EF-9012-608 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT</DESIGN_DESCRIPTION>
       <SAMPLE_DESCRIPTOR refname="EF-9012-608"/>
       <LIBRARY_DESCRIPTOR>
         <LIBRARY_STRATEGY>WGS</LIBRARY_STRATEGY>

@@ -1,19 +1,18 @@
 {
   "experiments": [
     {
-      "alias": "AB-1234-Sample_AB-1234-SampleA-1-NovaSeq",
+      "alias": "AB-1234-AB-1234-SampleA-1-NovaSeq",
       "project": {
         "project_id": "AB-1234"
       },
-      "title": "AB-1234 - Sample_AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
+      "title": "AB-1234 - AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
       "platform": {
         "model_name": "NovaSeq"
       },
       "library": {
         "sample": {
-          "sample_id": "Sample_AB-1234-SampleA-1"
+          "sample_id": "AB-1234-SampleA-1"
         },
-        "description": "Sample_AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
         "application": "WG re-seq Human",
         "sample_type": "gDNA",
         "library_kit": "TruSeq DNA PCR-Free Sample Preparation kit LT",
@@ -21,19 +20,18 @@
       }
     },
     {
-      "alias": "AB-1234-Sample_AB-1234-SampleA-2-NovaSeq",
+      "alias": "AB-1234-AB-1234-SampleA-2-NovaSeq",
       "project": {
         "project_id": "AB-1234"
       },
-      "title": "AB-1234 - Sample_AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit",
+      "title": "AB-1234 - AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit",
       "platform": {
         "model_name": "NovaSeq"
       },
       "library": {
         "sample": {
-          "sample_id": "Sample_AB-1234-SampleA-2"
+          "sample_id": "AB-1234-SampleA-2"
         },
-        "description": "Sample_AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit",
         "application": "WG re-seq",
         "sample_type": "gDNA",
         "library_kit": "thruplex smarter dna-seq kit",
@@ -41,19 +39,18 @@
       }
     },
     {
-      "alias": "AB-1234-Sample_AB-1234-SampleB-NovaSeq",
+      "alias": "AB-1234-AB-1234-SampleB-NovaSeq",
       "project": {
         "project_id": "AB-1234"
       },
-      "title": "AB-1234 - Sample_AB-1234-SampleB - olink explore - serum - olink explore 1536",
+      "title": "AB-1234 - AB-1234-SampleB - olink explore - serum - olink explore 1536",
       "platform": {
         "model_name": "NovaSeq"
       },
       "library": {
         "sample": {
-          "sample_id": "Sample_AB-1234-SampleB"
+          "sample_id": "AB-1234-SampleB"
         },
-        "description": "Sample_AB-1234-SampleB - olink explore - serum - olink explore 1536",
         "application": "olink explore",
         "sample_type": "serum",
         "library_kit": "olink explore 1536",
@@ -73,7 +70,6 @@
         "sample": {
           "sample_id": "CD-5678-SampleA-1"
         },
-        "description": "CD-5678-SampleA-1 - target re-seq - gDNA - twist human core exome",
         "application": "target re-seq",
         "sample_type": "gDNA",
         "library_kit": "twist human core exome",
@@ -93,7 +89,6 @@
         "sample": {
           "sample_id": "CD-5678-SampleA-2"
         },
-        "description": "CD-5678-SampleA-2 - epigenetics - gDNA - nebnext enzymatic methyl-seq kit",
         "application": "epigenetics",
         "sample_type": "gDNA",
         "library_kit": "nebnext enzymatic methyl-seq kit",
@@ -113,7 +108,6 @@
         "sample": {
           "sample_id": "CD-5678-SampleB"
         },
-        "description": "CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
         "application": "WG re-seq Human",
         "sample_type": "gDNA",
         "library_kit": "TruSeq DNA PCR-Free Sample Preparation kit LT",
@@ -133,7 +127,6 @@
         "sample": {
           "sample_id": "EF-9012-608"
         },
-        "description": "EF-9012-608 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
         "application": "WG re-seq Human",
         "sample_type": "gDNA",
         "library_kit": "TruSeq DNA PCR-Free Sample Preparation kit LT",

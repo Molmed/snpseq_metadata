@@ -429,7 +429,7 @@ class ConvertExperiment(Converter):
                 platform = ConvertSequencingPlatform.lims_to_ngi(lims_model=lims_model)
                 alias = f"{project.project_id}-{sample.sample_id}-{platform.model_name}"
                 library = ConvertLibrary.lims_to_ngi(lims_model=lims_model)
-                title = f"{project.project_id} - {library.description}"
+                title = f"{project.project_id} - {sample.sample_id} - {library.application} - {library.sample_type} - {library.library_kit}"
             except SomethingNotRecognizedException as ex:
                 print(ex)
                 return None

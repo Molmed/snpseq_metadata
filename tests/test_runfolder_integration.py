@@ -33,6 +33,11 @@ class TestNGIFlowcell:
     def test_to_json(self, ngi_flowcell_from_disk, runfolder_ngi_json):
         assert ngi_flowcell_from_disk.to_json() == runfolder_ngi_json
 
+    def test_from_json(self, ngi_flowcell_from_disk, runfolder_ngi_json):
+        assert (
+            NGIFlowcell.from_json(json_obj=runfolder_ngi_json) == ngi_flowcell_from_disk
+        )
+
 
 class TestSRAFlowcell:
     def test_convert_flowcell_to_run_set(self, sra_run_set_from_ngi_flowcell):

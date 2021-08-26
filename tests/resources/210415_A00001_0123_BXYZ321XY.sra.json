@@ -2,9 +2,9 @@
   "RUN": [
     {
       "center_name": "National Genomics Infrastructure, Uppsala",
-      "TITLE": "AB-1234-Sample_AB-1234-SampleA-1-BXYZ321XY",
+      "TITLE": "AB-1234-AB-1234-SampleA-1-BXYZ321XY",
       "EXPERIMENT_REF": {
-        "refname": "AB-1234-Sample_AB-1234-SampleA-1-NovaSeq"
+        "refname": "AB-1234-AB-1234-SampleA-1-NovaSeq"
       },
       "DATA_BLOCK": {
         "FILES": {
@@ -41,9 +41,9 @@
     },
     {
       "center_name": "National Genomics Infrastructure, Uppsala",
-      "TITLE": "AB-1234-Sample_AB-1234-SampleA-2-BXYZ321XY",
+      "TITLE": "AB-1234-AB-1234-SampleA-2-BXYZ321XY",
       "EXPERIMENT_REF": {
-        "refname": "AB-1234-Sample_AB-1234-SampleA-2-NovaSeq"
+        "refname": "AB-1234-AB-1234-SampleA-2-NovaSeq"
       },
       "DATA_BLOCK": {
         "FILES": {
@@ -80,9 +80,9 @@
     },
     {
       "center_name": "National Genomics Infrastructure, Uppsala",
-      "TITLE": "AB-1234-Sample_AB-1234-SampleB-BXYZ321XY",
+      "TITLE": "AB-1234-AB-1234-SampleB-BXYZ321XY",
       "EXPERIMENT_REF": {
-        "refname": "AB-1234-Sample_AB-1234-SampleB-NovaSeq"
+        "refname": "AB-1234-AB-1234-SampleB-NovaSeq"
       },
       "DATA_BLOCK": {
         "FILES": {
