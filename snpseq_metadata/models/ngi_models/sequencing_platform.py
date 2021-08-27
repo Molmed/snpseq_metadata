@@ -9,7 +9,8 @@ T = TypeVar("T", bound="NGISequencingPlatform")
 
 class NGISequencingPlatform(NGIMetadataModel):
     def __init__(self, model_name: str) -> None:
-        self.model_name = model_name
+        # split on whitespace
+        self.model_name = model_name.split()[0]
 
     @classmethod
     def from_json(cls: Type[T], json_obj: Dict) -> T:

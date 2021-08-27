@@ -1,15 +1,14 @@
 {
   "EXPERIMENT": [
     {
-      "alias": "AB-1234-Sample_AB-1234-SampleA-1-NovaSeq",
-      "TITLE": "AB-1234 - Sample_AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
+      "alias": "AB-1234-AB-1234-SampleA-1-NovaSeq",
+      "TITLE": "AB-1234 - AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
       "STUDY_REF": {
         "refname": "AB-1234"
       },
       "DESIGN": {
-        "DESIGN_DESCRIPTION": "Sample_AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
         "SAMPLE_DESCRIPTOR": {
-          "refname": "Sample_AB-1234-SampleA-1"
+          "refname": "AB-1234-SampleA-1"
         },
         "LIBRARY_DESCRIPTOR": {
           "LIBRARY_STRATEGY": "WGS",
@@ -27,15 +26,14 @@
       }
     },
     {
-      "alias": "AB-1234-Sample_AB-1234-SampleA-2-NovaSeq",
-      "TITLE": "AB-1234 - Sample_AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit",
+      "alias": "AB-1234-AB-1234-SampleA-2-NovaSeq",
+      "TITLE": "AB-1234 - AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit",
       "STUDY_REF": {
         "refname": "AB-1234"
       },
       "DESIGN": {
-        "DESIGN_DESCRIPTION": "Sample_AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit",
         "SAMPLE_DESCRIPTOR": {
-          "refname": "Sample_AB-1234-SampleA-2"
+          "refname": "AB-1234-SampleA-2"
         },
         "LIBRARY_DESCRIPTOR": {
           "LIBRARY_STRATEGY": "WGS",
@@ -53,15 +51,14 @@
       }
     },
     {
-      "alias": "AB-1234-Sample_AB-1234-SampleB-NovaSeq",
-      "TITLE": "AB-1234 - Sample_AB-1234-SampleB - olink explore - serum - olink explore 1536",
+      "alias": "AB-1234-AB-1234-SampleB-NovaSeq",
+      "TITLE": "AB-1234 - AB-1234-SampleB - olink explore - serum - olink explore 1536",
       "STUDY_REF": {
         "refname": "AB-1234"
       },
       "DESIGN": {
-        "DESIGN_DESCRIPTION": "Sample_AB-1234-SampleB - olink explore - serum - olink explore 1536",
         "SAMPLE_DESCRIPTOR": {
-          "refname": "Sample_AB-1234-SampleB"
+          "refname": "AB-1234-SampleB"
         },
         "LIBRARY_DESCRIPTOR": {
           "LIBRARY_STRATEGY": "OTHER",
@@ -85,7 +82,6 @@
         "refname": "CD-5678"
       },
       "DESIGN": {
-        "DESIGN_DESCRIPTION": "CD-5678-SampleA-1 - target re-seq - gDNA - twist human core exome",
         "SAMPLE_DESCRIPTOR": {
           "refname": "CD-5678-SampleA-1"
         },
@@ -111,7 +107,6 @@
         "refname": "CD-5678"
       },
       "DESIGN": {
-        "DESIGN_DESCRIPTION": "CD-5678-SampleA-2 - epigenetics - gDNA - nebnext enzymatic methyl-seq kit",
         "SAMPLE_DESCRIPTOR": {
           "refname": "CD-5678-SampleA-2"
         },
@@ -137,7 +132,6 @@
         "refname": "CD-5678"
       },
       "DESIGN": {
-        "DESIGN_DESCRIPTION": "CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
         "SAMPLE_DESCRIPTOR": {
           "refname": "CD-5678-SampleB"
         },
@@ -163,7 +157,6 @@
         "refname": "EF-9012"
       },
       "DESIGN": {
-        "DESIGN_DESCRIPTION": "EF-9012-608 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
         "SAMPLE_DESCRIPTOR": {
           "refname": "EF-9012-608"
         },

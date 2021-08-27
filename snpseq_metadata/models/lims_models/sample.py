@@ -1,4 +1,4 @@
-from typing import Dict, Type, TypeVar
+from typing import Dict, Optional, Type, TypeVar
 
 from snpseq_metadata.models.lims_models.metadata_model import LIMSMetadataModel
 
@@ -11,6 +11,21 @@ class LIMSSample(LIMSMetadataModel):
         self.project_id = project_id
         for udf_name, udf_value in udf.items():
             setattr(self, udf_name, udf_value)
+
+    def __str__(self) -> str:
+        return f"LIMSSample: '{self.sample_id}'"
+
+    def __getattr__(self, name: str) -> object:
+        # override the __getattr__ in order to return udf_rml_kitprotocol if
+        # udf_library_preparation_kit is missing
+        if name == "udf_library_preparation_kit":
+            return self.udf_rml_kitprotocol
+        raise AttributeError(f"{str(self)} is missing attribute '{name}'")
+
+    def is_paired(self) -> Optional[bool]:
+        read_length = getattr(self, "udf_read_length", None)
+        if read_length is not None:
+            return any([len(read_length.split("+")) > 2, read_length.endswith("x2")])
 
     @classmethod
     def from_json(cls: Type[L], json_obj: Dict[str, str]) -> L:

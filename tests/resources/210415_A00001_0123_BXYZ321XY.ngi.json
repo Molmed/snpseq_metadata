@@ -4,8 +4,6 @@
   "flowcell_id": "BXYZ321XY",
   "samplesheet": "fc_SampleSheet.csv",
   "run_parameters": "RunParameters.xml",
-  "project_id": null,
-  "sample_id": null,
   "checksum_method": "MD5",
   "platform": {
     "model_name": "NovaSeq"
@@ -13,15 +11,15 @@
   "run_date": "2021-04-15T00:00:00",
   "sequencing_runs": [
     {
-      "run_alias": "AB-1234-Sample_AB-1234-SampleA-1-BXYZ321XY",
+      "run_alias": "AB-1234-AB-1234-SampleA-1-BXYZ321XY",
       "run_center": "National Genomics Infrastructure, Uppsala",
       "experiment": {
-        "alias": "AB-1234-Sample_AB-1234-SampleA-1-NovaSeq",
+        "alias": "AB-1234-AB-1234-SampleA-1-NovaSeq",
         "project": {
           "project_id": "AB-1234"
         },
         "sample": {
-          "sample_id": "Sample_AB-1234-SampleA-1"
+          "sample_id": "AB-1234-SampleA-1"
         }
       },
       "platform": {
@@ -56,15 +54,15 @@
       ]
     },
     {
-      "run_alias": "AB-1234-Sample_AB-1234-SampleA-2-BXYZ321XY",
+      "run_alias": "AB-1234-AB-1234-SampleA-2-BXYZ321XY",
       "run_center": "National Genomics Infrastructure, Uppsala",
       "experiment": {
-        "alias": "AB-1234-Sample_AB-1234-SampleA-2-NovaSeq",
+        "alias": "AB-1234-AB-1234-SampleA-2-NovaSeq",
         "project": {
           "project_id": "AB-1234"
         },
         "sample": {
-          "sample_id": "Sample_AB-1234-SampleA-2"
+          "sample_id": "AB-1234-SampleA-2"
         }
       },
       "platform": {
@@ -99,15 +97,15 @@
       ]
     },
     {
-      "run_alias": "AB-1234-Sample_AB-1234-SampleB-BXYZ321XY",
+      "run_alias": "AB-1234-AB-1234-SampleB-BXYZ321XY",
       "run_center": "National Genomics Infrastructure, Uppsala",
       "experiment": {
-        "alias": "AB-1234-Sample_AB-1234-SampleB-NovaSeq",
+        "alias": "AB-1234-AB-1234-SampleB-NovaSeq",
         "project": {
           "project_id": "AB-1234"
         },
         "sample": {
-          "sample_id": "Sample_AB-1234-SampleB"
+          "sample_id": "AB-1234-SampleB"
         }
       },
       "platform": {

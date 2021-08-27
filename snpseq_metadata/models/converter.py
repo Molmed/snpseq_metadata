@@ -352,10 +352,8 @@ class ConvertLibrary(Converter):
             application = lims_model.udf_application
             sample_type = lims_model.udf_sample_type
             library_kit = lims_model.udf_library_preparation_kit
-            description = (
-                f"{sample.sample_id} - {application} - {sample_type} - {library_kit}"
-            )
-            is_paired = True if lims_model.udf_read_length.endswith("x2") else None
+            description = None
+            is_paired = lims_model.is_paired()
             return cls.ngi_model_class(
                 sample=sample,
                 description=description,
@@ -431,7 +429,7 @@ class ConvertExperiment(Converter):
                 platform = ConvertSequencingPlatform.lims_to_ngi(lims_model=lims_model)
                 alias = f"{project.project_id}-{sample.sample_id}-{platform.model_name}"
                 library = ConvertLibrary.lims_to_ngi(lims_model=lims_model)
-                title = f"{project.project_id} - {library.description}"
+                title = f"{project.project_id} - {sample.sample_id} - {library.application} - {library.sample_type} - {library.library_kit}"
             except SomethingNotRecognizedException as ex:
                 print(ex)
                 return None

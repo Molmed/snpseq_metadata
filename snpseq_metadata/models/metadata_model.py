@@ -25,7 +25,8 @@ class MetadataModel:
     def to_json(self) -> Dict:
         json_obj = {}
         for name, value in vars(self).items():
-            json_obj[name] = self._item_to_json(value)
+            if value is not None:
+                json_obj[name] = self._item_to_json(value)
         return json_obj
 
     @classmethod

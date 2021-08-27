@@ -52,11 +52,12 @@ class NGIExperimentRef(NGIExperimentBase):
     ) -> TR:
         project_id = samplesheet_row.get("sample_project")
         sample_id = samplesheet_row.get("sample_id")
-        alias = f"{project_id}-{sample_id}-{platform.model_name}"
+        sample_name = samplesheet_row.get("sample_name", sample_id)
+        alias = f"{project_id}-{sample_name}-{platform.model_name}"
         return cls(
             alias=alias,
             project=NGIStudyRef(project_id=project_id),
-            sample=NGISampleDescriptor(sample_id=sample_id),
+            sample=NGISampleDescriptor(sample_id=sample_name),
         )
 
     @classmethod
