@@ -1,10 +1,15 @@
 import click
 import json
+import logging
 import os
+
+from typing import Optional
 
 from snpseq_metadata.models.ngi_models import NGIFlowcell, NGIExperimentSet
 from snpseq_metadata.models.lims_models import LIMSSequencingContainer
 from snpseq_metadata.models.converter import Converter
+
+LOG: Optional[logging.Logger] = None
 
 
 def common_options(function):
@@ -19,8 +24,21 @@ def common_options(function):
 
 
 @click.group()
-def metadata():
-    pass
+@click.option(
+    "--log-level",
+    type=click.Choice(
+        ["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"], case_sensitive=False
+    ),
+    default="DEBUG",
+    show_default=True,
+)
+def metadata(log_level):
+    logging.basicConfig(
+        level=log_level,
+        format="%(asctime)s - %(name)s:%(funcName)s:L%(lineno)d - %(levelname)s: %(message)s",
+    )
+    global LOG
+    LOG = logging.getLogger(__name__)
 
 
 @click.group()
@@ -70,6 +88,7 @@ def extract_to_json():
         outfile = f"{outfile_prefix}.ngi.json"
         with open(outfile, "w") as fh:
             json.dump(ngi_object.to_json(), fh, indent=2)
+        LOG.debug(f"json output written to {outfile}")
 
     return processor
 
@@ -106,6 +125,7 @@ def to_xml():
             outfile = os.path.join(outdir, f"{project_id}-{obj_type}.xml")
             with open(outfile, "w") as fh:
                 fh.write(sra_obj.to_xml())
+            LOG.debug(f"xml output written to {outfile}")
 
     return processor
 
@@ -117,6 +137,7 @@ def to_json():
             outfile = os.path.join(outdir, f"{project_id}-{obj_type}.json")
             with open(outfile, "w") as fh:
                 json.dump(sra_obj.to_json(), fh, indent=2)
+            LOG.debug(f"json output written to {outfile}")
 
     return processor
 
@@ -132,6 +153,7 @@ def to_manifest():
                 for row in sra_run.experiment.to_manifest() + sra_run.to_manifest():
                     fh.write("\t".join(row))
                     fh.write("\n")
+            LOG.debug(f"manifest written to {outfile}")
 
     return processor
 

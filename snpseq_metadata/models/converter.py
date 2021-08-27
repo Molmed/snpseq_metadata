@@ -1,3 +1,5 @@
+import logging
+from functools import wraps
 from typing import ClassVar, Tuple, Type, TypeVar, Optional
 
 from snpseq_metadata.models.ngi_models import (
@@ -38,10 +40,51 @@ from snpseq_metadata.models.ngi_to_sra_library_mapping import (
 from snpseq_metadata.exceptions import (
     LibraryStrategyNotRecognizedException,
     InstrumentModelNotRecognizedException,
-    SomethingNotRecognizedException,
+    ModelConversionException,
 )
 
+LOG = logging.getLogger(__name__)
 T = TypeVar("T", bound="Converter")
+
+
+# These exceptions are defined here, since this class will know about the different model systems
+class NGIModelConversionException(ModelConversionException):
+    pass
+
+
+class SRAModelConversionException(ModelConversionException):
+    pass
+
+
+def catch_exception(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except ModelConversionException as ex:
+            raise ex
+        except Exception as ex:
+            if f.__name__ == "ngi_to_sra":
+                exception_cls = SRAModelConversionException
+                source_cls = args[0].ngi_model_class
+                target_cls = args[0].sra_model_class
+            elif f.__name__ == "lims_to_ngi":
+                exception_cls = NGIModelConversionException
+                source_cls = args[0].lims_model_class
+                target_cls = args[0].ngi_model_class
+            else:
+                exception_cls = ModelConversionException
+                source_cls = None
+                target_cls = None
+            raised_ex = exception_cls(
+                source=source_cls,
+                target=target_cls,
+                reason=ex,
+            )
+            LOG.debug(raised_ex)
+            raise raised_ex from ex
+
+    return wrapper
 
 
 class Converter:
@@ -60,6 +103,7 @@ class Converter:
     lims_model_class: ClassVar[Type] = LIMSMetadataModel
 
     @classmethod
+    @catch_exception
     def ngi_to_sra(
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
@@ -80,8 +124,13 @@ class Converter:
                     sra_model = subclass.ngi_to_sra(ngi_model=ngi_model)
                     if sra_model:
                         return sra_model
+            # conversion was unsuccessful, raise the exception
+            raise SRAModelConversionException(
+                source=type(ngi_model), target=cls.sra_model_class
+            )
 
     @classmethod
+    @catch_exception
     def lims_to_ngi(
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
@@ -90,6 +139,9 @@ class Converter:
         will iterate over subclasses to locate a subclass whose lims_model_class matches the
         supplied lims_model.
 
+        Since the LIMS models don't have a direct one-to-one mapping to NGI models, this entry
+        point method will only try the ConvertSampleDescriptor and ConvertExperimentSet classes.
+
         :param lims_model: an instance of LIMSMetadataModel or any of its subclasses
         :return: an instance of a subclass of NGIMetadataModel, corresponding to the supplied
         lims_model or None if no matching conversion could be made
@@ -97,11 +149,15 @@ class Converter:
         # iterate over all subclasses to find one whose lims_nodel_class variable matches the
         # supplied lims_model, but only if this is called in the base class
         if cls == Converter:
-            for subclass in cls.__subclasses__():
+            for subclass in [ConvertExperimentSet, ConvertSampleDescriptor]:
                 if isinstance(lims_model, subclass.lims_model_class):
                     ngi_model = subclass.lims_to_ngi(lims_model=lims_model)
                     if ngi_model:
                         return ngi_model
+            # conversion was unsuccessful, raise the exception
+            raise NGIModelConversionException(
+                source=type(lims_model), target=cls.ngi_model_class
+            )
 
 
 class ConvertSampleDescriptor(Converter):
@@ -114,6 +170,7 @@ class ConvertSampleDescriptor(Converter):
     lims_model_class = LIMSSample
 
     @classmethod
+    @catch_exception
     def ngi_to_sra(
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
@@ -121,6 +178,7 @@ class ConvertSampleDescriptor(Converter):
             return cls.sra_model_class.create_object(refname=ngi_model.sample_id)
 
     @classmethod
+    @catch_exception
     def lims_to_ngi(
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
@@ -138,6 +196,7 @@ class ConvertStudyRef(Converter):
     lims_model_class = LIMSSample
 
     @classmethod
+    @catch_exception
     def ngi_to_sra(
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
@@ -145,6 +204,7 @@ class ConvertStudyRef(Converter):
             return cls.sra_model_class.create_object(refname=ngi_model.project_id)
 
     @classmethod
+    @catch_exception
     def lims_to_ngi(
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
@@ -161,6 +221,7 @@ class ConvertRun(Converter):
     sra_model_class = SRARun
 
     @classmethod
+    @catch_exception
     def ngi_to_sra(
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
@@ -186,6 +247,7 @@ class ConvertSequencingPlatform(Converter):
     lims_model_class = LIMSSample
 
     @classmethod
+    @catch_exception
     def ngi_to_sra(
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
@@ -193,16 +255,12 @@ class ConvertSequencingPlatform(Converter):
             return cls.sra_model_class.create_object(model_name=ngi_model.model_name)
 
     @classmethod
+    @catch_exception
     def lims_to_ngi(
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
         if lims_model:
-            try:
-                return cls.ngi_model_class(
-                    model_name=lims_model.udf_sequencing_instrument
-                )
-            except AttributeError:
-                raise InstrumentModelNotRecognizedException(needle="None")
+            return cls.ngi_model_class(model_name=lims_model.udf_sequencing_instrument)
 
 
 class ConvertRunSet(Converter):
@@ -214,6 +272,7 @@ class ConvertRunSet(Converter):
     sra_model_class = SRARunSet
 
     @classmethod
+    @catch_exception
     def ngi_to_sra(
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
@@ -232,6 +291,7 @@ class ConvertResultFile(Converter):
     sra_model_class = SRAResultFile
 
     @classmethod
+    @catch_exception
     def ngi_to_sra(
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
@@ -254,6 +314,7 @@ class ConvertExperimentRef(Converter):
     lims_model_class = LIMSSample
 
     @classmethod
+    @catch_exception
     def ngi_to_sra(
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
@@ -261,6 +322,7 @@ class ConvertExperimentRef(Converter):
             return cls.sra_model_class.create_object(experiment_name=ngi_model.alias)
 
     @classmethod
+    @catch_exception
     def lims_to_ngi(
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
@@ -282,6 +344,7 @@ class ConvertExperimentSet(Converter):
     lims_model_class = LIMSSequencingContainer
 
     @classmethod
+    @catch_exception
     def ngi_to_sra(
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
@@ -294,21 +357,21 @@ class ConvertExperimentSet(Converter):
             )
 
     @classmethod
+    @catch_exception
     def lims_to_ngi(
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
         if lims_model:
-            return cls.ngi_model_class(
-                list(
-                    filter(
-                        lambda e: e is not None,
-                        [
-                            ConvertExperiment.lims_to_ngi(lims_model=lims_sample)
-                            for lims_sample in lims_model.samples or []
-                        ],
-                    )
-                )
-            )
+            experiments = []
+            for lims_sample in lims_model.samples or []:
+                try:
+                    experiment = ConvertExperiment.lims_to_ngi(lims_model=lims_sample)
+                    experiments.append(experiment)
+                except ModelConversionException as ex:
+                    # log this as an error but continue with the other samples
+                    LOG.error(f"{lims_sample} skipped - {str(ex)}")
+
+            return cls.ngi_model_class(experiments=experiments)
 
 
 class ConvertLibrary(Converter):
@@ -321,6 +384,7 @@ class ConvertLibrary(Converter):
     lims_model_class = LIMSSample
 
     @classmethod
+    @catch_exception
     def ngi_to_sra(
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
@@ -344,6 +408,7 @@ class ConvertLibrary(Converter):
             )
 
     @classmethod
+    @catch_exception
     def lims_to_ngi(
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
@@ -406,6 +471,7 @@ class ConvertExperiment(Converter):
     lims_model_class = LIMSSample
 
     @classmethod
+    @catch_exception
     def ngi_to_sra(
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
@@ -419,20 +485,17 @@ class ConvertExperiment(Converter):
             )
 
     @classmethod
+    @catch_exception
     def lims_to_ngi(
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
         if lims_model:
-            try:
-                sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
-                project = ConvertStudyRef.lims_to_ngi(lims_model=lims_model)
-                platform = ConvertSequencingPlatform.lims_to_ngi(lims_model=lims_model)
-                alias = f"{project.project_id}-{sample.sample_id}-{platform.model_name}"
-                library = ConvertLibrary.lims_to_ngi(lims_model=lims_model)
-                title = f"{project.project_id} - {sample.sample_id} - {library.application} - {library.sample_type} - {library.library_kit}"
-            except SomethingNotRecognizedException as ex:
-                print(ex)
-                return None
+            sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
+            project = ConvertStudyRef.lims_to_ngi(lims_model=lims_model)
+            platform = ConvertSequencingPlatform.lims_to_ngi(lims_model=lims_model)
+            alias = f"{project.project_id}-{sample.sample_id}-{platform.model_name}"
+            library = ConvertLibrary.lims_to_ngi(lims_model=lims_model)
+            title = f"{project.project_id} - {sample.sample_id} - {library.application} - {library.sample_type} - {library.library_kit}"
             return cls.ngi_model_class(
                 alias=alias,
                 title=title,

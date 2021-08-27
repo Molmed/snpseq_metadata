@@ -1,4 +1,18 @@
+import pytest
+
 from snpseq_metadata.models.converter import *
+
+
+class TestConverter:
+
+    # Failure to convert a model should raise the appropriate exception
+    def test_ngi_to_sra_exception(self):
+        with pytest.raises(SRAModelConversionException):
+            assert Converter.ngi_to_sra(ngi_model=None)
+
+    def test_lims_to_ngi_exception(self):
+        with pytest.raises(NGIModelConversionException):
+            assert Converter.lims_to_ngi(lims_model=None)
 
 
 class TestConvertSampleDescriptor:
