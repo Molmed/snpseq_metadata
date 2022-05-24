@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install snpseq_metadata
-        run: "pip install -r requirements_dev.txt ."
+        run: "pip install -r requirements_dev.txt -e ."
 
       - name: Download the ENA/SRA XML schema and generate python models
         run: "bash ./snpseq_metadata/scripts/generate_python_models.sh xsdata"
@@ -25,3 +25,8 @@ jobs:
       - name: Run unit tests
         run: "./validate-unit.sh"
 
+      - name: Run integration tests
+        run: |
+          mkdir python_out
+          tests/validate_test_data.sh "$(pwd)" "python_out"
+        shell: bash
