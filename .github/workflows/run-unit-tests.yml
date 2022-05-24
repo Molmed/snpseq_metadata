@@ -1,0 +1,27 @@
+name: Run unit tests
+on: [push]
+jobs:
+  run-unit-tests:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.7]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Install snpseq_metadata
+        run: "pip install -r requirements_dev.txt ."
+
+      - name: Download the ENA/SRA XML schema and generate python models
+        run: "bash ./snpseq_metadata/scripts/generate_python_models.sh xsdata"
+
+      - name: Run unit tests
+        run: "./validate-unit.sh"
+
