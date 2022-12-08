@@ -7,6 +7,7 @@ from snpseq_metadata.models.sra_models.library import SRALibrary
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.sra_models.study import SRAStudyRef
 from snpseq_metadata.models.xsdata import (
+    RefObjectType,
     Run,
     ExperimentType as XSDExperiment,
     ExperimentSet as XSDExperimentSet,
@@ -33,14 +34,14 @@ class SRAExperimentBase(SRAMetadataModel):
 
 
 class SRAExperimentRef(SRAExperimentBase):
-    model_object_class: ClassVar[Type] = Run.ExperimentRef
+    model_object_class: ClassVar[Type] = RefObjectType
 
     def __str__(self) -> str:
         return self.model_object.refname
 
     @classmethod
     def create_object(cls: Type[TR], experiment_name: str) -> TR:
-        model_object = Run.ExperimentRef(refname=experiment_name)
+        model_object = cls.model_object_class(refname=experiment_name)
         return cls(model_object=model_object)
 
     def to_manifest(self) -> List[Tuple[str, str]]:
