@@ -1,10 +1,16 @@
 import datetime
 import os
 import pytest
+import re
 
 from snpseq_metadata.models.lims_models import *
 from snpseq_metadata.models.ngi_models import *
 from snpseq_metadata.models.sra_models import *
+
+
+def ignore_xml_namespace_attributes(xml_str):
+    pattern = r' (xmlns|xsi)\:(xsi|type)=[^\s\>]+'
+    return re.sub(pattern, "", xml_str)
 
 
 @pytest.fixture
@@ -367,12 +373,12 @@ def sra_experiment_manifest(
 def sra_experiment_xml(
     sra_experiment_json, sra_study_xml, sra_sequencing_platform_xml, sra_library_xml
 ):
-    return f"""<EXPERIMENTTYPE alias="{sra_experiment_json["alias"]}">
+    return f"""<EXPERIMENT alias="{sra_experiment_json["alias"]}">
       <TITLE>{sra_experiment_json["TITLE"]}</TITLE>
       {sra_study_xml.replace('STUDYREF', 'STUDY_REF')}
       {sra_library_xml.replace("LIBRARYTYPE", "DESIGN")}
       {sra_sequencing_platform_xml.replace("PLATFORMTYPE", "PLATFORM")}
-    </EXPERIMENTTYPE>"""
+    </EXPERIMENT>"""
 
 
 @pytest.fixture
@@ -396,7 +402,7 @@ def sra_experiment_ref_manifest(sra_experiment_ref_json):
 def sra_experiment_ref_xml(sra_experiment_ref_json):
     # in the run context, the tag name will be EXPERIMENT_REF but when exported as a stand-alone
     # object, it will use the name of the python class, i.e. EXPERIMENTREF
-    return f'<EXPERIMENTREF refname="{sra_experiment_ref_json["refname"]}"/>'
+    return f'<EXPERIMENT_REF refname="{sra_experiment_ref_json["refname"]}"/>'
 
 
 @pytest.fixture
@@ -417,7 +423,7 @@ def sra_experiment_set_obj(sra_experiment_obj):
 @pytest.fixture
 def sra_experiment_set_xml(sra_experiment_xml):
     return f"""<EXPERIMENT_SET>
-  {sra_experiment_xml.replace("EXPERIMENTTYPE", "EXPERIMENT")}
+  {sra_experiment_xml}
   </EXPERIMENT_SET>"""
 
 
@@ -607,7 +613,7 @@ def sra_sequencing_run_obj(
 def sra_sequencing_run_xml(
     sra_sequencing_run_json, sra_experiment_ref_xml, sra_result_file_xml
 ):
-    return f"""<RUNTYPE center_name="{sra_sequencing_run_json["center_name"]}" run_date="{sra_sequencing_run_json["run_date"]}" run_center="{sra_sequencing_run_json["run_center"]}">
+    return f"""<RUN center_name="{sra_sequencing_run_json["center_name"]}" run_date="{sra_sequencing_run_json["run_date"]}" run_center="{sra_sequencing_run_json["run_center"]}">
     <TITLE>{sra_sequencing_run_json["TITLE"]}</TITLE>
     {sra_experiment_ref_xml.replace("EXPERIMENTREF", "EXPERIMENT_REF")}
     <DATA_BLOCK>
@@ -615,7 +621,7 @@ def sra_sequencing_run_xml(
         {sra_result_file_xml}
       </FILES>
     </DATA_BLOCK>
-  </RUNTYPE>"""
+  </RUN>"""
 
 
 @pytest.fixture
@@ -636,7 +642,7 @@ def sra_sequencing_run_set_obj(sra_sequencing_run_obj):
 @pytest.fixture
 def sra_sequencing_run_set_xml(sra_sequencing_run_xml):
     return f"""<RUN_SET>
-  {sra_sequencing_run_xml.replace("RUNTYPE", "RUN")}
+  {sra_sequencing_run_xml}
   </RUN_SET>"""
 
 
@@ -659,4 +665,4 @@ def sra_study_obj(sra_study_json):
 def sra_study_xml(sra_study_json):
     # in the experiment context, the tag name will be STUDY_REF but when exported as a stand-alone
     # object, it will use the name of the python class, i.e. STUDYREF
-    return f'<STUDYREF refname="{sra_study_json["refname"]}"/>'
+    return f'<STUDY_REF refname="{sra_study_json["refname"]}"/>'

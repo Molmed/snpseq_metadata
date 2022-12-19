@@ -13,9 +13,8 @@ class TestSRALibrary:
         assert sra_library_obj.to_manifest() == sra_library_manifest
 
     def test_to_xml(self, sra_library_obj, sra_library_xml):
-        assert "".join(sra_library_xml.split()) in "".join(
-            sra_library_obj.to_xml().split()
-        )
+        assert sra_library_obj.to_xml(xml_declaration=False).split() == \
+               sra_library_xml.split()
 
     def test_create_object(self, sra_library_obj, sra_library_json, sra_sample_obj):
         library = SRALibrary.create_object(

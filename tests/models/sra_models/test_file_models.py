@@ -17,7 +17,8 @@ class TestSRAResultFile:
         assert result_file == sra_result_file_obj.model_object
 
     def test_to_xml(self, sra_result_file_obj, sra_result_file_xml):
-        assert sra_result_file_xml in sra_result_file_obj.to_xml()
+        assert sra_result_file_obj.to_xml(xml_declaration=False).split() == \
+               sra_result_file_xml.split()
 
     def test_to_manifest(self, sra_result_file_obj, sra_result_file_manifest):
         assert sra_result_file_obj.to_manifest() == sra_result_file_manifest

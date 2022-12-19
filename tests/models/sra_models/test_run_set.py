@@ -21,9 +21,8 @@ class TestSRARunSet:
         )
 
     def test_to_xml(self, sra_sequencing_run_set_obj, sra_sequencing_run_set_xml):
-        assert "".join(sra_sequencing_run_set_xml.split()) in "".join(
-            sra_sequencing_run_set_obj.to_xml().split()
-        )
+        assert sra_sequencing_run_set_obj.to_xml(xml_declaration=False).split() == \
+               sra_sequencing_run_set_xml.split()
 
     def test_restrict_to_experiments(
         self, sra_sequencing_run_set_obj, sra_experiment_set_obj

@@ -13,7 +13,8 @@ class TestSRAStudyRef:
         assert sra_study_obj.to_manifest() == sra_study_manifest
 
     def test_to_xml(self, sra_study_obj, sra_study_xml):
-        assert sra_study_xml in sra_study_obj.to_xml()
+        assert sra_study_obj.to_xml(xml_declaration=False).split() == \
+               sra_study_xml.split()
 
     def test___str__(self, sra_study_obj):
         assert str(sra_study_obj) == sra_study_obj.model_object.refname

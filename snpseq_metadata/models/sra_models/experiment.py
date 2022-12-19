@@ -8,7 +8,8 @@ from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.sra_models.study import SRAStudyRef
 from snpseq_metadata.models.xsdata import (
     RefObjectType,
-    Run,
+    RunType as Run,
+    Experiment,
     ExperimentType as XSDExperiment,
     ExperimentSet as XSDExperimentSet,
 )
@@ -35,6 +36,7 @@ class SRAExperimentBase(SRAMetadataModel):
 
 class SRAExperimentRef(SRAExperimentBase):
     model_object_class: ClassVar[Type] = RefObjectType
+    model_object_parent_field: ClassVar[Optional[Tuple[Type, str]]] = (Run, "experiment_ref")
 
     def __str__(self) -> str:
         return self.model_object.refname
@@ -61,6 +63,7 @@ class SRAExperimentRef(SRAExperimentBase):
 
 class SRAExperiment(SRAExperimentBase):
     model_object_class: ClassVar[Type] = XSDExperiment
+    model_object_meta_class: ClassVar[Optional[Type]] = Experiment
 
     def __init__(
         self,
@@ -83,7 +86,7 @@ class SRAExperiment(SRAExperimentBase):
         platform: SRASequencingPlatform,
         library: SRALibrary,
     ) -> T:
-        model_object = XSDExperiment(
+        model_object = cls.model_object_class(
             title=title,
             alias=alias,
             study_ref=study_ref.model_object,
@@ -121,7 +124,7 @@ class SRAExperimentSet(SRAMetadataModel):
 
     @classmethod
     def create_object(cls: Type[TS], experiments: List[SRAExperiment]) -> TS:
-        model_object = XSDExperimentSet(
+        model_object = cls.model_object_class(
             experiment=[experiment.model_object for experiment in experiments]
         )
         return cls(model_object=model_object, experiments=experiments)

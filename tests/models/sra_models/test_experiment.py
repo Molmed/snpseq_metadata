@@ -56,9 +56,8 @@ class TestSRAExperiment:
         assert sra_experiment_obj.to_manifest() == sra_experiment_manifest
 
     def test_to_xml(self, sra_experiment_obj, sra_experiment_xml):
-        assert "".join(sra_experiment_xml.split()) in "".join(
-            sra_experiment_obj.to_xml().split()
-        )
+        assert sra_experiment_obj.to_xml(xml_declaration=False).split() == \
+               sra_experiment_xml.split()
 
     def test_get_reference(self, sra_experiment_obj, sra_experiment_ref_obj):
         assert sra_experiment_obj.get_reference() == sra_experiment_ref_obj
@@ -86,9 +85,8 @@ class TestSRAExperimentSet:
         assert sra_experiment_set_obj.to_manifest() == sra_experiment_set_manifest
 
     def test_to_xml(self, sra_experiment_set_obj, sra_experiment_set_xml):
-        assert "".join(sra_experiment_set_xml.split()) in "".join(
-            sra_experiment_set_obj.to_xml().split()
-        )
+        assert sra_experiment_set_obj.to_xml(xml_declaration=False).split() == \
+               sra_experiment_set_xml.split()
 
     def test_restrict_to_study(self, sra_experiment_set_obj, sra_experiment_obj):
         experiment_set = sra_experiment_set_obj.restrict_to_study(

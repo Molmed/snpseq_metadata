@@ -24,9 +24,8 @@ class TestSRAIlluminaSequencingPlatform:
         )
 
     def test_to_xml(self, sra_sequencing_platform_obj, sra_sequencing_platform_xml):
-        assert "".join(sra_sequencing_platform_xml.split()) in "".join(
-            sra_sequencing_platform_obj.to_xml().split()
-        )
+        assert sra_sequencing_platform_obj.to_xml(xml_declaration=False).split() == \
+               sra_sequencing_platform_xml.split()
 
     def test_create_object(
         self,

@@ -29,9 +29,8 @@ class TestSRARun:
         assert sra_sequencing_run_obj.to_manifest() == sra_sequencing_run_manifest
 
     def test_to_xml(self, sra_sequencing_run_obj, sra_sequencing_run_xml):
-        assert "".join(sra_sequencing_run_xml.split()) in "".join(
-            sra_sequencing_run_obj.to_xml().split()
-        )
+        assert sra_sequencing_run_obj.to_xml(xml_declaration=False).split() == \
+               sra_sequencing_run_xml.split()
 
     def test_from_json(self, sra_sequencing_run_obj, sra_sequencing_run_json):
         sequencing_run = SRARun.from_json(json_obj=sra_sequencing_run_json)

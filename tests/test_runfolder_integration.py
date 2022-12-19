@@ -4,6 +4,8 @@ from snpseq_metadata.models.ngi_models import NGIFlowcell
 from snpseq_metadata.models.sra_models import SRARunSet
 from snpseq_metadata.models.converter import Converter
 
+from tests.models.conftest import ignore_xml_namespace_attributes
+
 
 @pytest.fixture
 def ngi_flowcell_from_disk(runfolder_path):
@@ -47,7 +49,8 @@ class TestSRAFlowcell:
         assert sra_run_set_from_ngi_flowcell.to_json() == runfolder_sra_json
 
     def test_to_xml(self, sra_run_set_from_ngi_flowcell, runfolder_sra_xml):
-        assert "".join(sra_run_set_from_ngi_flowcell.to_xml().split()) == "".join(
+        observed_xml = ignore_xml_namespace_attributes(sra_run_set_from_ngi_flowcell.to_xml())
+        assert "".join(observed_xml.split()) == "".join(
             runfolder_sra_xml.split()
         )
 

@@ -13,7 +13,8 @@ class TestSRASampleDescriptor:
         assert sra_sample_obj.to_manifest() == sra_sample_manifest
 
     def test_to_xml(self, sra_sample_obj, sra_sample_xml):
-        assert sra_sample_xml in sra_sample_obj.to_xml()
+        assert sra_sample_obj.to_xml(xml_declaration=False).split() == \
+               sra_sample_xml.split()
 
     def test___str__(self, sra_sample_obj):
         assert str(sra_sample_obj) == sra_sample_obj.model_object.refname

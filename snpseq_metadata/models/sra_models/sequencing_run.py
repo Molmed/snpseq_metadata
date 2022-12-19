@@ -5,13 +5,14 @@ from xsdata.models.datatype import XmlDateTime
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.sra_models.experiment import SRAExperimentBase
 from snpseq_metadata.models.sra_models.file_models import SRAFastqFile
-from snpseq_metadata.models.xsdata import RunType
+from snpseq_metadata.models.xsdata import RunType, Run
 
 T = TypeVar("T", bound="SRARun")
 
 
 class SRARun(SRAMetadataModel):
     model_object_class: ClassVar[Type] = RunType
+    model_object_meta_class: ClassVar[Optional[Type]] = Run
 
     def __init__(
         self,
@@ -43,7 +44,7 @@ class SRARun(SRAMetadataModel):
             run_date=xsd_run_date,
             center_name=run_center,
             experiment_ref=experiment.get_reference().model_object,
-            data_block=xsd_data_block,
+            data_block=xsd_data_block
         )
         return cls(
             model_object=model_object,

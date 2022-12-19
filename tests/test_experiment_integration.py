@@ -1,10 +1,11 @@
 import pytest
-import json
 
 from snpseq_metadata.models.lims_models import LIMSSequencingContainer
 from snpseq_metadata.models.ngi_models import NGIExperimentSet
 from snpseq_metadata.models.sra_models import SRAExperimentSet
 from snpseq_metadata.models.converter import Converter, ConvertExperimentSet
+
+from tests.models.conftest import ignore_xml_namespace_attributes
 
 
 @pytest.fixture
@@ -106,7 +107,8 @@ class TestSRAExperimentSet:
         assert sra_experiment_set_from_ngi.to_json() == experiment_set_sra_json
 
     def test_to_xml(self, sra_experiment_set_from_ngi, experiment_set_sra_xml):
-        assert sra_experiment_set_from_ngi.to_xml() == experiment_set_sra_xml
+        observed_xml = ignore_xml_namespace_attributes(sra_experiment_set_from_ngi.to_xml())
+        assert observed_xml == experiment_set_sra_xml
 
     def test_to_manifest(
         self, sra_experiment_set_from_ngi, sra_experiment_set_manifest
