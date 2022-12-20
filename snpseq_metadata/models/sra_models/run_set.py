@@ -20,7 +20,7 @@ class SRARunSet(SRAMetadataModel):
 
     @classmethod
     def create_object(cls: Type[T], runs: List[SRARun]) -> T:
-        model_object = RunSet(run=[r.model_object for r in runs])
+        model_object = cls.model_object_class(run=[r.model_object for r in runs])
         return cls(model_object=model_object, runs=runs)
 
     def to_manifest(self) -> List[Tuple[str, str]]:

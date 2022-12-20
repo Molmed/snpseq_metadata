@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: [3.9]
     env:
       SCHEMAURL: "https://raw.githubusercontent.com/enasequence/schema/master/src/main/resources/uk/ac/ebi/ena/sra/schema"
     steps:
@@ -18,13 +18,16 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install snpseq_metadata
-        run: "pip install -r requirements_dev.txt -e ."
+        run: "pip install ."
 
       - name: Download the ENA/SRA XML schema and generate python models
-        run: "bash ./snpseq_metadata/scripts/generate_python_models.sh xsdata $SCHEMAURL"
+        run: "generate_python_models.sh xsdata $SCHEMAURL"
+
+      - name: Install the test requirements
+        run: "pip install .[test]"
 
       - name: Run unit tests
-        run: "./validate-unit.sh"
+        run: "validate-unit.sh"
 
       - name: Run integration tests
         run: |

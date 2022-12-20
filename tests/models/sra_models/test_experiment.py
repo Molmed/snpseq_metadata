@@ -4,6 +4,8 @@ from snpseq_metadata.models.sra_models import (
     SRAExperimentSet,
 )
 
+from tests.models.conftest import ignore_xml_namespace_attributes
+
 
 class TestSRAExperimentRef:
     def test_from_json(self, sra_experiment_ref_obj, sra_experiment_ref_json):
@@ -85,8 +87,11 @@ class TestSRAExperimentSet:
         assert sra_experiment_set_obj.to_manifest() == sra_experiment_set_manifest
 
     def test_to_xml(self, sra_experiment_set_obj, sra_experiment_set_xml):
-        assert sra_experiment_set_obj.to_xml(xml_declaration=False).split() == \
-               sra_experiment_set_xml.split()
+        observed_xml = ignore_xml_namespace_attributes(
+            sra_experiment_set_obj.to_xml(xml_declaration=False))
+        assert "".join(observed_xml.split()) == "".join(
+            sra_experiment_set_xml.split()
+        )
 
     def test_restrict_to_study(self, sra_experiment_set_obj, sra_experiment_obj):
         experiment_set = sra_experiment_set_obj.restrict_to_study(

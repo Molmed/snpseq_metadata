@@ -642,8 +642,7 @@ def sra_sequencing_run_set_obj(sra_sequencing_run_obj):
 @pytest.fixture
 def sra_sequencing_run_set_xml(sra_sequencing_run_xml):
     return f"""<RUN_SET>
-  {sra_sequencing_run_xml}
-  </RUN_SET>"""
+    {sra_sequencing_run_xml}</RUN_SET>"""
 
 
 @pytest.fixture

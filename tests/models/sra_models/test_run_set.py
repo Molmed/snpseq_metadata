@@ -1,4 +1,7 @@
+
 from snpseq_metadata.models.sra_models.run_set import SRARunSet
+
+from tests.models.conftest import ignore_xml_namespace_attributes
 
 
 class TestSRARunSet:
@@ -21,8 +24,11 @@ class TestSRARunSet:
         )
 
     def test_to_xml(self, sra_sequencing_run_set_obj, sra_sequencing_run_set_xml):
-        assert sra_sequencing_run_set_obj.to_xml(xml_declaration=False).split() == \
-               sra_sequencing_run_set_xml.split()
+        observed_xml = ignore_xml_namespace_attributes(
+            sra_sequencing_run_set_obj.to_xml(xml_declaration=False))
+        assert "".join(observed_xml.split()) == "".join(
+            sra_sequencing_run_set_xml.split()
+        )
 
     def test_restrict_to_experiments(
         self, sra_sequencing_run_set_obj, sra_experiment_set_obj

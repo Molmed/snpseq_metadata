@@ -1,6 +1,5 @@
 [main](/Molmed/snpseq_metadata/tree/main) | [dev](/Molmed/snpseq_metadata/tree/dev)
 --- | ---
-[![Build Status](https://app.travis-ci.com/Molmed/snpseq_metadata.svg?branch=main)](https://app.travis-ci.com/Molmed/snpseq_metadata) | [![Build Status](https://app.travis-ci.com/Molmed/snpseq_metadata.svg?branch=dev)](https://app.travis-ci.com/Molmed/snpseq_metadata)
 
 # snpseq_metadata
 
@@ -15,11 +14,13 @@ This is a Python project that allows parsing of metadata associated with sequenc
 Clone the repo to your local machine and deploy the code
 ```
 git clone https://github.com/Molmed/snpseq_metadata && cd snpseq_metadata
-pip install -r requirements.txt -e .
+python3 -m venv --upgrade-deps .venv
+source .venv/bin/activate
+pip install .
 ```
 Download the [ENA/SRA XML schema](#enasra-xml-schema) and generate python models (can be skipped if these are already available)
 ``` 
-bash snpseq_metadata/scripts/generate_python_models.sh xsdata
+generate_python_models.sh xsdata
 ```
 
 ## Docker
@@ -172,8 +173,13 @@ and one manifest file for each unique experiment. For the test data set, the com
 └── CD-5678-CD-5678-SampleB-NovaSeq.manifest
 ```
 ## Test data
-As mentioned above, test data is available under `tests/resources` and the package include a pytest suite that can be
-run with 
+As mentioned above, test data is available under `tests/resources` and the package include a pytest suite.
+If not already installed, first install the test dependencies:
+```
+source .venv/bin/activate
+pip install .[test]
+```
+Then the test suite can be run with 
 ```
 pytest tests/
 ``` 

@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["snpseq_metadata*"]
+
+[tool.setuptools]
+script-files = [
+    "validate-unit.sh",
+    "snpseq_metadata/scripts/generate_python_models.sh"
+]
+
+[project]
+name = "snpseq_metadata"
+version = "1.0.0"
+authors = [
+    {name = "SNP&SEQ Technology Platform, Uppsala University", email = "seq@medsci.uu.se" },
+]
+keywords = ["bioinformatics"]
+description = "Module that is used to extract run and experiment metadata and export in various formats"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Scientific/Engineering :: Bio-Informatics"
+]
+dependencies = [
+    "xsdata[cli,lxml,soap]",
+    "click"
+]
+
+[project.optional-dependencies]
+test = [
+    "xmlschema",
+    "pytest"
+]
+
+[project.scripts]
+snpseq_metadata = "snpseq_metadata.scripts.metadata:metadata"
+
+[project.urls]
+homepage = "https://github.com/Molmed/snpseq_metadata"

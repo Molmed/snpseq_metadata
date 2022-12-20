@@ -10,7 +10,6 @@ from snpseq_metadata.models.xsdata import (
     RefObjectType,
     RunType as Run,
     Experiment,
-    ExperimentType as XSDExperiment,
     ExperimentSet as XSDExperimentSet,
 )
 
@@ -62,8 +61,7 @@ class SRAExperimentRef(SRAExperimentBase):
 
 
 class SRAExperiment(SRAExperimentBase):
-    model_object_class: ClassVar[Type] = XSDExperiment
-    model_object_meta_class: ClassVar[Optional[Type]] = Experiment
+    model_object_class: ClassVar[Type] = Experiment
 
     def __init__(
         self,
