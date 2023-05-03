@@ -1,5 +1,5 @@
-[main](/Molmed/snpseq_metadata/tree/main) | [dev](/Molmed/snpseq_metadata/tree/dev)
---- | ---
+
+[![Run unit tests](https://github.com/b97pla/snpseq_metadata/actions/workflows/run-unit-tests.yml/badge.svg?event=push)](https://github.com/b97pla/snpseq_metadata/actions/workflows/run-unit-tests.yml)
 
 # snpseq_metadata
 
