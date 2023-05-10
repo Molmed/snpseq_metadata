@@ -62,8 +62,8 @@ def catch_exception(f):
     def wrapper(*args, **kwargs):
         try:
             return f(*args, **kwargs)
-        except ModelConversionException as ex:
-            raise ex
+        except ModelConversionException:
+            raise
         except Exception as ex:
             if f.__name__ == "ngi_to_sra":
                 exception_cls = SRAModelConversionException

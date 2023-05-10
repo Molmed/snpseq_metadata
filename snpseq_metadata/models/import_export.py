@@ -7,12 +7,15 @@ from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.context import XmlContext
 
 from snpseq_metadata.models.custom_json_parser import CustomJsonParser
+from snpseq_metadata.utilities import log_exception
+
 
 T = TypeVar("T")
 ME = TypeVar("ME", bound="ModelExporter")
 
 
 class ModelExporter(Generic[T]):
+
     @staticmethod
     def filter_none_empty(x: Tuple) -> Dict:
         return {
@@ -36,6 +39,7 @@ class ModelExporter(Generic[T]):
         return config, context
 
     @classmethod
+    @log_exception
     def to_json(
             cls: Type[ME],
             obj: T,
@@ -51,6 +55,7 @@ class ModelExporter(Generic[T]):
         return json.loads(serializer.render(obj))
 
     @classmethod
+    @log_exception
     def to_xml(
             cls: Type[ME],
             obj: T,
@@ -68,6 +73,7 @@ class ModelExporter(Generic[T]):
 class ModelImporter:
 
     @staticmethod
+    @log_exception
     def from_json(json_obj: Dict, model_cls: Type[T]) -> T:
         parser = CustomJsonParser(context=XmlContext())
         return parser.from_string(json.dumps(json_obj), model_cls)

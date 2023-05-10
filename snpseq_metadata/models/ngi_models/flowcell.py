@@ -1,5 +1,6 @@
 import os
 import datetime
+import logging
 from typing import Dict, List, Optional, Type, TypeVar
 
 import snpseq_metadata.utilities
@@ -12,6 +13,7 @@ from snpseq_metadata.models.ngi_models.sequencing_platform import (
     NGIIlluminaSequencingPlatform,
 )
 
+log = logging.getLogger(__name__)
 T = TypeVar("T", bound="NGIFlowcell")
 
 
@@ -173,7 +175,12 @@ class NGIFlowcell(NGIMetadataModel):
     def get_sequencing_run_for_experiment_ref(
         self, experiment_ref: NGIExperimentRef
     ) -> NGIRun:
-        fastqfiles = self.get_files_for_experiment_ref(experiment_ref=experiment_ref)
+        try:
+            fastqfiles = self.get_files_for_experiment_ref(experiment_ref=experiment_ref)
+        except FastqFileLocationNotFoundException as ex:
+            log.warning(ex)
+            fastqfiles = []
+
         return NGIRun(
             run_alias=f"{experiment_ref.project.project_id}-{experiment_ref.sample.sample_id}-{self.flowcell_id}",
             experiment=experiment_ref,

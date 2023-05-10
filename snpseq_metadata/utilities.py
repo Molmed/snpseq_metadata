@@ -1,6 +1,8 @@
 import csv
 import hashlib
+import logging
 import os
+from functools import wraps
 from typing import Dict, List, Optional
 
 from snpseq_metadata.exceptions import (
@@ -8,6 +10,9 @@ from snpseq_metadata.exceptions import (
     SampleSheetNotFoundException,
     RunParametersNotFoundException,
 )
+
+
+log = logging.getLogger(__name__)
 
 
 def calculate_checksum_from_file(queryfile: str, method: str) -> str:
@@ -31,11 +36,12 @@ def lookup_checksum_from_file(checksumfile: str, querypath: str) -> Optional[str
 
 def parse_samplesheet_data(samplesheet: str) -> List[Dict[str, str]]:
     with open(samplesheet) as fh:
-        row = "first"
-        # discard all rows until we encounter "[Data]"
-        while row and not row.startswith("[Data]"):
-            row = next(fh)
-        if not row:
+        row = ""
+        try:
+            # discard all rows until we encounter "[Data]"
+            while not row.startswith("[Data]"):
+                row = next(fh)
+        except StopIteration:
             raise NoSampleSheetDataFoundException(samplesheet)
 
         # use a DictReader to parse the data
@@ -67,3 +73,15 @@ def find_file(search_path: str, suffix: str) -> List[str]:
         )
     )
     return csvfiles
+
+
+def log_exception(f):
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as ex:
+            log.error(ex)
+            raise
+    return wrapper
