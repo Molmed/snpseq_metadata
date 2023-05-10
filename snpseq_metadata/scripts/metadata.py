@@ -148,4 +148,10 @@ extract.add_command(runfolder)
 metadata.add_command(extract)
 
 if __name__ == "__main__":
-    metadata()
+    # catch any exceptions and write a comprehensive message to stdout and raise the exception for
+    # stacktrace and exit code etc.
+    try:
+        metadata()
+    except Exception as ex:
+        print(str(ex))
+        raise
