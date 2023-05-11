@@ -40,7 +40,7 @@ test = [
 ]
 
 [project.scripts]
-snpseq_metadata = "snpseq_metadata.scripts.metadata:metadata"
+snpseq_metadata = "snpseq_metadata.scripts.metadata:entry_point"
 
 [project.urls]
 homepage = "https://github.com/Molmed/snpseq_metadata"

@@ -147,11 +147,16 @@ extract.add_command(snpseq_data)
 extract.add_command(runfolder)
 metadata.add_command(extract)
 
-if __name__ == "__main__":
+
+def entry_point():
     # catch any exceptions and write a comprehensive message to stdout and raise the exception for
     # stacktrace and exit code etc.
     try:
-        metadata()
+        metadata.main(standalone_mode=False)
     except Exception as ex:
         print(str(ex))
         raise
+
+
+if __name__ == "__main__":
+    entry_point()
