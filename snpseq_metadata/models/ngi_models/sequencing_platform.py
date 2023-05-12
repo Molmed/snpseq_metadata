@@ -20,6 +20,7 @@ class NGISequencingPlatform(NGIMetadataModel):
 class NGIIlluminaSequencingPlatform(NGISequencingPlatform):
 
     model_dict: ClassVar[Dict[str, str]] = {
+        "lh": "NovaSeqX",
         "a": "NovaSeq",
         "m": "MiSeq",
         "fs": "iSeq",

@@ -23,6 +23,7 @@ class SRAIlluminaSequencingPlatform(SRASequencingPlatform):
     @classmethod
     def object_from_name(cls: Type[T], model_name: str) -> TypeIlluminaModel:
         model_dict = {
+            "novaseqx": TypeIlluminaModel.ILLUMINA_NOVA_SEQ_X,
             "novaseq": TypeIlluminaModel.ILLUMINA_NOVA_SEQ_6000,
             "miseq": TypeIlluminaModel.ILLUMINA_MI_SEQ,
             "iseq": TypeIlluminaModel.ILLUMINA_I_SEQ_100,
