@@ -1,3 +1,4 @@
+from snpseq_metadata.models.sra_models.attribute import SRAAttribute
 from snpseq_metadata.models.sra_models.experiment import (
     SRAExperimentRef,
     SRAExperiment,

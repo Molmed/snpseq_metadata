@@ -1,7 +1,7 @@
 {
   "EXPERIMENT": [
     {
-      "alias": "AB-1234-AB-1234-SampleA-1-NovaSeq",
+      "alias": "AB-1234-AB-1234-SampleA-1",
       "TITLE": "AB-1234 - AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
       "STUDY_REF": {
         "refname": "AB-1234"
@@ -26,7 +26,7 @@
       }
     },
     {
-      "alias": "AB-1234-AB-1234-SampleA-2-NovaSeq",
+      "alias": "AB-1234-AB-1234-SampleA-2",
       "TITLE": "AB-1234 - AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit",
       "STUDY_REF": {
         "refname": "AB-1234"
@@ -51,7 +51,7 @@
       }
     },
     {
-      "alias": "AB-1234-AB-1234-SampleB-NovaSeq",
+      "alias": "AB-1234-AB-1234-SampleB",
       "TITLE": "AB-1234 - AB-1234-SampleB - olink explore - serum - olink explore 1536",
       "STUDY_REF": {
         "refname": "AB-1234"
@@ -76,7 +76,7 @@
       }
     },
     {
-      "alias": "CD-5678-CD-5678-SampleA-1-NovaSeq",
+      "alias": "CD-5678-CD-5678-SampleA-1",
       "TITLE": "CD-5678 - CD-5678-SampleA-1 - target re-seq - gDNA - twist human core exome",
       "STUDY_REF": {
         "refname": "CD-5678"
@@ -101,7 +101,7 @@
       }
     },
     {
-      "alias": "CD-5678-CD-5678-SampleA-2-NovaSeq",
+      "alias": "CD-5678-CD-5678-SampleA-2",
       "TITLE": "CD-5678 - CD-5678-SampleA-2 - epigenetics - gDNA - nebnext enzymatic methyl-seq kit",
       "STUDY_REF": {
         "refname": "CD-5678"
@@ -126,7 +126,7 @@
       }
     },
     {
-      "alias": "CD-5678-CD-5678-SampleB-NovaSeq",
+      "alias": "CD-5678-CD-5678-SampleB",
       "TITLE": "CD-5678 - CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
       "STUDY_REF": {
         "refname": "CD-5678"
@@ -151,7 +151,7 @@
       }
     },
     {
-      "alias": "EF-9012-EF-9012-608-HiSeqX",
+      "alias": "EF-9012-EF-9012-608",
       "TITLE": "EF-9012 - EF-9012-608 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT",
       "STUDY_REF": {
         "refname": "EF-9012"

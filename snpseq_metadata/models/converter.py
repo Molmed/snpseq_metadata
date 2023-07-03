@@ -15,6 +15,7 @@ from snpseq_metadata.models.ngi_models import (
     NGIExperiment,
     NGIExperimentSet,
     NGILibrary,
+    NGIAttribute
 )
 from snpseq_metadata.models.sra_models import (
     SRAMetadataModel,
@@ -28,6 +29,7 @@ from snpseq_metadata.models.sra_models import (
     SRAExperiment,
     SRAExperimentSet,
     SRALibrary,
+    SRAAttribute
 )
 
 from snpseq_metadata.models.lims_models import (
@@ -183,7 +185,10 @@ class ConvertSampleDescriptor(Converter):
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
         if lims_model:
-            return cls.ngi_model_class(sample_id=lims_model.sample_id)
+            # will only pass sample_id for now but should really figure out how to pass a library
+            # specification identifier
+            return cls.ngi_model_class(
+                sample_id=lims_model.sample_id)
 
 
 class ConvertStudyRef(Converter):
@@ -234,6 +239,10 @@ class ConvertRun(Converter):
                 fastqfiles=[
                     Converter.ngi_to_sra(n) for n in ngi_model.fastqfiles or []
                 ],
+                run_attributes=[
+                    Converter.ngi_to_sra(run_attribute)
+                    for run_attribute in ngi_model.run_attributes or []
+                ] or None
             )
 
 
@@ -335,8 +344,14 @@ class ConvertExperimentRef(Converter):
             sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
             project = ConvertStudyRef.lims_to_ngi(lims_model=lims_model)
             platform = ConvertSequencingPlatform.lims_to_ngi(lims_model=lims_model)
+            # this alias should ideally be the same regardless if it's created from the LIMS
+            # object or from the NGI object. Currently, it's not straightforward since there's not
+            # enough specific information
             alias = f"{project.project_id}-{sample.sample_id}-{platform.model_name}"
-            return cls.ngi_model_class(alias=alias, sample=sample, project=project)
+            return cls.ngi_model_class(
+                alias=alias,
+                sample=sample,
+                project=project)
 
 
 class ConvertExperimentSet(Converter):
@@ -370,7 +385,9 @@ class ConvertExperimentSet(Converter):
             experiments = []
             for lims_sample in lims_model.samples or []:
                 try:
-                    experiment = ConvertExperiment.lims_to_ngi(lims_model=lims_sample)
+                    experiment = ConvertExperiment.lims_to_ngi(
+                        lims_model=lims_sample
+                    )
                     if experiment is not None:
                         experiments.append(experiment)
                 except ModelConversionException as ex:
@@ -499,7 +516,7 @@ class ConvertExperiment(Converter):
             sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
             project = ConvertStudyRef.lims_to_ngi(lims_model=lims_model)
             platform = ConvertSequencingPlatform.lims_to_ngi(lims_model=lims_model)
-            alias = f"{project.project_id}-{sample.sample_id}-{platform.model_name}"
+            alias = f"{project.project_id}-{sample.sample_alias()}"
             library = ConvertLibrary.lims_to_ngi(lims_model=lims_model)
             title = f"{project.project_id} - " \
                     f"{sample.sample_id} - " \
@@ -512,4 +529,25 @@ class ConvertExperiment(Converter):
                 project=project,
                 platform=platform,
                 library=library,
+            )
+
+
+class ConvertAttribute(Converter):
+    """
+    Conversion between NGIAttribute and SRAAttribute
+    """
+
+    ngi_model_class = NGIAttribute
+    sra_model_class = SRAAttribute
+
+    @classmethod
+    @catch_exception
+    def ngi_to_sra(
+        cls: Type[T], ngi_model: ngi_model_class
+    ) -> Optional[sra_model_class]:
+        if ngi_model:
+            return cls.sra_model_class.create_object(
+                tag=ngi_model.tag,
+                value=ngi_model.value,
+                units=ngi_model.units
             )

@@ -1,4 +1,4 @@
-from typing import ClassVar, Type, TypeVar, Tuple, List
+from typing import ClassVar, Optional, Type, TypeVar, Tuple, List
 
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.xsdata import SampleDescriptorType
@@ -16,7 +16,7 @@ class SRASampleDescriptor(SRAMetadataModel):
         return cls(model_object=model_object)
 
     def to_manifest(self) -> List[Tuple[str, str]]:
-        return [("SAMPLE", self.model_object.refname)]
+        return [("SAMPLE", self.refname)]
 
     def __str__(self) -> str:
-        return self.model_object.refname
+        return self.refname

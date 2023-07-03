@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EXPERIMENT_SET>
-  <EXPERIMENT alias="AB-1234-AB-1234-SampleA-1-NovaSeq">
+  <EXPERIMENT alias="AB-1234-AB-1234-SampleA-1">
     <TITLE>AB-1234 - AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT</TITLE>
     <STUDY_REF refname="AB-1234"/>
     <DESIGN>
@@ -20,7 +20,7 @@
       </ILLUMINA>
     </PLATFORM>
   </EXPERIMENT>
-  <EXPERIMENT alias="AB-1234-AB-1234-SampleA-2-NovaSeq">
+  <EXPERIMENT alias="AB-1234-AB-1234-SampleA-2">
     <TITLE>AB-1234 - AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit</TITLE>
     <STUDY_REF refname="AB-1234"/>
     <DESIGN>
@@ -40,7 +40,7 @@
       </ILLUMINA>
     </PLATFORM>
   </EXPERIMENT>
-  <EXPERIMENT alias="AB-1234-AB-1234-SampleB-NovaSeq">
+  <EXPERIMENT alias="AB-1234-AB-1234-SampleB">
     <TITLE>AB-1234 - AB-1234-SampleB - olink explore - serum - olink explore 1536</TITLE>
     <STUDY_REF refname="AB-1234"/>
     <DESIGN>
@@ -60,7 +60,7 @@
       </ILLUMINA>
     </PLATFORM>
   </EXPERIMENT>
-  <EXPERIMENT alias="CD-5678-CD-5678-SampleA-1-NovaSeq">
+  <EXPERIMENT alias="CD-5678-CD-5678-SampleA-1">
     <TITLE>CD-5678 - CD-5678-SampleA-1 - target re-seq - gDNA - twist human core exome</TITLE>
     <STUDY_REF refname="CD-5678"/>
     <DESIGN>
@@ -80,7 +80,7 @@
       </ILLUMINA>
     </PLATFORM>
   </EXPERIMENT>
-  <EXPERIMENT alias="CD-5678-CD-5678-SampleA-2-NovaSeq">
+  <EXPERIMENT alias="CD-5678-CD-5678-SampleA-2">
     <TITLE>CD-5678 - CD-5678-SampleA-2 - epigenetics - gDNA - nebnext enzymatic methyl-seq kit</TITLE>
     <STUDY_REF refname="CD-5678"/>
     <DESIGN>
@@ -100,7 +100,7 @@
       </ILLUMINA>
     </PLATFORM>
   </EXPERIMENT>
-  <EXPERIMENT alias="CD-5678-CD-5678-SampleB-NovaSeq">
+  <EXPERIMENT alias="CD-5678-CD-5678-SampleB">
     <TITLE>CD-5678 - CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT</TITLE>
     <STUDY_REF refname="CD-5678"/>
     <DESIGN>
@@ -120,7 +120,7 @@
       </ILLUMINA>
     </PLATFORM>
   </EXPERIMENT>
-  <EXPERIMENT alias="EF-9012-EF-9012-608-HiSeqX">
+  <EXPERIMENT alias="EF-9012-EF-9012-608">
     <TITLE>EF-9012 - EF-9012-608 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT</TITLE>
     <STUDY_REF refname="EF-9012"/>
     <DESIGN>

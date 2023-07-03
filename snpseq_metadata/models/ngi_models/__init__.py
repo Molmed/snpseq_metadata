@@ -1,3 +1,4 @@
+from snpseq_metadata.models.ngi_models.attribute import NGIAttribute
 from snpseq_metadata.models.ngi_models.experiment import (
     NGIExperimentRef,
     NGIExperiment,

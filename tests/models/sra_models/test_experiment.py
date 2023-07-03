@@ -23,7 +23,7 @@ class TestSRAExperimentRef:
 
     def test___str__(self, sra_experiment_ref_obj):
         assert (
-            str(sra_experiment_ref_obj) == sra_experiment_ref_obj.model_object.refname
+            str(sra_experiment_ref_obj) == sra_experiment_ref_obj.refname
         )
 
     def test___eq__(self, sra_experiment_ref_obj):
@@ -66,9 +66,9 @@ class TestSRAExperiment:
 
     def test_create_object(self, sra_experiment_obj):
         obj = SRAExperiment.create_object(
-            alias=sra_experiment_obj.model_object.alias,
-            title=sra_experiment_obj.model_object.title,
-            study_ref=sra_experiment_obj.study_ref,
+            alias=sra_experiment_obj.alias,
+            title=sra_experiment_obj.title,
+            study_ref=sra_experiment_obj.project,
             library=sra_experiment_obj.library,
             platform=sra_experiment_obj.platform,
         )

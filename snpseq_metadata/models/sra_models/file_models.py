@@ -1,6 +1,6 @@
 import os
 
-from typing import ClassVar, TypeVar, Type, List, Tuple
+from typing import ClassVar, Optional, TypeVar, Type, List, Tuple
 
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.xsdata import Run, FileFiletype, FileChecksumMethod
@@ -17,12 +17,20 @@ class SRAResultFile(SRAMetadataModel):
 
     def __eq__(self, other: T) -> bool:
         return (
-            os.path.normpath(self.model_object.filename)
-            == os.path.normpath(other.model_object.filename)
-            and self.model_object.filetype == other.model_object.filetype
-            and self.model_object.checksum == other.model_object.checksum
-            and self.model_object.checksum_method == other.model_object.checksum_method
+            os.path.normpath(self.filename)
+            == os.path.normpath(other.filename)
+            and self.filetype == other.filetype
+            and self.checksum == other.checksum
+            and self.checksum_method == other.checksum_method
         )
+
+    def __getattr__(self, item: str) -> Optional[str]:
+        attr = super().__getattr__(item)
+        if attr:
+            return attr
+        attr = getattr(self.model_object, item)
+        if type(attr) in (FileChecksumMethod, FileFiletype):
+            return attr.value
 
     @classmethod
     def object_from_method(cls: Type[T], checksum_method: str) -> FileChecksumMethod:
@@ -57,7 +65,7 @@ class SRAResultFile(SRAMetadataModel):
         return cls(model_object=model_object)
 
     def to_manifest(self) -> List[Tuple[str, str]]:
-        return [(self.model_object.filetype.name, self.model_object.filename)]
+        return [(self.model_object.filetype.name, self.filename)]
 
 
 class SRAFastqFile(SRAResultFile):

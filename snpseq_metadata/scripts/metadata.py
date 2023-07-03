@@ -126,7 +126,7 @@ def to_manifest():
     def processor(project_id, experiment_set, run_set, outdir):
         for sra_run in run_set.runs:
             outfile = os.path.join(
-                outdir, f"{sra_run.experiment.model_object.alias}.manifest"
+                outdir, f"{sra_run.experiment.alias}.manifest"
             )
             with open(outfile, "w") as fh:
                 for row in sra_run.experiment.to_manifest() + sra_run.to_manifest():

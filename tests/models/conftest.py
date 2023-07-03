@@ -14,7 +14,12 @@ def ignore_xml_namespace_attributes(xml_str):
 
 
 @pytest.fixture
-def test_values(run_date):
+def flowcell_id():
+    return "ABC123XYZ"
+
+
+@pytest.fixture
+def test_values(run_date, flowcell_id):
     return {
         "study_refname": "this-is-a-project-id",
         "sample_refname": "this-is-a-sample-id",
@@ -40,10 +45,14 @@ def test_values(run_date):
         "platform_model_name": "this-is-a-platform-model-name",
         "samplesheet": "this-is-the-samplesheet-file",
         "run_parameters": "this-is-the-run-parameters-file",
+        "flowcell_id": flowcell_id,
         "runfolder_path": os.path.join("/this", "is", "a", "runfolder", "path"),
-        "runfolder_name": f"{run_date.strftime('%y%m%d')}_A00123_0001_AABC123XYZ",
+        "runfolder_name": f"{run_date.strftime('%y%m%d')}_A00123_0001_A{flowcell_id}",
         "run_date": run_date.isoformat(),
         "container_name": "this-is-a-sequencing-container-name",
+        "attribute_tag": "this-is-an-attribute-tag",
+        "attribute_value": "this-is-an-attribute-value",
+        "attribute_units": "this-is-an-attribute-unit"
     }
 
 
@@ -121,9 +130,9 @@ def ngi_experiment_ref_json(test_values, ngi_study_json, ngi_sample_json):
 
 
 @pytest.fixture
-def ngi_experiment_ref_obj(ngi_experiment_ref_json, ngi_study_obj, ngi_sample_obj):
+def ngi_experiment_ref_obj(test_values, ngi_study_obj, ngi_sample_obj):
     return NGIExperimentRef(
-        alias=ngi_experiment_ref_json["alias"],
+        alias=test_values["experiment_refname"],
         project=ngi_study_obj,
         sample=ngi_sample_obj,
     )
@@ -277,6 +286,7 @@ def ngi_sequencing_run_json(
     ngi_experiment_ref_json,
     ngi_illumina_platform_json,
     ngi_result_file_json,
+    ngi_attribute_json
 ):
     return {
         "run_alias": test_values["sequencing_run_alias"],
@@ -285,6 +295,7 @@ def ngi_sequencing_run_json(
         "experiment": ngi_experiment_ref_json,
         "platform": ngi_illumina_platform_json,
         "fastqfiles": [ngi_result_file_json],
+        "run_attributes": [ngi_attribute_json]
     }
 
 
@@ -294,6 +305,7 @@ def ngi_sequencing_run_obj(
     ngi_experiment_ref_obj,
     ngi_illumina_platform_obj,
     ngi_result_file_obj,
+    ngi_attribute_obj,
     run_date,
 ):
     return NGIRun(
@@ -302,17 +314,20 @@ def ngi_sequencing_run_obj(
         platform=ngi_illumina_platform_obj,
         run_date=run_date,
         fastqfiles=[ngi_result_file_obj],
+        run_attributes=[ngi_attribute_obj]
     )
 
 
 @pytest.fixture
 def ngi_sample_json(test_values):
-    return {"sample_id": test_values["sample_refname"]}
+    return {
+        "sample_id": test_values["sample_refname"]}
 
 
 @pytest.fixture
 def ngi_sample_obj(ngi_sample_json):
-    return NGISampleDescriptor(sample_id=ngi_sample_json["sample_id"])
+    return NGISampleDescriptor(
+        sample_id=ngi_sample_json["sample_id"])
 
 
 @pytest.fixture
@@ -323,6 +338,22 @@ def ngi_study_json(test_values):
 @pytest.fixture
 def ngi_study_obj(ngi_study_json):
     return NGIStudyRef(project_id=ngi_study_json["project_id"])
+
+
+@pytest.fixture
+def ngi_attribute_json(test_values):
+    return {
+        "tag": test_values["attribute_tag"],
+        "value": test_values["attribute_value"],
+        "units": test_values["attribute_units"]}
+
+
+@pytest.fixture
+def ngi_attribute_obj(ngi_attribute_json):
+    return NGIAttribute(
+        tag=ngi_attribute_json["tag"],
+        value=ngi_attribute_json["value"],
+        units=ngi_attribute_json["units"])
 
 
 # SRA models
@@ -580,10 +611,12 @@ def sra_sequencing_platform_xml(sra_sequencing_platform_json):
 
 
 @pytest.fixture
-def sra_sequencing_run_json(test_values, sra_experiment_ref_json, sra_result_file_json):
+def sra_sequencing_run_json(
+        test_values, sra_experiment_ref_json, sra_result_file_json, sra_attribute_json):
     return {
         "TITLE": test_values["sequencing_run_alias"],
         "EXPERIMENT_REF": sra_experiment_ref_json,
+        "RUN_ATTRIBUTES": {"RUN_ATTRIBUTE": [sra_attribute_json]},
         "DATA_BLOCK": {"FILES": {"FILE": [sra_result_file_json]}},
         "run_date": test_values["run_date"],
         "run_center": test_values["run_center"],
@@ -598,7 +631,7 @@ def sra_sequencing_run_manifest(sra_result_file_manifest):
 
 @pytest.fixture
 def sra_sequencing_run_obj(
-    sra_sequencing_run_json, sra_experiment_obj, sra_result_file_obj, run_date
+    sra_sequencing_run_json, sra_experiment_obj, sra_result_file_obj, sra_attribute_obj, run_date
 ):
     return SRARun.create_object(
         run_alias=sra_sequencing_run_json["TITLE"],
@@ -606,12 +639,13 @@ def sra_sequencing_run_obj(
         run_date=run_date,
         experiment=sra_experiment_obj,
         fastqfiles=[sra_result_file_obj],
+        run_attributes=[sra_attribute_obj]
     )
 
 
 @pytest.fixture
 def sra_sequencing_run_xml(
-    sra_sequencing_run_json, sra_experiment_ref_xml, sra_result_file_xml
+    sra_sequencing_run_json, sra_experiment_ref_xml, sra_result_file_xml, sra_attribute_xml
 ):
     return f"""<RUN center_name="{sra_sequencing_run_json["center_name"]}" run_date="{sra_sequencing_run_json["run_date"]}" run_center="{sra_sequencing_run_json["run_center"]}">
     <TITLE>{sra_sequencing_run_json["TITLE"]}</TITLE>
@@ -621,6 +655,9 @@ def sra_sequencing_run_xml(
         {sra_result_file_xml}
       </FILES>
     </DATA_BLOCK>
+    <RUN_ATTRIBUTES>
+    {sra_attribute_xml.replace("ATTRIBUTETYPE", "RUN_ATTRIBUTE")}
+    </RUN_ATTRIBUTES>
   </RUN>"""
 
 
@@ -665,3 +702,41 @@ def sra_study_xml(sra_study_json):
     # in the experiment context, the tag name will be STUDY_REF but when exported as a stand-alone
     # object, it will use the name of the python class, i.e. STUDYREF
     return f'<STUDY_REF refname="{sra_study_json["refname"]}"/>'
+
+
+@pytest.fixture
+def sra_attribute_json(test_values):
+    return {
+        "TAG": test_values["attribute_tag"],
+        "VALUE": test_values["attribute_value"],
+        "UNITS": test_values["attribute_units"]
+    }
+
+
+@pytest.fixture
+def sra_attribute_manifest(sra_attribute_json):
+    return [(
+        sra_attribute_json["TAG"].upper(),
+        f'{sra_attribute_json["VALUE"]} {sra_attribute_json["UNITS"]}')]
+
+
+@pytest.fixture
+def sra_attribute_obj(sra_attribute_json):
+    return SRAAttribute.create_object(
+        tag=sra_attribute_json["TAG"],
+        value=sra_attribute_json["VALUE"],
+        units=sra_attribute_json["UNITS"]
+    )
+
+
+@pytest.fixture
+def sra_attribute_xml(sra_attribute_json):
+    # in the experiment context, the tag name will be STUDY_REF but when exported as a stand-alone
+    # object, it will use the name of the python class, i.e. STUDYREF
+    return f"""
+<ATTRIBUTETYPE>
+<TAG>{sra_attribute_json['TAG']}</TAG>
+<VALUE>{sra_attribute_json['VALUE']}</VALUE>
+<UNITS>{sra_attribute_json['UNITS']}</UNITS>
+</ATTRIBUTETYPE>
+"""

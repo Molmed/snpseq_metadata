@@ -1,5 +1,5 @@
 import dataclasses
-from typing import ClassVar, Type, TypeVar, List, Tuple
+from typing import ClassVar, Optional, Type, TypeVar, List, Tuple
 
 from snpseq_metadata.models.xsdata import PlatformType, TypeIlluminaModel
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
@@ -11,15 +11,40 @@ T = TypeVar("T", "SRASequencingPlatform", "SRAIlluminaSequencingPlatform")
 class SRASequencingPlatform(SRAMetadataModel):
     model_object_class: ClassVar[Type] = PlatformType
 
+    def __getattr__(self, item: str) -> Optional[str]:
+        try:
+            if item in ("platform", "instrument_model"):
+                field = self.get_defined_fields(self.model_object)[0]
+                if item == "platform":
+                    return field.metadata["name"]
+                return getattr(self.model_object, field.name).instrument_model.value
+        except StopIteration:
+            pass
+
+    @staticmethod
+    def get_defined_fields(model_object: PlatformType) -> Optional[List[dataclasses.field]]:
+        return list(
+            filter(
+                lambda x: getattr(model_object, x.name),
+                dataclasses.fields(model_object)))
+
     @classmethod
     def create_object(cls: Type[T], model_name: str) -> T:
         raise NotImplementedError
+
+    @classmethod
+    def from_model_object(cls: Type[T], model_object: model_object_class) -> T:
+        defined_field = cls.get_defined_fields(model_object=model_object)[0]
+        if defined_field.metadata["name"] == "ILLUMINA":
+            return SRAIlluminaSequencingPlatform(model_object=model_object)
+        return cls(SRASequencingPlatform)
 
     def to_manifest(self) -> List[Tuple[str, str]]:
         raise NotImplementedError
 
 
 class SRAIlluminaSequencingPlatform(SRASequencingPlatform):
+
     @classmethod
     def object_from_name(cls: Type[T], model_name: str) -> TypeIlluminaModel:
         model_dict = {
@@ -49,21 +74,8 @@ class SRAIlluminaSequencingPlatform(SRASequencingPlatform):
         return cls(model_object=model_object)
 
     def to_manifest(self) -> List[Tuple[str, str]]:
-        manifest = []
-        manifest_fields = ["illumina"]
-        for field in filter(
-            lambda f: f.name in manifest_fields,
-            dataclasses.fields(self.model_object),
-        ):
-            manifest.extend(
-                [
-                    ("PLATFORM", field.metadata["name"]),
-                    (
-                        "INSTRUMENT",
-                        getattr(
-                            getattr(self.model_object, field.name), "instrument_model"
-                        ).value,
-                    ),
-                ]
-            )
+        manifest = [
+            ("PLATFORM", self.platform),
+            ("INSTRUMENT", self.instrument_model)
+        ]
         return manifest

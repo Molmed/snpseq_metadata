@@ -1,4 +1,4 @@
-from typing import ClassVar, List, Type, TypeVar, Optional, Tuple
+from typing import ClassVar, List, Type, TypeVar, Optional, Tuple, Union
 
 from snpseq_metadata.models.sra_models.sequencing_platform import (
     SRASequencingPlatform,
@@ -17,6 +17,7 @@ TR = TypeVar("TR", bound="SRAExperimentRef")
 T = TypeVar("T", bound="SRAExperiment")
 TS = TypeVar("TS", bound="SRAExperimentSet")
 TB = TypeVar("TB", bound="SRAExperimentBase")
+X = TypeVar("X", "None", "str", "SRAStudyRef", "SRALibrary", "SRASequencingPlatform")
 
 
 class SRAExperimentBase(SRAMetadataModel):
@@ -38,7 +39,7 @@ class SRAExperimentRef(SRAExperimentBase):
     model_object_parent_field: ClassVar[Optional[Tuple[Type, str]]] = (Run, "experiment_ref")
 
     def __str__(self) -> str:
-        return self.model_object.refname
+        return self.refname
 
     @classmethod
     def create_object(cls: Type[TR], experiment_name: str) -> TR:
@@ -46,13 +47,13 @@ class SRAExperimentRef(SRAExperimentBase):
         return cls(model_object=model_object)
 
     def to_manifest(self) -> List[Tuple[str, str]]:
-        return [("NAME", self.model_object.refname)]
+        return [("NAME", self.refname)]
 
     def is_reference_to(self, other: T) -> bool:
         return all(
             [
                 isinstance(other, SRAExperiment),
-                self.model_object.refname == other.model_object.alias,
+                self.refname == other.alias,
             ]
         )
 
@@ -63,17 +64,16 @@ class SRAExperimentRef(SRAExperimentBase):
 class SRAExperiment(SRAExperimentBase):
     model_object_class: ClassVar[Type] = Experiment
 
-    def __init__(
-        self,
-        model_object: model_object_class,
-        study_ref: Optional[SRAStudyRef] = None,
-        platform: Optional[SRASequencingPlatform] = None,
-        library: Optional[SRALibrary] = None,
-    ):
-        super().__init__(model_object)
-        self.study_ref = study_ref
-        self.platform = platform
-        self.library = library
+    def __getattr__(self, item: str) -> X:
+        attr = super().__getattr__(item)
+        if attr:
+            return attr
+        if item in ["project", "study_ref"]:
+            return SRAStudyRef(model_object=self.model_object.study_ref)
+        if item == "library":
+            return SRALibrary.from_model_object(self.model_object.design)
+        if item == "platform":
+            return SRASequencingPlatform.from_model_object(model_object=self.model_object.platform)
 
     @classmethod
     def create_object(
@@ -92,40 +92,40 @@ class SRAExperiment(SRAExperimentBase):
             design=library.model_object,
         )
         return cls(
-            model_object=model_object,
-            study_ref=study_ref,
-            platform=platform,
-            library=library,
-        )
+            model_object=model_object)
 
     def to_manifest(self) -> List[Tuple[str, str]]:
-        manifest = [("NAME", self.model_object.alias)]
-        manifest.extend(self.study_ref.to_manifest())
+        manifest = [("NAME", self.alias)]
+        manifest.extend(self.project.to_manifest())
         manifest.extend(self.platform.to_manifest())
         manifest.extend(self.library.to_manifest())
         return manifest
 
     def get_reference(self) -> SRAExperimentRef:
-        return SRAExperimentRef.create_object(experiment_name=self.model_object.alias)
+        return SRAExperimentRef.create_object(experiment_name=self.alias)
 
 
 class SRAExperimentSet(SRAMetadataModel):
     model_object_class: ClassVar[Type] = XSDExperimentSet
 
-    def __init__(
-        self,
-        model_object: model_object_class,
-        experiments: Optional[List[SRAExperiment]] = None,
-    ):
-        super().__init__(model_object)
-        self.experiments = experiments
+    def __getattr__(self, item: str) -> Union[None, str, List[SRAExperimentBase]]:
+        attr = super().__getattr__(item)
+        if attr:
+            return attr
+        if item in ["experiment", "experiments"]:
+            experiments = []
+            for experiment_model in self.model_object.experiment:
+                experiments.append(
+                    SRAExperiment.from_model_object(experiment_model) or
+                    SRAExperimentRef.from_model_object(experiment_model))
+            return experiments
 
     @classmethod
     def create_object(cls: Type[TS], experiments: List[SRAExperiment]) -> TS:
         model_object = cls.model_object_class(
             experiment=[experiment.model_object for experiment in experiments]
         )
-        return cls(model_object=model_object, experiments=experiments)
+        return cls(model_object=model_object)
 
     def to_manifest(self) -> List[Tuple[str, str]]:
         manifest = []

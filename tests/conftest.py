@@ -36,7 +36,7 @@ def runfolder_run_date(runfolder_path):
 
 @pytest.fixture
 def runfolder_flowcell_id(runfolder_path):
-    return runfolder_path.split("_")[-1]
+    return runfolder_path.split("_")[-1][1:]
 
 
 @pytest.fixture
