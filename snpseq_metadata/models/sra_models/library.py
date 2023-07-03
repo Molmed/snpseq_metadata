@@ -1,5 +1,5 @@
 import dataclasses
-from typing import ClassVar, Dict, Type, TypeVar, Optional, List, Tuple
+from typing import ClassVar, Dict, Type, TypeVar, Optional, List, Tuple, Union
 
 from snpseq_metadata.exceptions import (
     LibraryStrategyNotRecognizedException,
@@ -23,13 +23,8 @@ TLS = TypeVar("TLS", TypeLibraryStrategy, TypeLibrarySelection, TypeLibrarySourc
 class SRALibrary(SRAMetadataModel):
     model_object_class: ClassVar[Type] = LibraryType
 
-    def __init__(
-        self,
-        model_object: model_object_class,
-        sample: Optional[SRASampleDescriptor] = None,
-    ):
+    def __init__(self, model_object: model_object_class):
         super().__init__(model_object)
-        self.sample = sample
 
     @classmethod
     def object_from_paired(
@@ -94,7 +89,7 @@ class SRALibrary(SRAMetadataModel):
             sample_descriptor=sample.model_object,
             library_descriptor=xsdlibrary,
         )
-        return cls(model_object=model_object, sample=sample)
+        return cls(model_object=model_object)
 
     def to_manifest(self) -> List[Tuple[str, str]]:
         manifest = (
@@ -103,6 +98,7 @@ class SRALibrary(SRAMetadataModel):
             else []
         )
         manifest_fields = ["library_source", "library_selection", "library_strategy"]
+
         for field in filter(
             lambda f: f.name in manifest_fields,
             dataclasses.fields(self.model_object.library_descriptor),
@@ -110,8 +106,24 @@ class SRALibrary(SRAMetadataModel):
             manifest.append(
                 (
                     field.metadata["name"],
-                    getattr(self.model_object.library_descriptor, field.name).name,
+                    getattr(self, field.name),
                 )
             )
         manifest.extend(self.sample.to_manifest())
         return manifest
+
+    def __getattr__(self, item: str) -> Union[None, str, SRASampleDescriptor]:
+        attr = super().__getattr__(item)
+        if attr:
+            return attr
+        if item in ("library_source", "library_selection", "library_strategy", "library_layout"):
+            library_descriptor = getattr(self.model_object, "library_descriptor")
+            attr = getattr(library_descriptor, item)
+            if item == "library_layout":
+                field = next(filter(lambda x: getattr(attr, x.name), dataclasses.fields(attr)))
+                return field.metadata["name"]
+            return attr.name
+        if item == "sample":
+            attr = getattr(self.model_object, "sample_descriptor")
+            return SRASampleDescriptor.from_model_object(attr)
+

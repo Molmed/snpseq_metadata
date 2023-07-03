@@ -1,6 +1,7 @@
 from typing import ClassVar, List, Dict, Optional, Type, TypeVar
 import datetime
 
+from snpseq_metadata.models.ngi_models.attribute import NGIAttribute
 from snpseq_metadata.models.ngi_models.metadata_model import NGIMetadataModel
 from snpseq_metadata.models.ngi_models.experiment import NGIExperimentBase
 from snpseq_metadata.models.ngi_models.file_models import NGIFastqFile
@@ -22,12 +23,14 @@ class NGIRun(NGIMetadataModel):
         platform: NGIIlluminaSequencingPlatform,
         run_date: Optional[datetime.datetime] = None,
         fastqfiles: Optional[List[NGIFastqFile]] = None,
+        run_attributes: Optional[List[NGIAttribute]] = None,
     ) -> None:
         self.run_alias = run_alias
         self.experiment = experiment
         self.platform = platform
         self.run_date = run_date
         self.fastqfiles = fastqfiles
+        self.run_attributes = run_attributes
         self.run_center = NGIRun.run_center
 
     @classmethod
@@ -44,4 +47,8 @@ class NGIRun(NGIMetadataModel):
                 NGIFastqFile.from_json(file_json)
                 for file_json in json_obj.get("fastqfiles", [])
             ],
+            run_attributes=[
+                NGIAttribute.from_json(json_obj=attribute_json)
+                for attribute_json in json_obj.get("run_attributes", [])
+            ] or None
         )

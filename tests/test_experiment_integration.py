@@ -38,7 +38,9 @@ def sra_experiment_set_manifest(
 
     manifest = []
     for experiment in sra_experiment_set_from_ngi.experiments:
-        manifest_file = f'{".".join(experiment_set_sra_json_file.split(".")[0:-2])}.{experiment.model_object.alias}.sra.manifest'
+        manifest_file = \
+            f'{".".join(experiment_set_sra_json_file.split(".")[0:-2])}.' \
+            f'{experiment.library.sample.refname}.sra.manifest'
         manifest.extend(_parse_manifest(manifest_file))
     return manifest
 

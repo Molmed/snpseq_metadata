@@ -1,4 +1,4 @@
-from typing import ClassVar, List, Type, TypeVar, Optional, Tuple
+from typing import ClassVar, List, Type, TypeVar, Optional, Tuple, Union
 
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.sra_models.sequencing_run import SRARun
@@ -17,6 +17,14 @@ class SRARunSet(SRAMetadataModel):
     ):
         super().__init__(model_object=model_object)
         self.runs = runs
+
+    def __getattr__(self, item: str) -> Union[None, str, List[SRARun]]:
+        attr = super().__getattr__(item)
+        if attr:
+            return attr
+        if item == "runs":
+            attr = getattr(self.model_object, "run")
+            return [SRARun(model_object=run_model) for run_model in attr]
 
     @classmethod
     def create_object(cls: Type[T], runs: List[SRARun]) -> T:
@@ -44,9 +52,8 @@ class SRARunSet(SRAMetadataModel):
         try:
             return next(
                 filter(
-                    lambda run: run.experiment.get_reference().is_reference_to(
-                        experiment
-                    ),
+                    lambda run: run.is_project(experiment.study_ref.refname)
+                                and run.is_sample(experiment.library.sample.refname),
                     self.runs,
                 )
             )

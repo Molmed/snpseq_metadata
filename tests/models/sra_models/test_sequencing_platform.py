@@ -48,3 +48,9 @@ class TestSRAIlluminaSequencingPlatform:
             SRAIlluminaSequencingPlatform.object_from_name(
                 model_name="this-is-not-recognized"
             )
+
+    def test___getattr__(self, sra_sequencing_platform_obj, sra_sequencing_platform_json):
+        assert sra_sequencing_platform_obj.platform == \
+               list(sra_sequencing_platform_json.keys())[0]
+        assert sra_sequencing_platform_obj.instrument_model == \
+               sra_sequencing_platform_json["ILLUMINA"]["INSTRUMENT_MODEL"]

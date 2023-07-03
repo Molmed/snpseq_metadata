@@ -17,10 +17,10 @@ class SRAStudyRef(SRAMetadataModel):
         return cls(model_object=model_object)
 
     def to_manifest(self) -> List[Tuple[str, str]]:
-        return [("STUDY", self.model_object.refname)]
+        return [("STUDY", self.refname)]
 
     def __str__(self) -> str:
-        return self.model_object.refname
+        return self.refname
 
     def __hash__(self) -> int:
         return str(self).__hash__()

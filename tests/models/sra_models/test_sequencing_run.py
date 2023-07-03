@@ -10,6 +10,7 @@ class TestSRARun:
         sra_sequencing_run_json,
         sra_experiment_obj,
         sra_result_file_obj,
+        sra_attribute_obj
     ):
         sequencing_run = SRARun.create_object(
             run_alias=sra_sequencing_run_json["TITLE"],
@@ -19,6 +20,7 @@ class TestSRARun:
             ),
             experiment=sra_experiment_obj,
             fastqfiles=[sra_result_file_obj],
+            run_attributes=[sra_attribute_obj]
         )
         assert sequencing_run == sra_sequencing_run_obj
 

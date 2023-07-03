@@ -1,5 +1,5 @@
 
-[![Run unit tests](../../actions/workflows/run-unit-tests.yml/badge.svg?branch=develop&event=push)](../../actions/workflows/run-unit-tests.yml)
+[![Run unit tests](../../actions/workflows/run-unit-tests.yml/badge.svg?event=push)](../../actions/workflows/run-unit-tests.yml)
 
 # snpseq_metadata
 

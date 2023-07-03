@@ -5,6 +5,7 @@ import uuid
 import snpseq_metadata.utilities
 from snpseq_metadata.exceptions import FastqFileLocationNotFoundException
 from snpseq_metadata.models.ngi_models import (
+    NGIAttribute,
     NGIFlowcell,
     NGIIlluminaSequencingPlatform,
     NGIRun,
@@ -32,6 +33,34 @@ class TestNGIFlowcell:
 
         ngi_flowcell_obj.runfolder_name = "this-can-not-be-parsed-as-a-date"
         assert ngi_flowcell_obj.get_run_date() is None
+
+    def test_get_flowcell_id_from_runfolder_name(self, run_date, flowcell_id):
+        date_formats = [
+            run_date.strftime("%y%m%d"),
+            run_date.strftime("%Y%m%d")
+        ]
+        instrument_ids = ["A0123", "FS000012", "M00145"]
+        flowcell_positions = ["A", "X", ""]
+        flowcell_ids = [flowcell_id, flowcell_id, f"00000-{flowcell_id}"]
+
+        runfolder_names = []
+        expected_fcids = []
+        for date_str in date_formats:
+            for instrument_id in instrument_ids:
+                for flowcell_position, fcid in zip(flowcell_positions, flowcell_ids):
+                    runfolder_names.append(
+                        "_".join([
+                            date_str,
+                            instrument_id,
+                            "0123",
+                            f"{flowcell_position}{fcid}"
+                        ])
+                    )
+                    expected_fcids.append(fcid)
+
+        for runfolder_name, expected_fcid in zip(runfolder_names, expected_fcids):
+            obs_fcid = NGIFlowcell.get_flowcell_id_from_runfolder_name(runfolder_name)
+            assert obs_fcid == expected_fcid
 
     def test_get_sequencing_platform(self, ngi_flowcell_obj, illumina_model_prefixes):
         (model_id, model_name) = illumina_model_prefixes.popitem()
@@ -67,17 +96,27 @@ class TestNGIFlowcell:
         )
 
     def test_get_sequencing_run_for_experiment_ref(
-        self, ngi_flowcell_obj, ngi_experiment_ref_obj, ngi_fastq_file_obj, monkeypatch
-    ):
+            self,
+            ngi_flowcell_obj,
+            ngi_experiment_ref_obj,
+            ngi_fastq_file_obj,
+            ngi_study_obj,
+            ngi_sample_obj,
+            monkeypatch):
+
         def fastqfiles(**kwargs):
             return [ngi_fastq_file_obj, ngi_fastq_file_obj]
 
         exp_run_obj = NGIRun(
-            run_alias=f"{ngi_experiment_ref_obj.project.project_id}-{ngi_experiment_ref_obj.sample.sample_id}-{ngi_flowcell_obj.flowcell_id}",
+            run_alias=f"{ngi_experiment_ref_obj.alias}-{ngi_flowcell_obj.flowcell_id}",
             experiment=ngi_experiment_ref_obj,
             platform=ngi_flowcell_obj.platform,
             run_date=ngi_flowcell_obj.run_date,
             fastqfiles=fastqfiles(),
+            run_attributes=[
+                NGIAttribute(tag="project_id", value=ngi_study_obj.project_id),
+                NGIAttribute(tag="sample_id", value=ngi_sample_obj.sample_id)
+            ]
         )
 
         monkeypatch.setattr(
@@ -133,15 +172,15 @@ class TestNGIFlowcell:
         def _fastqdir(*args, **kwargs):
             return os.path.join(tmpdir, "fastq")
 
-        def _checksum(checksumfile, querypath):
-            return querypath
+        def _checksum(queryfile, method):
+            return f"{method}-{os.path.basename(queryfile)}"
 
         # set up the test
         monkeypatch.setattr(
             ngi_flowcell_obj, "get_fastqdir_for_experiment_ref", _fastqdir
         )
         monkeypatch.setattr(
-            snpseq_metadata.utilities, "lookup_checksum_from_file", _checksum
+            snpseq_metadata.utilities, "calculate_checksum_from_file", _checksum
         )
         ngi_flowcell_obj.runfolder_path = tmpdir
 
@@ -173,9 +212,7 @@ class TestNGIFlowcell:
             [
                 NGIFastqFile(
                     filepath=fqfile,
-                    checksum=os.path.join(
-                        os.path.basename(tmpdir), "fastq", os.path.basename(fqfile)
-                    ),
+                    checksum=f"{ngi_flowcell_obj.checksum_method}-{os.path.basename(fqfile)}",
                     checksum_method=ngi_flowcell_obj.checksum_method,
                 )
                 for fqfile in exp_fastqfiles
