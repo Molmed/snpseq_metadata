@@ -75,10 +75,9 @@ def test_lookup_checksum_from_file(test_resources_path, checksum_file, file_chec
 
     # for files having checksums in a file, assert that they can be retrieved
     for testfile, expected_checksum in file_checksums.items():
-        querypath = os.path.relpath(testfile, os.path.dirname(test_resources_path))
         assert (
             snpseq_metadata.utilities.lookup_checksum_from_file(
-                checksumfile=checksum_file, querypath=querypath
+                checksumfile=checksum_file, querypath=testfile
             )
             == expected_checksum
         )

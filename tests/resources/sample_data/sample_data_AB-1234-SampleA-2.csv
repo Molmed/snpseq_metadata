@@ -1,0 +1,64 @@
+udf_id,2-2272
+
+udf_species,"Human (Homo sapiens, GRCh37)"
+udf_data_analysis,NGI-pipeline WGS
+udf_seq_data_coverage_x,62x
+
+udf_volume_ul,52
+udf_current_sample_volume_ul,12
+udf_conc_fc,152 pM
+udf_sample_conc,83.2
+udf_plate_,AB-1234 #12 180322
+udf_phix_,2
+udf_fragment_size,432
+udf_fragment_lower,232
+udf_fragment_upper,632
+
+udf_special_info_seq,No
+udf_special_info_prep,No
+udf_custom_sequencing_primer,No
+udf_genotyping_idpanel,Yes
+
+udf_rml_kitprotocol,
+udf_of_libraries_per_sample,2
+udf_number_of_lanes,1 lane/library
+udf_pooling,No
+
+udf_progress,Library preparation and QC validation complete
+
+flowcell_id,XYZ321XY
+project_id,AB-1234
+sample_name,AB-1234-SampleA-2
+sample_id,AB-1234-SampleA-2
+sample_library_id,AB-1234-SampleA-2_2-2272
+experiment_alias,AB-1234-AB-1234-SampleA-2-AB-1234-SampleA-2_2-2272-TTATAACC+TCGATATC
+experiment_title,AB-1234 - AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit
+sequencing_run_alias,AB-1234-AB-1234-SampleA-2-AB-1234-SampleA-2_2-2272-TTATAACC+TCGATATC-XYZ321XY
+
+experiment_application,WG re-seq
+experiment_library_strategy_key,WGS
+experiment_library_strategy_value,WGS
+experiment_sample_type,gDNA
+experiment_sample_source,GENOMIC
+experiment_library_selection_key,RANDOM
+experiment_library_selection_value,RANDOM
+experiment_library_kit,thruplex smarter dna-seq kit
+
+index_i7,TTATAACC
+index_i5,TCGATATC
+sample_library_tag,TTATAACC+TCGATATC
+
+read_configuration,151x2
+read_configuration_paired,true
+insert_size,352
+
+instrument_platform,ILLUMINA
+illumina_model_value,Illumina NovaSeq 6000
+experiment_instrument_model_name,NovaSeq
+sequencing_run_center,"National Genomics Infrastructure, Uppsala"
+sequencing_run_date,2021-04-15T00:00:00
+
+filepaths,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-2/AB-1234-SampleA-2_S3_L001_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-2/AB-1234-SampleA-2_S3_L001_R2_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-2/AB-1234-SampleA-2_S3_L002_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-2/AB-1234-SampleA-2_S3_L002_R2_001.fastq.gz
+filetypes,fastq,fastq,fastq,fastq
+checksums,55a35bd5ee20f507368bca2eb14b72d8,e34c9ddcd657d59808981796718295e5,2e8abc3dce5dd0faeeeda7210b013507,0e172ee34f38c7af2613df53b98e8a09
+checksum_methods,MD5,MD5,MD5,MD5

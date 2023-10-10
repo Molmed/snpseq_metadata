@@ -1,0 +1,64 @@
+udf_id,2-2277
+
+udf_species,Homo sapiens
+udf_data_analysis,NGI-pipeline WGS
+udf_seq_data_coverage_x,37x
+
+udf_volume_ul,37
+udf_current_sample_volume_ul,8.1
+udf_conc_fc,117 pM
+udf_sample_conc,308
+udf_plate_,CD-5678 #47 180223
+udf_phix_,17
+udf_fragment_size,467
+udf_fragment_lower,277
+udf_fragment_upper,557
+
+udf_special_info_seq,No
+udf_special_info_prep,No
+udf_custom_sequencing_primer,No
+udf_genotyping_idpanel,Yes
+
+udf_rml_kitprotocol,
+udf_of_libraries_per_sample,2
+udf_number_of_lanes,1 lane/library
+udf_pooling,No
+
+udf_progress,Library preparation and QC validation complete
+
+flowcell_id,XYZ321XY
+project_id,Project_CD-5678
+sample_name,CD-5678-SampleB
+sample_id,CD-5678-SampleB-2
+sample_library_id,CD-5678-SampleB_2-2277
+experiment_alias,Project_CD-5678-CD-5678-SampleB-CD-5678-SampleB_2-2277-CCTGATAG+TAACGCGA
+experiment_title,Project_CD-5678 - CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
+sequencing_run_alias,Project_CD-5678-CD-5678-SampleB-CD-5678-SampleB_2-2277-CCTGATAG+TAACGCGA-XYZ321XY
+
+experiment_application,WG re-seq Human
+experiment_library_strategy_key,WGS
+experiment_library_strategy_value,WGS
+experiment_sample_type,gDNA
+experiment_sample_source,GENOMIC
+experiment_library_selection_key,RANDOM
+experiment_library_selection_value,RANDOM
+experiment_library_kit,TruSeq DNA PCR-Free Sample Preparation kit LT
+
+index_i7,CCTGATAG
+index_i5,TAACGCGA
+sample_library_tag,CCTGATAG+TAACGCGA
+
+read_configuration,151x2
+read_configuration_paired,true
+insert_size,347
+
+instrument_platform,ILLUMINA
+illumina_model_value,Illumina NovaSeq 6000
+experiment_instrument_model_name,NovaSeq
+sequencing_run_center,"National Genomics Infrastructure, Uppsala"
+sequencing_run_date,2021-04-15T00:00:00
+
+filepaths,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleB-2/CD-5678-SampleB_S7_L003_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleB-2/CD-5678-SampleB_S7_L003_R2_001.fastq.gz
+filetypes,fastq,fastq
+checksums,0b186113fa683201a10bd3f11cb24f7a,00cc3e3f589c57c38569445f68d773c0
+checksum_methods,MD5,MD5

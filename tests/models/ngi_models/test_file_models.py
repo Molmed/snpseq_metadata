@@ -18,7 +18,10 @@ class TestNGIResultFile:
 
         kwargs = ngi_result_file_json.copy()
         kwargs["filepath"] = os.path.join(
-            "/this", "is", "a", "identical", "..", "file.path"
+            os.path.dirname(new_obj.filepath),
+            "something",
+            "..",
+            "file.path"
         )
         new_obj = NGIResultFile(**kwargs)
         assert new_obj == ngi_result_file_obj

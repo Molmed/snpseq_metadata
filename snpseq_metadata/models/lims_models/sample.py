@@ -27,6 +27,21 @@ class LIMSSample(LIMSMetadataModel):
         if read_length is not None:
             return any([len(read_length.split("+")) > 2, read_length.endswith("x2")])
 
+    def index_tag(self) -> Optional[str]:
+        try:
+            tag = "+".join([self.udf_index, self.udf_index2])
+        except AttributeError:
+            pass
+        else:
+            return tag if len(tag) > 1 else ""
+
+        try:
+            return self.udf_index
+        except AttributeError:
+            pass
+
+        return None
+
     @classmethod
     def from_json(cls: Type[L], json_obj: Dict[str, str]) -> L:
         sample_id = json_obj.get("name")

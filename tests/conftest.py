@@ -1,7 +1,39 @@
+import gzip
 import json
 import datetime
 import os
 import pytest
+import shutil
+import subprocess
+
+
+def pytest_sessionstart(session):
+    create_test_data_script = os.path.join(
+        "create_test_data.py"
+    )
+    run_data_spec = os.path.join(
+        "sample_data",
+        "run_data_XYZ321XY.csv"
+    )
+    export_dir = os.path.join(
+        "tests",
+        "resources",
+        "export"
+    )
+    try:
+        shutil.rmtree(export_dir)
+    except FileNotFoundError:
+        pass
+    subprocess.check_call(
+        [
+            "python",
+            create_test_data_script,
+            run_data_spec
+        ],
+        cwd=os.path.join(
+            "tests",
+            "resources")
+    )
 
 
 def parse_json(json_file):
@@ -16,12 +48,36 @@ def parse_xml(xml_file):
 
 @pytest.fixture
 def test_resources_path():
-    return os.path.join("tests", "resources")
+    return os.path.join("tests", "resources", "export")
+
+
+@pytest.fixture
+def sample_data_path(test_resources_path):
+    return os.path.join(
+        os.path.dirname(test_resources_path),
+        "sample_data"
+    )
+
+
+@pytest.fixture
+def sample_data_csv(sample_data_path):
+    return os.path.join(
+        sample_data_path,
+        "sample_data_test_values.csv"
+    )
+
+
+@pytest.fixture
+def run_data_csv(sample_data_path):
+    return os.path.join(
+        sample_data_path,
+        "run_data_test_values.csv"
+    )
 
 
 @pytest.fixture
 def experiment_set_lims_json_file(test_resources_path):
-    return os.path.join(test_resources_path, "snpseq_data_XYZ321XY.json")
+    return os.path.join(test_resources_path, "snpseq_data_XYZ321XY.snpseq.json")
 
 
 @pytest.fixture
@@ -31,7 +87,11 @@ def runfolder_path(test_resources_path):
 
 @pytest.fixture
 def runfolder_run_date(runfolder_path):
-    return datetime.datetime.strptime(os.path.basename(runfolder_path)[0:6], "%y%m%d")
+    date_str = os.path.basename(runfolder_path).split("_")[0]
+    if len(date_str) == 6:
+        return datetime.datetime.strptime(date_str, "%y%m%d")
+    else:
+        return datetime.datetime.strptime(date_str, "%Y%m%d")
 
 
 @pytest.fixture
@@ -109,7 +169,10 @@ def experiment_set_lims_json(experiment_set_lims_json_file):
 def experiment_set_ngi_json_file(experiment_set_lims_json_file):
     return os.path.join(
         os.path.dirname(experiment_set_lims_json_file),
-        f'{".".join(os.path.basename(experiment_set_lims_json_file).split(".")[0:-1])}.ngi.json',
+        os.path.basename(experiment_set_lims_json_file).replace(
+            ".snpseq.",
+            ".ngi."
+        )
     )
 
 
@@ -122,7 +185,10 @@ def experiment_set_ngi_json(experiment_set_ngi_json_file):
 def experiment_set_sra_json_file(experiment_set_lims_json_file):
     return os.path.join(
         os.path.dirname(experiment_set_lims_json_file),
-        f'{".".join(os.path.basename(experiment_set_lims_json_file).split(".")[0:-1])}.sra.json',
+        os.path.basename(experiment_set_lims_json_file).replace(
+            ".snpseq.",
+            ".sra."
+        )
     )
 
 
@@ -133,7 +199,13 @@ def experiment_set_sra_json(experiment_set_sra_json_file):
 
 @pytest.fixture
 def experiment_set_sra_xml_file(experiment_set_sra_json_file):
-    return f'{".".join(experiment_set_sra_json_file.split(".")[0:-1])}.xml'
+    return os.path.join(
+        os.path.dirname(experiment_set_sra_json_file),
+        os.path.basename(experiment_set_sra_json_file).replace(
+            ".json",
+            ".xml"
+        )
+    )
 
 
 @pytest.fixture
@@ -144,24 +216,102 @@ def experiment_set_sra_xml(experiment_set_sra_xml_file):
 @pytest.fixture
 def file_checksums(test_resources_path):
     method = "MD5"
-    return {
-        os.path.join(test_resources_path, os.path.basename(testfile)): os.path.basename(
-            testfile
-        ).split(".")[0]
-        for testfile in filter(
-            lambda f: f.endswith(f".{method.lower()}"), os.listdir(test_resources_path)
+    file_checksums = {}
+
+    file_contents = [
+        "this is some text that will generate a checksum",
+        "this is some other text that will generate another checksum"
+    ]
+
+    checksums = [
+        "3bcd3f921bab077437a4d5289fbee4c9",
+        "ba55c62dc4e8420b71c8b13763e54f7c"
+    ]
+
+    for contents, checksum in zip(file_contents, checksums):
+
+        testfile = os.path.join(
+            test_resources_path,
+            f"{checksum}.{method.lower()}"
         )
-    }
+        with open(testfile, "w") as fh:
+            fh.write(contents)
+            fh.write("\n")
+
+        file_checksums[testfile] = checksum
+
+    return file_checksums
 
 
 @pytest.fixture
-def checksum_file(test_resources_path):
-    return os.path.join(test_resources_path, "MD5", "checksums.md5")
+def checksum_file(test_resources_path, file_checksums):
+    checksum_file = os.path.join(
+        test_resources_path,
+        "MD5",
+        "checksums.md5"
+    )
+    if not os.path.exists(checksum_file):
+        os.makedirs(
+            os.path.dirname(
+                checksum_file
+            ),
+            exist_ok=True
+        )
+        with open(checksum_file, "w") as fh:
+            for pth, md5 in file_checksums.items():
+                fh.write(f"{md5}  {pth}\n")
+
+    return checksum_file
 
 
 @pytest.fixture
-def samplesheet_file(test_resources_path):
-    return os.path.join(test_resources_path, "test_samplesheet.csv")
+def samplesheet_file(
+        test_resources_path,
+        samplesheet_header,
+        samplesheet_data):
+    samplesheet_file = os.path.join(
+        test_resources_path,
+        "test_samplesheet.csv"
+    )
+    if not os.path.exists(samplesheet_file):
+        with open(samplesheet_file, "w") as fh:
+            fh.write(samplesheet_header)
+            cols = ",".join(samplesheet_data[0].keys())
+            fh.write(
+                "\n".join(
+                    [cols] + [
+                        ",".join(row.values())
+                        for row in samplesheet_data
+                    ]
+                )
+            )
+    return samplesheet_file
+
+
+@pytest.fixture
+def samplesheet_header():
+    header = """[Header],,,,,,,,
+IEMFileVersion,4,,,,,,,
+Investigator Name,SNPSEQ,,,,,,,
+Experiment,NovaSeq-dual-index,,,,,,,
+Date,2021-03-09,,,,,,,
+Workflow,GenerateFASTQ,,,,,,,
+Application,NovaSeq FASTQ Only,,,,,,,
+Assay,TruSeq HT,,,,,,,
+Description,,,,,,,,
+Chemistry,Amplicon,,,,,,,
+,,,,,,,,
+[Reads],,,,,,,,
+151,,,,,,,,
+151,,,,,,,,
+,,,,,,,,
+[Settings],,,,,,,,
+Adapter,,,,,,,,
+AdapterRead2,,,,,,,,
+,,,,,,,,
+[Data],,,,,,,,
+"""
+    return header
 
 
 @pytest.fixture
@@ -675,4 +825,15 @@ def samplesheet_data():
             "FRAGMENT_SIZE:430;FRAGMENT_LOWER:230;FRAGMENT_UPPER:630;LIBRARY_NAME:AB-2769-728_2-5897",
         ],
     ]
-    return [dict(zip(map(str.lower, data[0]), row)) for row in data[1:]]
+    return [
+        dict(
+            zip(
+                map(
+                    str.lower,
+                    data[0]
+                ),
+                row
+            )
+        )
+        for row in data[1:]
+    ]

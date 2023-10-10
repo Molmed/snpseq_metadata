@@ -7,8 +7,11 @@ from snpseq_metadata.models.ngi_models import *
 def samplesheet_row(ngi_study_json, ngi_sample_json):
     return {
         "sample_project": ngi_study_json["project_id"],
-        "sample_id": f'Sample_{ngi_sample_json["sample_id"]}',
-        "sample_name": ngi_sample_json["sample_id"],
+        "sample_id": ngi_sample_json["sample_id"],
+        "sample_name": ngi_sample_json["sample_name"],
+        "index": ngi_sample_json["sample_library_tag"],
+        "description": f"LIBRARY_NAME:"
+                       f"{ngi_sample_json['sample_library_id']}"
     }
 
 
@@ -66,8 +69,10 @@ def samplesheet_experiment_refs(samplesheet_rows):
     for row in samplesheet_rows:
         project = NGIStudyRef(project_id=row["sample_project"])
         sample = NGISampleDescriptor(
-            sample_id=row["sample_name"],
-            sample_library_id=row["sample_id"]
+            sample_id=row["sample_id"],
+            sample_name=row["sample_name"],
+            sample_library_id=row["sample_id"],
+            sample_library_tag=row.get("sample_library_tag", "")
         )
         alias = f"{project.project_id}-{sample.sample_alias()}"
         experiment_refs.append(NGIExperimentRef(alias=alias, project=project, sample=sample))

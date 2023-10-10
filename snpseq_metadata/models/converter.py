@@ -177,7 +177,7 @@ class ConvertSampleDescriptor(Converter):
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
         if ngi_model:
-            return cls.sra_model_class.create_object(refname=ngi_model.sample_id)
+            return cls.sra_model_class.create_object(refname=ngi_model.sample_library_id)
 
     @classmethod
     @catch_exception
@@ -185,10 +185,18 @@ class ConvertSampleDescriptor(Converter):
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
         if lims_model:
-            # will only pass sample_id for now but should really figure out how to pass a library
-            # specification identifier
+            sample_library_id = lims_model.sample_id
+            try:
+                sample_library_id = f"{lims_model.sample_id}_{lims_model.udf_id}" \
+                    if lims_model.udf_id \
+                    else sample_library_id
+            except AttributeError:
+                pass
             return cls.ngi_model_class(
-                sample_id=lims_model.sample_id)
+                sample_name=lims_model.sample_id,
+                sample_library_id=sample_library_id,
+                sample_library_tag=lims_model.index_tag())
+        return None
 
 
 class ConvertStudyRef(Converter):
@@ -347,7 +355,11 @@ class ConvertExperimentRef(Converter):
             # this alias should ideally be the same regardless if it's created from the LIMS
             # object or from the NGI object. Currently, it's not straightforward since there's not
             # enough specific information
-            alias = f"{project.project_id}-{sample.sample_id}-{platform.model_name}"
+            alias = f"{project.project_id}-" \
+                    f"{sample.sample_name}-" \
+                    f"{sample.sample_library_id}-" \
+                    f"{sample.sample_library_tag}-" \
+                    f"{platform.model_name}"
             return cls.ngi_model_class(
                 alias=alias,
                 sample=sample,
@@ -519,7 +531,7 @@ class ConvertExperiment(Converter):
             alias = f"{project.project_id}-{sample.sample_alias()}"
             library = ConvertLibrary.lims_to_ngi(lims_model=lims_model)
             title = f"{project.project_id} - " \
-                    f"{sample.sample_id} - " \
+                    f"{sample.sample_name} - " \
                     f"{library.application} - " \
                     f"{library.sample_type} - " \
                     f"{library.library_kit}"
