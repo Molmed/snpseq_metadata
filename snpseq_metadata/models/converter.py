@@ -185,10 +185,11 @@ class ConvertSampleDescriptor(Converter):
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
         if lims_model:
-            # will only pass sample_id for now but should really figure out how to pass a library
-            # specification identifier
             return cls.ngi_model_class(
-                sample_id=lims_model.sample_id)
+                sample_id=lims_model.sample_id,
+                sample_library_id=lims_model.udf_id,
+                sample_library_tag=lims_model.index_tag())
+        return None
 
 
 class ConvertStudyRef(Converter):
