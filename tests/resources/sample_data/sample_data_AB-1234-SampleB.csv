@@ -1,0 +1,61 @@
+udf_id,2-2283
+
+udf_species,"Human (Homo sapiens, GRCh37)"
+udf_data_analysis,NGI-pipeline WGS
+udf_seq_data_coverage_x,60x
+
+udf_volume_ul,50
+udf_current_sample_volume_ul,28.9
+udf_conc_fc,150 pM
+udf_sample_conc,193.8
+udf_plate_,AB-1234 #1 180322
+udf_phix_,1
+udf_fragment_size,430
+udf_fragment_lower,230
+udf_fragment_upper,630
+
+udf_special_info_seq,No
+udf_special_info_prep,No
+udf_custom_sequencing_primer,No
+udf_genotyping_idpanel,Yes
+
+udf_rml_kitprotocol,
+udf_of_libraries_per_sample,2
+udf_number_of_lanes,1 lane/library
+udf_pooling,No
+
+udf_progress,Library preparation and QC validation complete
+
+flowcell_id,XYZ321XY
+project_id,AB-1234
+sample_name,AB-1234-SampleB
+sample_id,AB-1234-SampleB
+experiment_alias,AB-1234-AB-1234-SampleB
+experiment_title,AB-1234 - AB-1234-SampleB - olink explore - serum - olink explore 1536
+sequencing_run_alias,AB-1234-AB-1234-SampleB-Sample_AB-1234-SampleB-CGTGTCCA+ATTCGACG-XYZ321XY
+
+experiment_application,olink explore
+experiment_application_short,OTHER
+experiment_sample_type,serum
+experiment_sample_source,OTHER
+experiment_library_selection,OTHER
+experiment_library_kit,olink explore 1536
+
+index_i7,CGTGTCCA
+index_i5,ATTCGACG
+sample_library_tag,CGTGTCCA+ATTCGACG
+
+read_configuration,151x2
+read_configuration_paired,True
+insert_size,350
+
+instrument_platform,ILLUMINA
+instrument_model,Illumina NovaSeq 6000
+instrument_model_name,NovaSeq
+sequencing_run_center,"National Genomics Infrastructure, Uppsala"
+sequencing_run_date,2021-04-15T00:00:00
+
+filepaths,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S1_L001_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S1_L001_R2_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S1_L002_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S1_L002_R2_001.fastq.gz
+filetypes,fastq,fastq,fastq,fastq
+checksums,8df33e868951c1e56b6831a2df0ff87d,77bc05ab62ea44a3e5051e5bd558c126,09d5a72ee196c5493562ce5890134519,cd664b5be5ac69168c92e7c9002f7f1e
+checksum_methods,MD5,MD5,MD5,MD5

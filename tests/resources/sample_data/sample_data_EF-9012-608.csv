@@ -1,0 +1,61 @@
+udf_id,
+
+udf_species,Homo sapiens
+udf_data_analysis,NGI-pipeline WGS
+udf_seq_data_coverage_x,30x
+
+udf_volume_ul,30
+udf_current_sample_volume_ul,16.7
+udf_conc_fc,150 pM
+udf_sample_conc,162
+udf_plate_,EF-9012 #3 180223
+udf_phix_,1
+udf_fragment_size,430
+udf_fragment_lower,230
+udf_fragment_upper,630
+
+udf_special_info_seq,No
+udf_special_info_prep,No
+udf_custom_sequencing_primer,No
+udf_genotyping_idpanel,Yes
+
+udf_rml_kitprotocol,
+udf_of_libraries_per_sample,1
+udf_number_of_lanes,1 lane/library
+udf_pooling,No
+
+udf_progress,Library preparation and QC validation complete
+
+flowcell_id,XYZ321XY
+project_id,EF-9012
+sample_name,EF-9012-608
+sample_id,EF-9012-608
+experiment_alias,EF-9012-EF-9012-608
+experiment_title,EF-9012 - EF-9012-608 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
+sequencing_run_alias,
+
+experiment_application,WG re-seq Human
+experiment_application_short,WGS
+experiment_sample_type,gDNA
+experiment_sample_source,GENOMIC
+experiment_library_selection,RANDOM
+experiment_library_kit,TruSeq DNA PCR-Free Sample Preparation kit LT
+
+index_i7, 
+index_i5, 
+sample_library_tag,
+
+read_configuration,151x2
+read_configuration_paired,True
+insert_size,350
+
+instrument_platform,ILLUMINA
+instrument_model,HiSeq X Ten
+instrument_model_name,HiSeqX
+sequencing_run_center,"National Genomics Infrastructure, Uppsala"
+sequencing_run_date,2021-04-15T00:00:00
+
+filepaths,
+filetypes,
+checksums,
+checksum_methods,
