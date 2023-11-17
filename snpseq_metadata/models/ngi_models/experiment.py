@@ -50,19 +50,30 @@ class NGIExperimentRef(NGIExperimentBase):
     def from_samplesheet_row(
             cls: Type[TR],
             samplesheet_row: Dict) -> TR:
+        # split the description string first on ";" and then into key-value pairs
+        description = {}
+        for data in samplesheet_row.get("description", "").split(";"):
+            s = data.split(":")
+            if len(s) == 2:
+                description[s[0]] = s[1]
+
         project_id = samplesheet_row.get("sample_project")
-        sample_library_id = samplesheet_row.get("sample_id")
+        sample_id = samplesheet_row.get("sample_id")
+        # CHANGEME: parse the lims id from the description instead
+        sample_library_id = description.get("LIBRARY_NAME", sample_id)
         sample_name = samplesheet_row.get(
             "sample_name",
-            sample_library_id.replace("Sample_", ""))
+            sample_id.replace("Sample_", ""))
         sample_library_tag = "+".join(
             filter(
                 lambda x: x,
                 [
                     samplesheet_row.get("index"),
-                    samplesheet_row.get("index2")])) or None
+                    samplesheet_row.get("index2")]))
+        sample_library_tag = sample_library_tag if len(sample_library_id.strip()) > 1 else ""
         sample = NGISampleDescriptor(
-            sample_id=sample_name,
+            sample_name=sample_name,
+            sample_id=sample_id,
             sample_library_id=sample_library_id,
             sample_library_tag=sample_library_tag)
         alias = f"{project_id}-{sample.sample_alias()}"

@@ -29,9 +29,11 @@ class LIMSSample(LIMSMetadataModel):
 
     def index_tag(self) -> Optional[str]:
         try:
-            return "+".join([self.udf_index, self.udf_index2])
+            tag = "+".join([self.udf_index, self.udf_index2])
         except AttributeError:
             pass
+        else:
+            return tag if len(tag) > 1 else ""
 
         try:
             return self.udf_index

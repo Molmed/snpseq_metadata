@@ -30,15 +30,18 @@ flowcell_id,XYZ321XY
 project_id,AB-1234
 sample_name,AB-1234-SampleA-2
 sample_id,AB-1234-SampleA-2
-experiment_alias,AB-1234-AB-1234-SampleA-2
+sample_library_id,AB-1234-SampleA-2_2-2272
+experiment_alias,AB-1234-AB-1234-SampleA-2-AB-1234-SampleA-2-AB-1234-SampleA-2_2-2272-TTATAACC+TCGATATC
 experiment_title,AB-1234 - AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit
-sequencing_run_alias,AB-1234-AB-1234-SampleA-2-Sample_AB-1234-SampleA-2-TTATAACC+TCGATATC-XYZ321XY
+sequencing_run_alias,AB-1234-AB-1234-SampleA-2-AB-1234-SampleA-2-AB-1234-SampleA-2_2-2272-TTATAACC+TCGATATC-XYZ321XY
 
 experiment_application,WG re-seq
-experiment_application_short,WGS
+experiment_library_strategy_key,WGS
+experiment_library_strategy_value,WGS
 experiment_sample_type,gDNA
 experiment_sample_source,GENOMIC
-experiment_library_selection,RANDOM
+experiment_library_selection_key,RANDOM
+experiment_library_selection_value,RANDOM
 experiment_library_kit,thruplex smarter dna-seq kit
 
 index_i7,TTATAACC
@@ -46,12 +49,12 @@ index_i5,TCGATATC
 sample_library_tag,TTATAACC+TCGATATC
 
 read_configuration,151x2
-read_configuration_paired,True
+read_configuration_paired,true
 insert_size,350
 
 instrument_platform,ILLUMINA
-instrument_model,Illumina NovaSeq 6000
-instrument_model_name,NovaSeq
+illumina_model_value,Illumina NovaSeq 6000
+experiment_instrument_model_name,NovaSeq
 sequencing_run_center,"National Genomics Infrastructure, Uppsala"
 sequencing_run_date,2021-04-15T00:00:00
 

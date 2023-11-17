@@ -27,18 +27,21 @@ udf_pooling,No
 udf_progress,Library preparation and QC validation complete
 
 flowcell_id,XYZ321XY
-project_id,CD-5678
+project_id,Project_CD-5678
 sample_name,CD-5678-SampleA-1
 sample_id,CD-5678-SampleA-1
-experiment_alias,CD-5678-CD-5678-SampleA-1
-experiment_title,CD-5678 - CD-5678-SampleA-1 - target re-seq - gDNA - twist human core exome
-sequencing_run_alias,CD-5678-CD-5678-SampleA-1-Sample_CD-5678-SampleA-1-AAGTCCAA+TACTCATA-XYZ321XY
+sample_library_id,CD-5678-SampleA-1_2-2274
+experiment_alias,Project_CD-5678-CD-5678-SampleA-1-CD-5678-SampleA-1-CD-5678-SampleA-1_2-2274-AAGTCCAA+TACTCATA
+experiment_title,Project_CD-5678 - CD-5678-SampleA-1 - target re-seq - gDNA - twist human core exome
+sequencing_run_alias,Project_CD-5678-CD-5678-SampleA-1-CD-5678-SampleA-1-CD-5678-SampleA-1_2-2274-AAGTCCAA+TACTCATA-XYZ321XY
 
 experiment_application,target re-seq
-experiment_application_short,TARGETED_CAPTURE
+experiment_library_strategy_key,TARGETED_CAPTURE
+experiment_library_strategy_value,Targeted-Capture
 experiment_sample_type,gDNA
 experiment_sample_source,GENOMIC
-experiment_library_selection,OTHER
+experiment_library_selection_key,OTHER
+experiment_library_selection_value,other
 experiment_library_kit,twist human core exome
 
 index_i7,AAGTCCAA
@@ -46,16 +49,16 @@ index_i5,TACTCATA
 sample_library_tag,AAGTCCAA+TACTCATA
 
 read_configuration,151x2
-read_configuration_paired,True
+read_configuration_paired,true
 insert_size,350
 
 instrument_platform,ILLUMINA
-instrument_model,Illumina NovaSeq 6000
-instrument_model_name,NovaSeq
+illumina_model_value,Illumina NovaSeq 6000
+experiment_instrument_model_name,NovaSeq
 sequencing_run_center,"National Genomics Infrastructure, Uppsala"
 sequencing_run_date,2021-04-15T00:00:00
 
 filepaths,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleA-1/CD-5678-SampleA-1_S4_L001_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleA-1/CD-5678-SampleA-1_S4_L001_R2_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleA-1/CD-5678-SampleA-1_S4_L003_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleA-1/CD-5678-SampleA-1_S4_L003_R2_001.fastq.gz
 filetypes,fastq,fastq,fastq,fastq
-checksums,05b5b747622c93263c8841ce25fde438,f74c58e2b2045e7c98501db6fc00accb,97c71529c101eb0fe7d074a1d997b8fb,78b4ffb6f960dbef316f8c6f113a7c5f
+checksums,bc9ced62f0b4652cfe7c9087d6e021d6,04ddbf4edfebb115c975921dcef41eee,4d2b9097ba63d360ba4b3503d1ff688a,afc6fc392eb0604ffc533300b53e4266
 checksum_methods,MD5,MD5,MD5,MD5

@@ -1,9 +1,9 @@
-sample_csv_files,sample_data/sample_data_AB-1234-SampleA-1.csv,sample_data/sample_data_AB-1234-SampleA-2.csv,sample_data/sample_data_AB-1234-SampleB.csv,sample_data/sample_data_CD-5678-SampleA-1.csv,sample_data/sample_data_CD-5678-SampleA-2.csv,sample_data/sample_data_CD-5678-SampleB.csv,sample_data/sample_data_EF-9012-608.csv
+sample_csv_files,sample_data/sample_data_AB-1234-SampleB.csv,sample_data/sample_data_AB-1234-SampleA-1.csv,sample_data/sample_data_AB-1234-SampleA-2.csv,sample_data/sample_data_CD-5678-SampleA-1.csv,sample_data/sample_data_CD-5678-SampleA-2.csv,sample_data/sample_data_CD-5678-SampleB.csv,sample_data/sample_data_EF-9012-608.csv
 flowcell_id,XYZ321XY
-runfolder_path,210415_A00001_0123_BXYZ321XY
+runfolder_path,tests/resources/export/210415_A00001_0123_BXYZ321XY
 runfolder_name,210415_A00001_0123_BXYZ321XY
 samplesheet,fc_SampleSheet.csv
 run_parameters,RunParameters.xml
 checksum_method,MD5
-instrument_model_name,NovaSeq
+flowcell_instrument_model_name,NovaSeq
 run_date,2021-04-15T00:00:00

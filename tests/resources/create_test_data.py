@@ -28,15 +28,25 @@ class MetaObj:
     def flowcell_id(self):
         return self.fields.get("flowcell_id", "FCID")
 
-    def structure_to_str(self, structure):
-        return structure.format(**self.fields)
+    def structure_to_str(self, structure, fields=None):
+        d = fields or self.fields
+        return structure.format(**d)
 
     def to_json(self):
-        return json.loads(
-            self.structure_to_str(
-                self.JSON_STRUCTURE
+
+        json_dumped_fields = {}
+        for k, v in self.fields.items():
+            if f'{k}' in self.JSON_STRUCTURE:
+                json_dumped_fields[k] = json.dumps(v)
+        s = self.structure_to_str(
+                self.JSON_STRUCTURE,
+                fields=json_dumped_fields
             )
-        )
+        try:
+            return json.loads(s)
+        except json.decoder.JSONDecodeError:
+            print(s)
+            raise
 
     def to_xml(self):
         return self.structure_to_str(
@@ -62,6 +72,33 @@ class MetaObj:
             )
         )
 
+    @staticmethod
+    def _parse_value(val):
+        truths = ["true"]
+        falses = ["false"]
+
+        # None values will be parsed as an empty string
+        val = val or ""
+
+        # parse an int
+        try:
+            return int(val)
+        except ValueError:
+            pass
+
+        # parse a float
+        try:
+            return float(val)
+        except ValueError:
+            pass
+
+        # parse a boolean
+        if val.lower() in truths + falses:
+            return val in truths #str(val in truths).lower()
+
+        # nothing worked, return a string
+        return str(val)
+
     @classmethod
     def create_from_csv(cls, csv_file):
         fields = dict()
@@ -69,9 +106,9 @@ class MetaObj:
             reader = csv.reader(fh, dialect=csv.excel)
             for row in filter(lambda r: len(r) >= 2, reader):
                 if len(row) > 2:
-                    fields[row[0]] = row[1:]
+                    fields[row[0]] = [cls._parse_value(v) for v in row[1:]]
                 else:
-                    fields[row[0]] = row[1]
+                    fields[row[0]] = cls._parse_value(row[1])
         return cls(fields=fields)
 
     def to_class(self, cls):
@@ -112,11 +149,8 @@ class MetaObj:
         )
 
     def create_sample_folder(self, outdir):
-        project_dir = os.path.join(outdir, self.fields["project_id"])
-        sample_dir = os.path.join(project_dir, self.fields["sample_id"])
-        os.makedirs(sample_dir, exist_ok=True)
         for fqfile in self.fields["sequencing_run_fastq_files"]:
-            fqfile.create_file(sample_dir)
+            fqfile.create_file(outdir)
 
     def write_checksum(self, checksumfile):
         for fqfile in self.fields["sequencing_run_fastq_files"]:
@@ -130,14 +164,14 @@ class MetaObj:
                 continue
             entry["sample_id"] = self.fields["sample_id"]
             entry["sample_name"] = self.fields["sample_name"]
-            entry["project_id"] = self.fields["project_id"]
+            entry["sample_project"] = self.fields["project_id"]
             entry["index"] = self.fields["index_i7"]
             entry["index2"] = self.fields["index_i5"]
             entry["description"] = ";".join([
                 f"FRAGMENT_SIZE:{self.fields['fragment_size']}",
                 f"FRAGMENT_LOWER:{self.fields['fragment_lower']}",
                 f"FRAGMENT_UPPER:{self.fields['fragment_upper']}",
-                f"LIBRARY_NAME:{self.fields['sample_name']}_{self.fields['udf_id']}",
+                f"LIBRARY_NAME:{self.fields['sample_library_id']}",
             ])
             entries.append(entry)
 
@@ -149,13 +183,15 @@ class FastqFile(MetaObj):
     def _filepath(self, outdir):
         return os.path.join(
             outdir,
-            os.path.basename(
-                self.fields["filepath"]
-            )
+            self.fields["filepath"]
         )
 
     def create_file(self, outdir):
         fpath = self._filepath(outdir)
+        os.makedirs(
+            os.path.dirname(fpath),
+            exist_ok=True
+        )
         with open(fpath, "w") as fh:
             fh.write(self.fields["checksum"])
 
@@ -189,10 +225,10 @@ class NGIFastqFile(FastqFile):
 
     JSON_STRUCTURE = """
         {{
-            "filepath": "{filepath}",
-            "filetype": "{filetype}",
-            "checksum": "{checksum}",
-            "checksum_method": "{checksum_method}"
+            "filepath": {filepath},
+            "filetype": {filetype},
+            "checksum": {checksum},
+            "checksum_method": {checksum_method}
         }}
     """
 
@@ -203,15 +239,15 @@ class SRAFastqFile(FastqFile):
 
     JSON_STRUCTURE = """
         {{
-            "filename": "{filename}",
-            "filetype": "{filetype}",
-            "checksum": "{checksum}",
-            "checksum_method": "{checksum_method}"
+            "filename": {filename},
+            "filetype": {filetype},
+            "checksum": {checksum},
+            "checksum_method": {checksum_method}
         }}
     """
 
     XML_STRUCTURE = """
-                <FILE filename="{filename}" filetype="{filetype}" checksum_method="{checksum_method}" checksum="{checksum}" />"""
+                <FILE filename="{filename}" filetype="{filetype}" checksum_method="{checksum_method}" checksum="{checksum}"/>"""
 
     MANIFEST = [
         ["FASTQ", "{filename}"]
@@ -263,7 +299,7 @@ class SnpseqDataSampleObj(MetaObj):
         "name": "sample_name",
         "project": "project_id",
         "udf_read_length": "read_configuration",
-        "udf_sequencing_instrument": "instrument_model_name",
+        "udf_sequencing_instrument": "experiment_instrument_model_name",
         "udf_index": "index_i7",
         "udf_index2": "index_i5",
         "udf_insert_size_bp": "insert_size",
@@ -291,22 +327,25 @@ class NGIExperimentObj(ExperimentObj):
 
     JSON_STRUCTURE = """
         {{
-          "alias": "{experiment_ngi_alias}",
+          "alias": {experiment_ngi_alias},
           "project": {{
-            "project_id": "{experiment_ngi_project_id}"
+            "project_id": {experiment_ngi_project_id}
           }},
-          "title": "{experiment_ngi_title}",
+          "title": {experiment_ngi_title},
           "platform": {{
-            "model_name": "{experiment_ngi_model_name}"
+            "model_name": {experiment_ngi_model_name}
           }},
           "library": {{
             "sample": {{
-              "sample_id": "{experiment_ngi_sample_id}"
+              "sample_id": {experiment_ngi_sample_id},
+              "sample_name": {experiment_ngi_sample_name},
+              "sample_library_id": {experiment_ngi_sample_library_id},
+              "sample_library_tag": {experiment_ngi_sample_library_tag}
             }},
-            "application": "{experiment_ngi_application}",
-            "sample_type": "{experiment_ngi_sample_type}",
-            "library_kit": "{experiment_ngi_library_kit}",
-            "is_paired": "{experiment_ngi_is_paired}"
+            "application": {experiment_ngi_application},
+            "sample_type": {experiment_ngi_sample_type},
+            "library_kit": {experiment_ngi_library_kit},
+            "is_paired": {experiment_ngi_is_paired}
           }}
         }}
     """
@@ -315,8 +354,11 @@ class NGIExperimentObj(ExperimentObj):
         "experiment_ngi_alias": "experiment_alias",
         "experiment_ngi_project_id": "project_id",
         "experiment_ngi_title": "experiment_title",
-        "experiment_ngi_model_name": "instrument_model_name",
+        "experiment_ngi_model_name": "experiment_instrument_model_name",
         "experiment_ngi_sample_id": "sample_id",
+        "experiment_ngi_sample_name": "sample_name",
+        "experiment_ngi_sample_library_id": "sample_library_id",
+        "experiment_ngi_sample_library_tag": "sample_library_tag",
         "experiment_ngi_application": "experiment_application",
         "experiment_ngi_sample_type": "experiment_sample_type",
         "experiment_ngi_library_kit": "experiment_library_kit",
@@ -330,62 +372,62 @@ class SRAExperimentObj(ExperimentObj):
 
     JSON_STRUCTURE = """
         {{
-          "alias": "{experiment_sra_alias}",
-          "TITLE": "{experiment_sra_title}",
+          "alias": {experiment_sra_alias},
+          "TITLE": {experiment_sra_title},
           "STUDY_REF": {{
-            "refname": "{experiment_sra_study_refname}"
+            "refname": {experiment_sra_study_refname}
           }},
           "DESIGN": {{
             "SAMPLE_DESCRIPTOR": {{
-              "refname": "{experiment_sra_sample_refname}"
+              "refname": {experiment_sra_sample_refname}
             }},
             "LIBRARY_DESCRIPTOR": {{
-              "LIBRARY_STRATEGY": "{experiment_sra_library_strategy}",
-              "LIBRARY_SOURCE": "{experiment_sra_library_source}",
-              "LIBRARY_SELECTION": "{experiment_sra_library_selection}",
+              "LIBRARY_STRATEGY": {experiment_sra_library_strategy},
+              "LIBRARY_SOURCE": {experiment_sra_library_source},
+              "LIBRARY_SELECTION": {experiment_sra_library_selection},
               "LIBRARY_LAYOUT": {{
-                "PAIRED": "{{}}"
+                "PAIRED": {experiment_sra_library_layout}
               }}
             }}
           }},
           "PLATFORM": {{
-            "{experiment_sra_platform}": {{
-              "INSTRUMENT_MODEL": "{experiment_sra_instrument_model}"
+            {experiment_sra_platform}: {{
+              "INSTRUMENT_MODEL": {illumina_model_value}
             }}
           }}
         }}
     """
 
     XML_STRUCTURE = """
-    <EXPERIMENT alias="{experiment_sra_alias}">
+  <EXPERIMENT alias="{experiment_sra_alias}">
     <TITLE>{experiment_sra_title}</TITLE>
     <STUDY_REF refname="{experiment_sra_study_refname}"/>
     <DESIGN>
-        <SAMPLE_DESCRIPTOR refname="{experiment_sra_sample_refname}"/>
-        <LIBRARY_DESCRIPTOR>
-            <LIBRARY_STRATEGY>{experiment_sra_library_strategy}</LIBRARY_STRATEGY>
-            <LIBRARY_SOURCE>{experiment_sra_library_source}</LIBRARY_SOURCE>
-            <LIBRARY_SELECTION>{experiment_sra_library_selection}</LIBRARY_SELECTION>
-            <LIBRARY_LAYOUT>
-                <PAIRED/>
-            </LIBRARY_LAYOUT>
-        </LIBRARY_DESCRIPTOR>
+      <SAMPLE_DESCRIPTOR refname="{experiment_sra_sample_refname}"/>
+      <LIBRARY_DESCRIPTOR>
+        <LIBRARY_STRATEGY>{experiment_sra_library_strategy}</LIBRARY_STRATEGY>
+        <LIBRARY_SOURCE>{experiment_sra_library_source}</LIBRARY_SOURCE>
+        <LIBRARY_SELECTION>{experiment_sra_library_selection}</LIBRARY_SELECTION>
+        <LIBRARY_LAYOUT>
+          <PAIRED/>
+        </LIBRARY_LAYOUT>
+      </LIBRARY_DESCRIPTOR>
     </DESIGN>
     <PLATFORM>
-        <{experiment_sra_platform}>
-            <INSTRUMENT_MODEL>{experiment_sra_instrument_model}</INSTRUMENT_MODEL>
-        </{experiment_sra_platform}>
+      <{experiment_sra_platform}>
+        <INSTRUMENT_MODEL>{experiment_sra_instrument_model}</INSTRUMENT_MODEL>
+      </{experiment_sra_platform}>
     </PLATFORM>
-    </EXPERIMENT>"""
+  </EXPERIMENT>"""
 
     MANIFEST = [
         ["NAME", "{experiment_sra_alias}"],
         ["STUDY", "{experiment_sra_study_refname}"],
         ["PLATFORM", "{experiment_sra_platform}"],
         ["INSTRUMENT", "{experiment_sra_instrument_model}"],
-        ["LIBRARY_STRATEGY", "{experiment_sra_library_strategy}"],
+        ["LIBRARY_STRATEGY", "{experiment_library_strategy_key}"],
         ["LIBRARY_SOURCE", "{experiment_sra_library_source}"],
-        ["LIBRARY_SELECTION", "{experiment_sra_library_selection}"],
+        ["LIBRARY_SELECTION", "{experiment_library_selection_key}"],
         ["SAMPLE", "{experiment_sra_sample_refname}"]
     ]
 
@@ -393,13 +435,17 @@ class SRAExperimentObj(ExperimentObj):
         "experiment_sra_alias": "experiment_alias",
         "experiment_sra_study_refname": "project_id",
         "experiment_sra_title": "experiment_title",
-        "experiment_sra_instrument_model": "instrument_model",
+        "experiment_sra_instrument_model": "illumina_model_value",
         "experiment_sra_sample_refname": "sample_id",
         "experiment_sra_platform": "instrument_platform",
-        "experiment_sra_library_strategy": "experiment_application_short",
+        "experiment_sra_library_strategy": "experiment_library_strategy_value",
         "experiment_sra_library_source": "experiment_sample_source",
-        "experiment_sra_library_selection": "experiment_library_selection"
+        "experiment_sra_library_selection": "experiment_library_selection_value"
     }
+
+    def __init__(self, fields):
+        super(SRAExperimentObj, self).__init__(fields)
+        self.fields["experiment_sra_library_layout"] = {}
 
 
 class RunObj(ExperimentObj):
@@ -429,9 +475,10 @@ class RunObj(ExperimentObj):
             fastq.to_json()
             for fastq in self.fields["sequencing_run_fastq_files"]
         ]
-        self.fields["fastq_files_json"] = json.dumps(
-            fastq_json
-        )
+        if not fastq_json:
+            return None
+
+        self.fields["fastq_files_json"] = fastq_json
         return super(RunObj, self).to_json()
 
     def to_xml(self):
@@ -439,6 +486,9 @@ class RunObj(ExperimentObj):
             fastq.to_xml()
             for fastq in self.fields["sequencing_run_fastq_files"]
         ]
+        if not fastq_xml:
+            return None
+
         self.fields["fastq_files_xml"] = "".join(fastq_xml)
         return super(RunObj, self).to_xml()
 
@@ -458,35 +508,36 @@ class NGIRunObj(RunObj):
 
     JSON_STRUCTURE = """
         {{
-            "run_alias": "{sequencing_run_alias}",
-            "run_center": "{sequencing_run_center}",
+            "run_alias": {sequencing_run_alias},
+            "run_center": {sequencing_run_center},
             "experiment": {{
-                "alias": "{experiment_alias}",
+                "alias": {experiment_alias},
                 "project": {{
-                    "project_id": "{project_id}"
+                    "project_id": {project_id}
                 }},
                 "sample": {{
-                    "sample_id": "{sample_id}",
-                    "sample_library_id": "{sample_library_id}",
-                    "sample_library_tag": "{sample_library_tag}"
+                    "sample_id": {sample_id},
+                    "sample_name": {sample_name},
+                    "sample_library_id": {sample_library_id},
+                    "sample_library_tag": {sample_library_tag}
                 }}
             }},
             "platform": {{
-                "model_name": "{instrument_model_name}"
+                "model_name": {experiment_instrument_model_name}
             }},
-            "run_date": "{sequencing_run_date}",
+            "run_date": {sequencing_run_date},
             "run_attributes": [
                 {{
                     "tag": "project_id",
-                    "value": "{project_id}"
+                    "value": {project_id}
                 }},
                 {{
                     "tag": "sample_id",
-                    "value": "{sample_id}"
+                    "value": {sample_id}
                 }},
                 {{
                     "tag": "sample_library_id",
-                    "value": "{sample_library_id}"
+                    "value": {sample_library_id}
                 }}
             ],
             "fastqfiles": {fastq_files_json}
@@ -494,7 +545,6 @@ class NGIRunObj(RunObj):
     """
 
     MAPPING = {
-        "sample_library_id": "sample_id",
         "fragment_size": "udf_fragment_size",
         "fragment_lower": "udf_fragment_lower",
         "fragment_upper": "udf_fragment_upper"
@@ -508,24 +558,24 @@ class SRARunObj(RunObj):
 
     JSON_STRUCTURE = """
         {{
-            "center_name": "{sequencing_run_center}",
-            "TITLE": "{sequencing_run_alias}",
+            "center_name": {sequencing_run_center},
+            "TITLE": {sequencing_run_alias},
             "EXPERIMENT_REF": {{
-                "refname": "{experiment_alias}"
+                "refname": {experiment_alias}
             }},
             "RUN_ATTRIBUTES": {{
                 "RUN_ATTRIBUTE": [
                     {{
                         "TAG": "project_id",
-                        "VALUE": "{project_id}"
+                        "VALUE": {project_id}
                     }},
                     {{
                         "TAG": "sample_id",
-                        "VALUE": "{sample_id}"
+                        "VALUE": {sample_id}
                     }},
                     {{
                         "TAG": "sample_library_id",
-                        "VALUE": "{sample_library_id}"
+                        "VALUE": {sample_library_id}
                     }}
                 ]
             }},
@@ -534,8 +584,8 @@ class SRARunObj(RunObj):
                     "FILE": {fastq_files_json}
                 }}
             }},
-            "run_date": "{sequencing_run_date}",
-            "run_center": "{sequencing_run_center}"
+            "run_date": {sequencing_run_date},
+            "run_center": {sequencing_run_center}
         }}
     """
 
@@ -565,9 +615,7 @@ class SRARunObj(RunObj):
 
     MANIFEST = []
 
-    MAPPING = {
-        "sample_library_id": "sample_id"
-    }
+    MAPPING = {}
 
 
 class RunSetObj(MetaObj):
@@ -579,27 +627,34 @@ class RunSetObj(MetaObj):
         sample_csv_files = self.fields["sample_csv_files"]
         sample_csv_files = [sample_csv_files] \
             if type(sample_csv_files) is str else sample_csv_files
-        self.fields["samples"] = [
+        self.fields["sample_objects"] = [
             self.sample_cls.create_from_csv(
                 sample_csv
             ) for sample_csv in sample_csv_files
         ]
 
     def to_json(self):
-        samples_json = [
-            sample.to_json()
-            for sample in self.fields["samples"]
-        ]
-        self.fields["samples_json"] = json.dumps(
-            samples_json
+        samples_json = list(
+            filter(
+                lambda x: x is not None,
+                [
+                    sample.to_json()
+                    for sample in self.fields["sample_objects"]
+                ]
+            )
         )
+        self.fields["samples_json"] = samples_json
+
         return super(RunSetObj, self).to_json()
 
     def to_xml(self):
-        samples_xml = [
-            sample.to_xml()
-            for sample in self.fields["samples"]
-        ]
+        samples_xml = filter(
+            lambda x: x is not None,
+            [
+                sample.to_xml()
+                for sample in self.fields["sample_objects"]
+            ]
+        )
         self.fields["samples_xml"] = "".join(samples_xml)
         return super(RunSetObj, self).to_xml()
 
@@ -607,7 +662,7 @@ class RunSetObj(MetaObj):
         extra_rows = extra_rows or []
         rows = [
             sample.to_manifest()
-            for sample in self.fields["samples"]
+            for sample in self.fields["sample_objects"]
         ] + extra_rows
         return super(RunSetObj, self).to_manifest(extra_rows=rows)
 
@@ -638,17 +693,16 @@ class RunSetObj(MetaObj):
 
     def create_runfolder(self, outdir):
         runfolder_dir = os.path.join(outdir, self.fields["runfolder_name"])
-        unaligned_dir = os.path.join(runfolder_dir, "Unaligned")
-        md5_dir = os.path.join(runfolder_dir, "MD5")
-        os.makedirs(unaligned_dir, exist_ok=True)
-        os.makedirs(md5_dir, exist_ok=True)
 
+        md5_dir = os.path.join(runfolder_dir, "MD5")
         checksumfile = os.path.join(md5_dir, "checksums.md5")
+        os.makedirs(md5_dir, exist_ok=True)
         open(checksumfile, "w").close()
+
         samplesheet = os.path.join(runfolder_dir, self.fields["samplesheet"])
         samplesheet_entries = []
-        for sample in self.fields["samples"]:
-            sample.create_sample_folder(unaligned_dir)
+        for sample in self.fields["sample_objects"]:
+            sample.create_sample_folder(outdir)
             sample.write_checksum(checksumfile)
             samplesheet_entries.extend(
                 sample.samplesheet_entries()
@@ -668,6 +722,28 @@ class RunSetObj(MetaObj):
             )
         )
 
+        header = """[Header],,,,,,,,
+IEMFileVersion,4,,,,,,,
+Investigator Name,SNPSEQ,,,,,,,
+Experiment,NovaSeq-dual-index,,,,,,,
+Date,2021-03-09,,,,,,,
+Workflow,GenerateFASTQ,,,,,,,
+Application,NovaSeq FASTQ Only,,,,,,,
+Assay,TruSeq HT,,,,,,,
+Description,,,,,,,,
+Chemistry,Amplicon,,,,,,,
+,,,,,,,,
+[Reads],,,,,,,,
+151,,,,,,,,
+151,,,,,,,,
+,,,,,,,,
+[Settings],,,,,,,,
+Adapter,,,,,,,,
+AdapterRead2,,,,,,,,
+,,,,,,,,
+[Data],,,,,,,,
+"""
+
         columns = [
             "lane",
             "sample_id",
@@ -678,10 +754,11 @@ class RunSetObj(MetaObj):
             "index",
             "i5_index_id",
             "index2",
-            "project_id",
+            "sample_project",
             "description"
         ]
         with open(samplesheet, "w") as fh:
+            fh.write(header)
             fh.write(",".join(columns))
             for entry in sorted_entries:
                 fh.write("\n")
@@ -694,20 +771,11 @@ class RunSetObj(MetaObj):
                     )
                 )
 
-
-class SnpseqDataRunSetObj(RunSetObj):
-
-    sample_cls = SnpseqDataSampleObj
-    model_source = "snpseq"
-
-    JSON_STRUCTURE = """
-    {{
-        "result": {{
-            "name": "{flowcell_id}",
-            "samples": {samples_json}
-        }}
-    }}
-    """
+        runparameters_file = os.path.join(
+            runfolder_dir,
+            self.fields["run_parameters"]
+        )
+        open(runparameters_file, "w").close()
 
 
 class NGIRunSetObj(RunSetObj):
@@ -717,16 +785,16 @@ class NGIRunSetObj(RunSetObj):
 
     JSON_STRUCTURE = """
     {{
-        "runfolder_path": "{runfolder_path}",
-        "runfolder_name": "{runfolder_name}",
-        "flowcell_id": "{flowcell_id}",
-        "samplesheet": "{samplesheet}",
-        "run_parameters": "{run_parameters}",
-        "checksum_method": "{checksum_method}",
+        "runfolder_path": {runfolder_path},
+        "runfolder_name": {runfolder_name},
+        "flowcell_id": {flowcell_id},
+        "samplesheet": {samplesheet},
+        "run_parameters": {run_parameters},
+        "checksum_method": {checksum_method},
         "platform": {{
-            "model_name": "{instrument_model_name}"
+            "model_name": {flowcell_instrument_model_name}
         }},
-        "run_date": "{run_date}",
+        "run_date": {run_date},
         "sequencing_runs": {samples_json}
     }}
     """
@@ -765,9 +833,24 @@ class ExperimentSetObj(RunSetObj):
                 outdir,
                 outname=outname
             )
-            for sample in self.fields["samples"]
+            for sample in self.fields["sample_objects"]
         ]
         return manifest_files
+
+
+class SnpseqDataExperimentSetObj(ExperimentSetObj):
+
+    sample_cls = SnpseqDataSampleObj
+    model_source = "snpseq"
+
+    JSON_STRUCTURE = """
+    {{
+        "result": {{
+            "name": {flowcell_id},
+            "samples": {samples_json}
+        }}
+    }}
+    """
 
 
 class NGIExperimentSetObj(ExperimentSetObj):
@@ -801,8 +884,8 @@ class SRAExperimentSetObj(ExperimentSetObj):
 
 if __name__ == '__main__':
     csvfile = sys.argv[1]
-    obj = SnpseqDataRunSetObj.create_from_csv(csvfile)
-    obj.export_json("export")
+    obj = SnpseqDataExperimentSetObj.create_from_csv(csvfile)
+    obj.export_json("export", outname="snpseq_data_")
 
     obj = obj.to_class(NGIRunSetObj)
     obj.export_json("export")

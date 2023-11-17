@@ -30,15 +30,18 @@ flowcell_id,XYZ321XY
 project_id,AB-1234
 sample_name,AB-1234-SampleB
 sample_id,AB-1234-SampleB
-experiment_alias,AB-1234-AB-1234-SampleB
+sample_library_id,AB-1234-SampleB_2-2283
+experiment_alias,AB-1234-AB-1234-SampleB-AB-1234-SampleB-AB-1234-SampleB_2-2283-CGTGTCCA+ATTCGACG
 experiment_title,AB-1234 - AB-1234-SampleB - olink explore - serum - olink explore 1536
-sequencing_run_alias,AB-1234-AB-1234-SampleB-Sample_AB-1234-SampleB-CGTGTCCA+ATTCGACG-XYZ321XY
+sequencing_run_alias,AB-1234-AB-1234-SampleB-AB-1234-SampleB-AB-1234-SampleB_2-2283-CGTGTCCA+ATTCGACG-XYZ321XY
 
 experiment_application,olink explore
-experiment_application_short,OTHER
+experiment_library_strategy_key,OTHER
+experiment_library_strategy_value,OTHER
 experiment_sample_type,serum
 experiment_sample_source,OTHER
-experiment_library_selection,OTHER
+experiment_library_selection_key,UNSPECIFIED
+experiment_library_selection_value,unspecified
 experiment_library_kit,olink explore 1536
 
 index_i7,CGTGTCCA
@@ -46,16 +49,16 @@ index_i5,ATTCGACG
 sample_library_tag,CGTGTCCA+ATTCGACG
 
 read_configuration,151x2
-read_configuration_paired,True
+read_configuration_paired,true
 insert_size,350
 
 instrument_platform,ILLUMINA
-instrument_model,Illumina NovaSeq 6000
-instrument_model_name,NovaSeq
+illumina_model_value,Illumina NovaSeq 6000
+experiment_instrument_model_name,NovaSeq
 sequencing_run_center,"National Genomics Infrastructure, Uppsala"
 sequencing_run_date,2021-04-15T00:00:00
 
-filepaths,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S1_L001_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S1_L001_R2_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S1_L002_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S1_L002_R2_001.fastq.gz
+filepaths,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleB/AB-1234-SampleA-1_S1_L001_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleB/AB-1234-SampleA-1_S1_L001_R2_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleB/AB-1234-SampleA-1_S1_L002_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleB/AB-1234-SampleA-1_S1_L002_R2_001.fastq.gz
 filetypes,fastq,fastq,fastq,fastq
 checksums,8df33e868951c1e56b6831a2df0ff87d,77bc05ab62ea44a3e5051e5bd558c126,09d5a72ee196c5493562ce5890134519,cd664b5be5ac69168c92e7c9002f7f1e
 checksum_methods,MD5,MD5,MD5,MD5

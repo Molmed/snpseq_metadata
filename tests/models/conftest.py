@@ -7,6 +7,11 @@ from snpseq_metadata.models.lims_models import *
 from snpseq_metadata.models.ngi_models import *
 from snpseq_metadata.models.sra_models import *
 
+from tests.resources.create_test_data import \
+    SnpseqDataExperimentSetObj, \
+    SRAExperimentSetObj, \
+    SRARunSetObj
+
 
 def ignore_xml_namespace_attributes(xml_str):
     pattern = r' (xmlns|xsi)\:(xsi|type)=[^\s\>]+'
@@ -14,46 +19,84 @@ def ignore_xml_namespace_attributes(xml_str):
 
 
 @pytest.fixture
-def flowcell_id():
-    return "ABC123XYZ"
+def snpseqdata_experiment_set(run_data_csv):
+    return SnpseqDataExperimentSetObj.create_from_csv(
+        run_data_csv
+    )
 
 
 @pytest.fixture
-def test_values(run_date, flowcell_id):
-    return {
-        "study_refname": "this-is-a-project-id",
-        "sample_refname": "this-is-a-sample-id",
-        "experiment_refname": "this-is-a-experiment-alias",
-        "experiment_title": "this-is-an-experiment-title",
-        "sequencing_run_title": "this-is-a-sequencing-run-title",
-        "sequencing_run_alias": "this-is-a-sequencing-run-alias",
-        "run_center": NGIRun.run_center,
-        "center_name": NGIRun.run_center,
-        "filepath": os.path.join("/this", "is", "a", "file.path"),
-        "filetype": "fastq",
-        "checksum_method": "MD5",
-        "checksum": "this-is-a-checksum",
-        "library_description": "this-is-a-library-description",
-        "library_sample_type": "this-is-a-sample-type",
-        "library_application": "this-is-a-library-application",
-        "library_kit": "this-is-a-library-kit",
-        "library_is_paired": True,
-        "library_read_length": "150x2",
-        "library_strategy": "OTHER",
-        "library_source": "OTHER",
-        "library_selection": "other",
-        "platform_model_name": "this-is-a-platform-model-name",
-        "samplesheet": "this-is-the-samplesheet-file",
-        "run_parameters": "this-is-the-run-parameters-file",
-        "flowcell_id": flowcell_id,
-        "runfolder_path": os.path.join("/this", "is", "a", "runfolder", "path"),
-        "runfolder_name": f"{run_date.strftime('%y%m%d')}_A00123_0001_A{flowcell_id}",
-        "run_date": run_date.isoformat(),
-        "container_name": "this-is-a-sequencing-container-name",
-        "attribute_tag": "this-is-an-attribute-tag",
-        "attribute_value": "this-is-an-attribute-value",
-        "attribute_units": "this-is-an-attribute-unit"
-    }
+def sra_experiment_set(run_data_csv):
+    return SRAExperimentSetObj.create_from_csv(
+        run_data_csv
+    )
+
+
+@pytest.fixture
+def sra_run_set(run_data_csv):
+    return SRARunSetObj.create_from_csv(
+        run_data_csv
+    )
+
+
+@pytest.fixture
+def flowcell_id(snpseqdata_experiment_set):
+    return snpseqdata_experiment_set.fields["flowcell_id"]
+
+
+@pytest.fixture
+def test_values(snpseqdata_experiment_set, sra_experiment_set, sra_run_set):
+    test_values = {}
+    test_values.update(snpseqdata_experiment_set.fields)
+    test_values.update(sra_experiment_set.fields)
+    test_values.update(sra_run_set.fields)
+    for sample in \
+            snpseqdata_experiment_set.fields["sample_objects"] + \
+            sra_experiment_set.fields["sample_objects"] + \
+            sra_run_set.fields["sample_objects"]:
+        for fqfile in sample.fields.get(
+                "sequencing_run_fastq_files", []):
+            test_values.update(fqfile.fields)
+        test_values.update(sample.fields)
+
+    del test_values["sample_objects"]
+    del test_values["sequencing_run_fastq_files"]
+
+    return test_values
+
+#        "study_refname": "this-is-a-project-id",
+#        "sample_refname": "this-is-a-sample-id",
+#        "experiment_refname": "this-is-a-experiment-alias",
+#        "experiment_title": "this-is-an-experiment-title",
+#        "sequencing_run_title": "this-is-a-sequencing-run-title",
+#        "sequencing_run_alias": "this-is-a-sequencing-run-alias",
+#        "run_center": NGIRun.run_center,
+#        "center_name": NGIRun.run_center,
+#        "filepath": os.path.join("/this", "is", "a", "file.path"),
+#        "filetype": "fastq",
+#        "checksum_method": "MD5",
+#        "checksum": "this-is-a-checksum",
+#        "library_description": "this-is-a-library-description",
+#        "library_sample_type": "this-is-a-sample-type",
+#        "library_application": "this-is-a-library-application",
+#        "library_kit": "this-is-a-library-kit",
+#        "library_is_paired": True,
+#        "library_read_length": "150x2",
+#        "library_strategy": "OTHER",
+#        "library_source": "OTHER",
+#        "library_selection": "other",
+#        "platform_model_name": "this-is-a-platform-model-name",
+#        "samplesheet": "this-is-the-samplesheet-file",
+#        "run_parameters": "this-is-the-run-parameters-file",
+#        "flowcell_id": flowcell_id,
+#        "runfolder_path": os.path.join("/this", "is", "a", "runfolder", "path"),
+#        "runfolder_name": f"{run_date.strftime('%y%m%d')}_A00123_0001_A{flowcell_id}",
+#        "run_date": run_date.isoformat(),
+#        "container_name": "this-is-a-sequencing-container-name",
+#        "attribute_tag": "this-is-an-attribute-tag",
+#        "attribute_value": "this-is-an-attribute-value",
+#        "attribute_units": "this-is-an-attribute-unit"
+#    }
 
 
 @pytest.fixture
@@ -64,6 +107,7 @@ def run_date():
 @pytest.fixture
 def illumina_model_prefixes():
     return {
+        "Lh": "NovaSeqX",
         "A12": "NovaSeq",
         "m0___": "MiSeq",
         "Fs98756 ": "iSeq",
@@ -82,15 +126,17 @@ def illumina_sequencing_platforms(illumina_model_prefixes):
 
 
 @pytest.fixture
-def lims_sample_json(test_values, illumina_sequencing_platforms):
+def lims_sample_json(test_values):
     return {
-        "name": test_values["sample_refname"],
-        "project": test_values["study_refname"],
-        "udf_sequencing_instrument": illumina_sequencing_platforms[0],
-        "udf_application": test_values["library_application"],
-        "udf_sample_type": test_values["library_sample_type"],
-        "udf_library_preparation_kit": test_values["library_kit"],
-        "udf_read_length": test_values["library_read_length"],
+        "name": test_values["sample_id"],
+        "project": test_values["project_id"],
+        "udf_sequencing_instrument": test_values["udf_sequencing_instrument"],
+        "udf_application": test_values["udf_application"],
+        "udf_sample_type": test_values["udf_sample_type"],
+        "udf_library_preparation_kit": test_values["udf_library_preparation_kit"],
+        "udf_read_length": test_values["udf_read_length"],
+        "udf_index": test_values["sample_library_tag"],
+        "udf_id": test_values["udf_id"]
     }
 
 
@@ -106,7 +152,10 @@ def lims_sample_obj(lims_sample_json):
 @pytest.fixture
 def lims_sequencing_container_json(test_values, lims_sample_json):
     return {
-        "result": {"name": test_values["container_name"], "samples": [lims_sample_json]}
+        "result": {
+            "name": test_values["flowcell_id"],
+            "samples": [lims_sample_json]
+        }
     }
 
 
@@ -123,7 +172,7 @@ def lims_sequencing_container_obj(lims_sequencing_container_json, lims_sample_ob
 @pytest.fixture
 def ngi_experiment_ref_json(test_values, ngi_study_json, ngi_sample_json):
     return {
-        "alias": test_values["experiment_refname"],
+        "alias": test_values["experiment_alias"],
         "project": ngi_study_json,
         "sample": ngi_sample_json,
     }
@@ -132,7 +181,7 @@ def ngi_experiment_ref_json(test_values, ngi_study_json, ngi_sample_json):
 @pytest.fixture
 def ngi_experiment_ref_obj(test_values, ngi_study_obj, ngi_sample_obj):
     return NGIExperimentRef(
-        alias=test_values["experiment_refname"],
+        alias=test_values["experiment_alias"],
         project=ngi_study_obj,
         sample=ngi_sample_obj,
     )
@@ -143,7 +192,7 @@ def ngi_experiment_json(
     test_values, ngi_study_json, ngi_illumina_platform_json, ngi_library_json
 ):
     return {
-        "alias": test_values["experiment_refname"],
+        "alias": test_values["experiment_alias"],
         "title": test_values["experiment_title"],
         "project": ngi_study_json,
         "platform": ngi_illumina_platform_json,
@@ -215,8 +264,8 @@ def ngi_flowcell_obj(ngi_flowcell_json, ngi_sequencing_run_obj):
 
 
 @pytest.fixture
-def ngi_illumina_platform_json(illumina_sequencing_platforms):
-    return {"model_name": illumina_sequencing_platforms[0]}
+def ngi_illumina_platform_json(test_values):
+    return {"model_name": test_values["illumina_model_value"]}
 
 
 @pytest.fixture
@@ -230,10 +279,10 @@ def ngi_illumina_platform_obj(ngi_illumina_platform_json):
 def ngi_library_json(test_values, ngi_sample_json):
     return {
         "description": test_values["library_description"],
-        "sample_type": test_values["library_sample_type"],
-        "application": test_values["library_application"],
-        "library_kit": test_values["library_kit"],
-        "is_paired": test_values["library_is_paired"],
+        "sample_type": test_values["experiment_sample_type"],
+        "application": test_values["experiment_application"],
+        "library_kit": test_values["experiment_library_kit"],
+        "is_paired": test_values["read_configuration_paired"],
         "sample": ngi_sample_json,
     }
 
@@ -252,7 +301,7 @@ def ngi_library_obj(ngi_sample_obj, ngi_library_json):
 
 @pytest.fixture
 def ngi_platform_json(test_values):
-    return {"model_name": test_values["platform_model_name"]}
+    return {"model_name": test_values["experiment_instrument_model_name"]}
 
 
 @pytest.fixture
@@ -290,8 +339,8 @@ def ngi_sequencing_run_json(
 ):
     return {
         "run_alias": test_values["sequencing_run_alias"],
-        "run_date": test_values["run_date"],
-        "run_center": test_values["run_center"],
+        "run_date": test_values["sequencing_run_date"],
+        "run_center": test_values["sequencing_run_center"],
         "experiment": ngi_experiment_ref_json,
         "platform": ngi_illumina_platform_json,
         "fastqfiles": [ngi_result_file_json],
@@ -321,18 +370,28 @@ def ngi_sequencing_run_obj(
 @pytest.fixture
 def ngi_sample_json(test_values):
     return {
-        "sample_id": test_values["sample_refname"]}
+        "sample_name": test_values["sample_name"],
+        "sample_id": test_values["sample_id"],
+        "sample_library_id": test_values["sample_library_id"],
+        "sample_library_tag": test_values["sample_library_tag"]
+    }
 
 
 @pytest.fixture
 def ngi_sample_obj(ngi_sample_json):
     return NGISampleDescriptor(
-        sample_id=ngi_sample_json["sample_id"])
+        sample_id=ngi_sample_json["sample_id"],
+        sample_name=ngi_sample_json["sample_name"],
+        sample_library_id=ngi_sample_json["sample_library_id"],
+        sample_library_tag=ngi_sample_json["sample_library_tag"]
+    )
 
 
 @pytest.fixture
 def ngi_study_json(test_values):
-    return {"project_id": test_values["study_refname"]}
+    return {
+        "project_id": test_values["project_id"]
+    }
 
 
 @pytest.fixture
@@ -364,7 +423,7 @@ def sra_experiment_json(
     test_values, sra_study_json, sra_library_json, sra_sequencing_platform_json
 ):
     return {
-        "alias": test_values["experiment_refname"],
+        "alias": test_values["experiment_alias"],
         "TITLE": test_values["experiment_title"],
         "STUDY_REF": sra_study_json,
         "DESIGN": sra_library_json,
@@ -414,7 +473,7 @@ def sra_experiment_xml(
 
 @pytest.fixture
 def sra_experiment_ref_json(test_values):
-    return {"refname": test_values["experiment_refname"]}
+    return {"refname": test_values["experiment_alias"]}
 
 
 @pytest.fixture
@@ -460,14 +519,14 @@ def sra_experiment_set_xml(sra_experiment_xml):
 
 @pytest.fixture
 def sra_library_json(test_values, sra_sample_json):
-    layout = "PAIRED" if test_values["library_is_paired"] else "SINGLE"
+    layout = "PAIRED" if test_values["read_configuration_paired"] else "SINGLE"
     return {
         "DESIGN_DESCRIPTION": test_values["library_description"],
         "SAMPLE_DESCRIPTOR": sra_sample_json,
         "LIBRARY_DESCRIPTOR": {
-            "LIBRARY_STRATEGY": test_values["library_strategy"],
-            "LIBRARY_SOURCE": test_values["library_source"],
-            "LIBRARY_SELECTION": test_values["library_selection"],
+            "LIBRARY_STRATEGY": test_values["experiment_sra_library_strategy"],
+            "LIBRARY_SOURCE": test_values["experiment_sra_library_source"],
+            "LIBRARY_SELECTION": test_values["experiment_sra_library_selection"],
             "LIBRARY_LAYOUT": {layout: {}},
         },
     }
@@ -553,7 +612,7 @@ def sra_result_file_manifest(sra_result_file_json):
 
 @pytest.fixture
 def sra_sample_json(test_values):
-    return {"refname": test_values["sample_refname"]}
+    return {"refname": test_values["sample_id"]}
 
 
 @pytest.fixture
@@ -618,9 +677,9 @@ def sra_sequencing_run_json(
         "EXPERIMENT_REF": sra_experiment_ref_json,
         "RUN_ATTRIBUTES": {"RUN_ATTRIBUTE": [sra_attribute_json]},
         "DATA_BLOCK": {"FILES": {"FILE": [sra_result_file_json]}},
-        "run_date": test_values["run_date"],
-        "run_center": test_values["run_center"],
-        "center_name": test_values["center_name"],
+        "run_date": test_values["sequencing_run_date"],
+        "run_center": test_values["sequencing_run_center"],
+        "center_name": test_values["sequencing_run_center"],
     }
 
 
@@ -684,7 +743,7 @@ def sra_sequencing_run_set_xml(sra_sequencing_run_xml):
 
 @pytest.fixture
 def sra_study_json(test_values):
-    return {"refname": test_values["study_refname"]}
+    return {"refname": test_values["project_id"]}
 
 
 @pytest.fixture

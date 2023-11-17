@@ -27,18 +27,21 @@ udf_pooling,No
 udf_progress,Library preparation and QC validation complete
 
 flowcell_id,XYZ321XY
-project_id,CD-5678
+project_id,Project_CD-5678
 sample_name,CD-5678-SampleA-2
 sample_id,CD-5678-SampleA-2
-experiment_alias,CD-5678-CD-5678-SampleA-2
-experiment_title,CD-5678 - CD-5678-SampleA-2 - epigenetics - gDNA - nebnext enzymatic methyl-seq kit
-sequencing_run_alias,CD-5678-CD-5678-SampleA-2-Sample_CD-5678-SampleA-2-ATCCACTG+ACGCACCT-XYZ321XY
+sample_library_id,CD-5678-SampleA-2_2-2275
+experiment_alias,Project_CD-5678-CD-5678-SampleA-2-CD-5678-SampleA-2-CD-5678-SampleA-2_2-2275-ATCCACTG+ACGCACCT
+experiment_title,Project_CD-5678 - CD-5678-SampleA-2 - epigenetics - gDNA - nebnext enzymatic methyl-seq kit
+sequencing_run_alias,Project_CD-5678-CD-5678-SampleA-2-CD-5678-SampleA-2-CD-5678-SampleA-2_2-2275-ATCCACTG+ACGCACCT-XYZ321XY
 
 experiment_application,epigenetics
-experiment_application_short,BISULFITE_SEQ
+experiment_library_strategy_key,BISULFITE_SEQ
+experiment_library_strategy_value,Bisulfite-Seq
 experiment_sample_type,gDNA
 experiment_sample_source,GENOMIC
-experiment_library_selection,RANDOM
+experiment_library_selection_key,RANDOM
+experiment_library_selection_value,RANDOM
 experiment_library_kit,nebnext enzymatic methyl-seq kit
 
 index_i7,ATCCACTG
@@ -46,16 +49,16 @@ index_i5,ACGCACCT
 sample_library_tag,ATCCACTG+ACGCACCT
 
 read_configuration,151x2
-read_configuration_paired,True
+read_configuration_paired,true
 insert_size,350
 
 instrument_platform,ILLUMINA
-instrument_model,Illumina NovaSeq 6000
-instrument_model_name,NovaSeq
+illumina_model_value,Illumina NovaSeq 6000
+experiment_instrument_model_name,NovaSeq
 sequencing_run_center,"National Genomics Infrastructure, Uppsala"
 sequencing_run_date,2021-04-15T00:00:00
 
 filepaths,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleA-2/CD-5678-SampleA-2_S5_L001_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleA-2/CD-5678-SampleA-2_S5_L001_R2_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleA-2/CD-5678-SampleA-2_S5_L003_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleA-2/CD-5678-SampleA-2_S5_L003_R2_001.fastq.gz
 filetypes,fastq,fastq,fastq,fastq
-checksums,540572f70c8d47213bb046d1accc2532,46948c9a70df0185cd88db2e108c012e,0e7c27a4571a02f7a079448784d22194,e4e734f9f41d754dfe09083e8726f1ab
+checksums,fb2d74511d69ab4200049939d307d3ee,7b368131f221cfe8c130f8e9ac28f7f8,8c9dc5c0a556a6a87d336b3f2892d95f,311238fb068964e201a294797d7a9b12
 checksum_methods,MD5,MD5,MD5,MD5

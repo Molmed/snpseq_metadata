@@ -115,7 +115,8 @@ class TestNGIFlowcell:
             fastqfiles=fastqfiles(),
             run_attributes=[
                 NGIAttribute(tag="project_id", value=ngi_study_obj.project_id),
-                NGIAttribute(tag="sample_id", value=ngi_sample_obj.sample_id)
+                NGIAttribute(tag="sample_id", value=ngi_sample_obj.sample_id),
+                NGIAttribute(tag="sample_library_id", value=ngi_sample_obj.sample_library_id)
             ]
         )
 
@@ -211,7 +212,10 @@ class TestNGIFlowcell:
         exp_objs = sorted(
             [
                 NGIFastqFile(
-                    filepath=fqfile,
+                    filepath=os.path.relpath(
+                        fqfile,
+                        os.path.dirname(tmpdir)
+                    ),
                     checksum=f"{ngi_flowcell_obj.checksum_method}-{os.path.basename(fqfile)}",
                     checksum_method=ngi_flowcell_obj.checksum_method,
                 )

@@ -30,28 +30,31 @@ flowcell_id,XYZ321XY
 project_id,EF-9012
 sample_name,EF-9012-608
 sample_id,EF-9012-608
-experiment_alias,EF-9012-EF-9012-608
+sample_library_id,EF-9012-608
+experiment_alias,EF-9012-EF-9012-608-EF-9012-608-EF-9012-608
 experiment_title,EF-9012 - EF-9012-608 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
 sequencing_run_alias,
 
 experiment_application,WG re-seq Human
-experiment_application_short,WGS
+experiment_library_strategy_key,WGS
+experiment_library_strategy_value,WGS
 experiment_sample_type,gDNA
 experiment_sample_source,GENOMIC
-experiment_library_selection,RANDOM
+experiment_library_selection_key,RANDOM
+experiment_library_selection_value,RANDOM
 experiment_library_kit,TruSeq DNA PCR-Free Sample Preparation kit LT
 
-index_i7, 
-index_i5, 
+index_i7,
+index_i5,
 sample_library_tag,
 
 read_configuration,151x2
-read_configuration_paired,True
+read_configuration_paired,true
 insert_size,350
 
 instrument_platform,ILLUMINA
-instrument_model,HiSeq X Ten
-instrument_model_name,HiSeqX
+illumina_model_value,HiSeq X Ten
+experiment_instrument_model_name,HiSeqX
 sequencing_run_center,"National Genomics Infrastructure, Uppsala"
 sequencing_run_date,2021-04-15T00:00:00
 

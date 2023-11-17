@@ -30,15 +30,18 @@ flowcell_id,XYZ321XY
 project_id,AB-1234
 sample_name,AB-1234-SampleA-1
 sample_id,AB-1234-SampleA-1
-experiment_alias,AB-1234-AB-1234-SampleA-1
+sample_library_id,AB-1234-SampleA-1_2-2271
+experiment_alias,AB-1234-AB-1234-SampleA-1-AB-1234-SampleA-1-AB-1234-SampleA-1_2-2271-CCGCGGTT+CTAGCGCT
 experiment_title,AB-1234 - AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
-sequencing_run_alias,AB-1234-AB-1234-SampleA-1-Sample_AB-1234-SampleA-1-CCGCGGTT+CTAGCGCT-XYZ321XY
+sequencing_run_alias,AB-1234-AB-1234-SampleA-1-AB-1234-SampleA-1-AB-1234-SampleA-1_2-2271-CCGCGGTT+CTAGCGCT-XYZ321XY
 
 experiment_application,WG re-seq Human
-experiment_application_short,WGS
+experiment_library_strategy_key,WGS
+experiment_library_strategy_value,WGS
 experiment_sample_type,gDNA
 experiment_sample_source,GENOMIC
-experiment_library_selection,RANDOM
+experiment_library_selection_key,RANDOM
+experiment_library_selection_value,RANDOM
 experiment_library_kit,TruSeq DNA PCR-Free Sample Preparation kit LT
 
 index_i7,CCGCGGTT
@@ -46,14 +49,14 @@ index_i5,CTAGCGCT
 sample_library_tag,CCGCGGTT+CTAGCGCT
 
 read_configuration,151x2
-read_configuration_paired,True
+read_configuration_paired,true
 insert_size,350
 
 instrument_platform,ILLUMINA
-instrument_model,Illumina NovaSeq 6000
-instrument_model_name,NovaSeq
+illumina_model_value,Illumina NovaSeq 6000
 sequencing_run_center,"National Genomics Infrastructure, Uppsala"
 sequencing_run_date,2021-04-15T00:00:00
+experiment_instrument_model_name,NovaSeq
 
 filepaths,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S2_L001_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S2_L001_R2_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S2_L002_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/AB-1234/Sample_AB-1234-SampleA-1/AB-1234-SampleA-1_S2_L002_R2_001.fastq.gz
 filetypes,fastq,fastq,fastq,fastq

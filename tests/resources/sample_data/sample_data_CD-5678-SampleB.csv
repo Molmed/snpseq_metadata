@@ -27,18 +27,21 @@ udf_pooling,No
 udf_progress,Library preparation and QC validation complete
 
 flowcell_id,XYZ321XY
-project_id,CD-5678
+project_id,Project_CD-5678
 sample_name,CD-5678-SampleB
 sample_id,CD-5678-SampleB
-experiment_alias,CD-5678-CD-5678-SampleB
-experiment_title,CD-5678 - CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
-sequencing_run_alias,CD-5678-CD-5678-SampleB-Sample_CD-5678-SampleB-GCTTGTCA+GTATGTTC-XYZ321XY
+sample_library_id,CD-5678-SampleB_2-2276
+experiment_alias,Project_CD-5678-CD-5678-SampleB-CD-5678-SampleB-CD-5678-SampleB_2-2276-GCTTGTCA+GTATGTTC
+experiment_title,Project_CD-5678 - CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
+sequencing_run_alias,Project_CD-5678-CD-5678-SampleB-CD-5678-SampleB-CD-5678-SampleB_2-2276-GCTTGTCA+GTATGTTC-XYZ321XY
 
 experiment_application,WG re-seq Human
-experiment_application_short,WGS
+experiment_library_strategy_key,WGS
+experiment_library_strategy_value,WGS
 experiment_sample_type,gDNA
 experiment_sample_source,GENOMIC
-experiment_library_selection,RANDOM
+experiment_library_selection_key,RANDOM
+experiment_library_selection_value,RANDOM
 experiment_library_kit,TruSeq DNA PCR-Free Sample Preparation kit LT
 
 index_i7,GCTTGTCA
@@ -46,16 +49,16 @@ index_i5,GTATGTTC
 sample_library_tag,GCTTGTCA+GTATGTTC
 
 read_configuration,151x2
-read_configuration_paired,True
+read_configuration_paired,true
 insert_size,350
 
 instrument_platform,ILLUMINA
-instrument_model,Illumina NovaSeq 6000
-instrument_model_name,NovaSeq SP
+illumina_model_value,Illumina NovaSeq 6000
+experiment_instrument_model_name,NovaSeq
 sequencing_run_center,"National Genomics Infrastructure, Uppsala"
 sequencing_run_date,2021-04-15T00:00:00
 
 filepaths,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleB/CD-5678-SampleB_S6_L001_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleB/CD-5678-SampleB_S6_L001_R2_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleB/CD-5678-SampleB_S6_L003_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/CD-5678-SampleB/CD-5678-SampleB_S6_L003_R2_001.fastq.gz
 filetypes,fastq,fastq,fastq,fastq
-checksums,dac4c8dd69843e6cdc997cef3122c404,1611c36835b1a2560fd82150735fd22e,31a9e96d6cf59599889e111d154df900,bb921ed31f96fd699bb2c6ee53d06ea5
+checksums,8820f6ff98ed4da12200ff472552d17d,c7e460d24f81375ab25a8a5485a6d279,37435fbea7ccbb85784b8fa79e49427b,566006c970f7dcaf37441ccc31450d02
 checksum_methods,MD5,MD5,MD5,MD5

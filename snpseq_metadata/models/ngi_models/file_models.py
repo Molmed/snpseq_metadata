@@ -9,12 +9,19 @@ T = TypeVar("T", bound="NGIResultFile")
 
 class NGIResultFile(NGIMetadataModel):
     def __init__(
-        self, filepath: str, filetype: str, checksum: str, checksum_method: str = "MD5"
+            self,
+            filepath: str,
+            filetype: str,
+            checksum: str,
+            checksum_method: str = "MD5",
+            relative_path: str = None
     ) -> None:
-        self.filepath = filepath
         self.filetype = filetype
         self.checksum = checksum
         self.checksum_method = checksum_method
+        self.filepath = filepath \
+            if not relative_path \
+            else os.path.relpath(filepath, relative_path)
 
     def __eq__(self, other: T) -> bool:
         return (
@@ -41,10 +48,12 @@ class NGIFastqFile(NGIResultFile):
         filetype: str = "fastq",
         checksum: str = None,
         checksum_method: str = None,
+        relative_path: str = None
     ) -> None:
         super().__init__(
             filepath=filepath,
             filetype=filetype,
             checksum=checksum,
             checksum_method=checksum_method,
+            relative_path=relative_path
         )
