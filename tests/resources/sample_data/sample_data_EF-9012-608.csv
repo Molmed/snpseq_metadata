@@ -2,17 +2,17 @@ udf_id,
 
 udf_species,Homo sapiens
 udf_data_analysis,NGI-pipeline WGS
-udf_seq_data_coverage_x,30x
+udf_seq_data_coverage_x,38x
 
-udf_volume_ul,30
+udf_volume_ul,38
 udf_current_sample_volume_ul,16.7
-udf_conc_fc,150 pM
+udf_conc_fc,158 pM
 udf_sample_conc,162
-udf_plate_,EF-9012 #3 180223
-udf_phix_,1
-udf_fragment_size,430
-udf_fragment_lower,230
-udf_fragment_upper,630
+udf_plate_,EF-9012 #38 180223
+udf_phix_,8
+udf_fragment_size,438
+udf_fragment_lower,238
+udf_fragment_upper,638
 
 udf_special_info_seq,No
 udf_special_info_prep,No
@@ -31,7 +31,7 @@ project_id,EF-9012
 sample_name,EF-9012-608
 sample_id,EF-9012-608
 sample_library_id,EF-9012-608
-experiment_alias,EF-9012-EF-9012-608-EF-9012-608-EF-9012-608
+experiment_alias,EF-9012-EF-9012-608-EF-9012-608
 experiment_title,EF-9012 - EF-9012-608 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
 sequencing_run_alias,
 
@@ -50,7 +50,7 @@ sample_library_tag,
 
 read_configuration,151x2
 read_configuration_paired,true
-insert_size,350
+insert_size,358
 
 instrument_platform,ILLUMINA
 illumina_model_value,HiSeq X Ten

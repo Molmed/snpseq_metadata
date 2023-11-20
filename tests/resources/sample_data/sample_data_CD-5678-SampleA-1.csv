@@ -2,17 +2,17 @@ udf_id,2-2274
 
 udf_species,"Human (Homo sapiens, GRCh37)"
 udf_data_analysis,NGI-pipeline WGS
-udf_seq_data_coverage_x,60x
+udf_seq_data_coverage_x,64x
 
-udf_volume_ul,50
+udf_volume_ul,54
 udf_current_sample_volume_ul,10.5
-udf_conc_fc,150 pM
+udf_conc_fc,154 pM
 udf_sample_conc,101.1
-udf_plate_,CD-5678 #1 180322
-udf_phix_,1
-udf_fragment_size,430
-udf_fragment_lower,230
-udf_fragment_upper,630
+udf_plate_,CD-5678 #14 180322
+udf_phix_,4
+udf_fragment_size,434
+udf_fragment_lower,234
+udf_fragment_upper,634
 
 udf_special_info_seq,No
 udf_special_info_prep,No
@@ -31,9 +31,9 @@ project_id,Project_CD-5678
 sample_name,CD-5678-SampleA-1
 sample_id,CD-5678-SampleA-1
 sample_library_id,CD-5678-SampleA-1_2-2274
-experiment_alias,Project_CD-5678-CD-5678-SampleA-1-CD-5678-SampleA-1-CD-5678-SampleA-1_2-2274-AAGTCCAA+TACTCATA
+experiment_alias,Project_CD-5678-CD-5678-SampleA-1-CD-5678-SampleA-1_2-2274-AAGTCCAA+TACTCATA
 experiment_title,Project_CD-5678 - CD-5678-SampleA-1 - target re-seq - gDNA - twist human core exome
-sequencing_run_alias,Project_CD-5678-CD-5678-SampleA-1-CD-5678-SampleA-1-CD-5678-SampleA-1_2-2274-AAGTCCAA+TACTCATA-XYZ321XY
+sequencing_run_alias,Project_CD-5678-CD-5678-SampleA-1-CD-5678-SampleA-1_2-2274-AAGTCCAA+TACTCATA-XYZ321XY
 
 experiment_application,target re-seq
 experiment_library_strategy_key,TARGETED_CAPTURE
@@ -50,7 +50,7 @@ sample_library_tag,AAGTCCAA+TACTCATA
 
 read_configuration,151x2
 read_configuration_paired,true
-insert_size,350
+insert_size,354
 
 instrument_platform,ILLUMINA
 illumina_model_value,Illumina NovaSeq 6000

@@ -2,17 +2,17 @@ udf_id,2-2276
 
 udf_species,Homo sapiens
 udf_data_analysis,NGI-pipeline WGS
-udf_seq_data_coverage_x,30x
+udf_seq_data_coverage_x,36x
 
-udf_volume_ul,30
+udf_volume_ul,36
 udf_current_sample_volume_ul,18.6
-udf_conc_fc,150 pM
+udf_conc_fc,156 pM
 udf_sample_conc,276
-udf_plate_,CD-5678 #3 180223
-udf_phix_,1
-udf_fragment_size,430
-udf_fragment_lower,230
-udf_fragment_upper,630
+udf_plate_,CD-5678 #36 180223
+udf_phix_,6
+udf_fragment_size,436
+udf_fragment_lower,236
+udf_fragment_upper,636
 
 udf_special_info_seq,No
 udf_special_info_prep,No
@@ -20,7 +20,7 @@ udf_custom_sequencing_primer,No
 udf_genotyping_idpanel,Yes
 
 udf_rml_kitprotocol,
-udf_of_libraries_per_sample,1
+udf_of_libraries_per_sample,2
 udf_number_of_lanes,1 lane/library
 udf_pooling,No
 
@@ -31,9 +31,9 @@ project_id,Project_CD-5678
 sample_name,CD-5678-SampleB
 sample_id,CD-5678-SampleB
 sample_library_id,CD-5678-SampleB_2-2276
-experiment_alias,Project_CD-5678-CD-5678-SampleB-CD-5678-SampleB-CD-5678-SampleB_2-2276-GCTTGTCA+GTATGTTC
+experiment_alias,Project_CD-5678-CD-5678-SampleB-CD-5678-SampleB_2-2276-GCTTGTCA+GTATGTTC
 experiment_title,Project_CD-5678 - CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
-sequencing_run_alias,Project_CD-5678-CD-5678-SampleB-CD-5678-SampleB-CD-5678-SampleB_2-2276-GCTTGTCA+GTATGTTC-XYZ321XY
+sequencing_run_alias,Project_CD-5678-CD-5678-SampleB-CD-5678-SampleB_2-2276-GCTTGTCA+GTATGTTC-XYZ321XY
 
 experiment_application,WG re-seq Human
 experiment_library_strategy_key,WGS
@@ -50,7 +50,7 @@ sample_library_tag,GCTTGTCA+GTATGTTC
 
 read_configuration,151x2
 read_configuration_paired,true
-insert_size,350
+insert_size,356
 
 instrument_platform,ILLUMINA
 illumina_model_value,Illumina NovaSeq 6000

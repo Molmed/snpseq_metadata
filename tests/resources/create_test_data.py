@@ -317,7 +317,7 @@ class ExperimentObj(MetaObj):
     def export_manifest(self, outdir, outname=None):
         return super(ExperimentObj, self).export_manifest(
             outdir,
-            outname=f"{outname or ''}.{self.fields['sample_id']}"
+            outname=f"{outname or ''}.{self.fields['sample_library_id']}"
         )
 
 
@@ -337,7 +337,6 @@ class NGIExperimentObj(ExperimentObj):
           }},
           "library": {{
             "sample": {{
-              "sample_id": {experiment_ngi_sample_id},
               "sample_name": {experiment_ngi_sample_name},
               "sample_library_id": {experiment_ngi_sample_library_id},
               "sample_library_tag": {experiment_ngi_sample_library_tag}
@@ -355,7 +354,6 @@ class NGIExperimentObj(ExperimentObj):
         "experiment_ngi_project_id": "project_id",
         "experiment_ngi_title": "experiment_title",
         "experiment_ngi_model_name": "experiment_instrument_model_name",
-        "experiment_ngi_sample_id": "sample_id",
         "experiment_ngi_sample_name": "sample_name",
         "experiment_ngi_sample_library_id": "sample_library_id",
         "experiment_ngi_sample_library_tag": "sample_library_tag",
@@ -436,7 +434,7 @@ class SRAExperimentObj(ExperimentObj):
         "experiment_sra_study_refname": "project_id",
         "experiment_sra_title": "experiment_title",
         "experiment_sra_instrument_model": "illumina_model_value",
-        "experiment_sra_sample_refname": "sample_id",
+        "experiment_sra_sample_refname": "sample_library_id",
         "experiment_sra_platform": "instrument_platform",
         "experiment_sra_library_strategy": "experiment_library_strategy_value",
         "experiment_sra_library_source": "experiment_sample_source",

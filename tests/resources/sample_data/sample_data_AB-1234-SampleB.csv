@@ -2,17 +2,17 @@ udf_id,2-2283
 
 udf_species,"Human (Homo sapiens, GRCh37)"
 udf_data_analysis,NGI-pipeline WGS
-udf_seq_data_coverage_x,60x
+udf_seq_data_coverage_x,63x
 
-udf_volume_ul,50
+udf_volume_ul,53
 udf_current_sample_volume_ul,28.9
-udf_conc_fc,150 pM
+udf_conc_fc,153 pM
 udf_sample_conc,193.8
-udf_plate_,AB-1234 #1 180322
-udf_phix_,1
-udf_fragment_size,430
-udf_fragment_lower,230
-udf_fragment_upper,630
+udf_plate_,AB-1234 #13 180322
+udf_phix_,3
+udf_fragment_size,433
+udf_fragment_lower,233
+udf_fragment_upper,633
 
 udf_special_info_seq,No
 udf_special_info_prep,No
@@ -31,9 +31,9 @@ project_id,AB-1234
 sample_name,AB-1234-SampleB
 sample_id,AB-1234-SampleB
 sample_library_id,AB-1234-SampleB_2-2283
-experiment_alias,AB-1234-AB-1234-SampleB-AB-1234-SampleB-AB-1234-SampleB_2-2283-CGTGTCCA+ATTCGACG
+experiment_alias,AB-1234-AB-1234-SampleB-AB-1234-SampleB_2-2283-CGTGTCCA+ATTCGACG
 experiment_title,AB-1234 - AB-1234-SampleB - olink explore - serum - olink explore 1536
-sequencing_run_alias,AB-1234-AB-1234-SampleB-AB-1234-SampleB-AB-1234-SampleB_2-2283-CGTGTCCA+ATTCGACG-XYZ321XY
+sequencing_run_alias,AB-1234-AB-1234-SampleB-AB-1234-SampleB_2-2283-CGTGTCCA+ATTCGACG-XYZ321XY
 
 experiment_application,olink explore
 experiment_library_strategy_key,OTHER
@@ -50,7 +50,7 @@ sample_library_tag,CGTGTCCA+ATTCGACG
 
 read_configuration,151x2
 read_configuration_paired,true
-insert_size,350
+insert_size,353
 
 instrument_platform,ILLUMINA
 illumina_model_value,Illumina NovaSeq 6000

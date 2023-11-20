@@ -2,17 +2,17 @@ udf_id,2-2271
 
 udf_species,"Human (Homo sapiens, GRCh37)"
 udf_data_analysis,NGI-pipeline WGS
-udf_seq_data_coverage_x,60x
+udf_seq_data_coverage_x,63x
 
-udf_volume_ul,50
+udf_volume_ul,51
 udf_current_sample_volume_ul,0.5
-udf_conc_fc,150 pM
+udf_conc_fc,151 pM
 udf_sample_conc,78.7
 udf_plate_,AB-1234 #1 180322
 udf_phix_,1
-udf_fragment_size,430
-udf_fragment_lower,230
-udf_fragment_upper,630
+udf_fragment_size,431
+udf_fragment_lower,231
+udf_fragment_upper,631
 
 udf_special_info_seq,No
 udf_special_info_prep,No
@@ -31,9 +31,9 @@ project_id,AB-1234
 sample_name,AB-1234-SampleA-1
 sample_id,AB-1234-SampleA-1
 sample_library_id,AB-1234-SampleA-1_2-2271
-experiment_alias,AB-1234-AB-1234-SampleA-1-AB-1234-SampleA-1-AB-1234-SampleA-1_2-2271-CCGCGGTT+CTAGCGCT
+experiment_alias,AB-1234-AB-1234-SampleA-1-AB-1234-SampleA-1_2-2271-CCGCGGTT+CTAGCGCT
 experiment_title,AB-1234 - AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
-sequencing_run_alias,AB-1234-AB-1234-SampleA-1-AB-1234-SampleA-1-AB-1234-SampleA-1_2-2271-CCGCGGTT+CTAGCGCT-XYZ321XY
+sequencing_run_alias,AB-1234-AB-1234-SampleA-1-AB-1234-SampleA-1_2-2271-CCGCGGTT+CTAGCGCT-XYZ321XY
 
 experiment_application,WG re-seq Human
 experiment_library_strategy_key,WGS
@@ -50,7 +50,7 @@ sample_library_tag,CCGCGGTT+CTAGCGCT
 
 read_configuration,151x2
 read_configuration_paired,true
-insert_size,350
+insert_size,351
 
 instrument_platform,ILLUMINA
 illumina_model_value,Illumina NovaSeq 6000

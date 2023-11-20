@@ -177,7 +177,7 @@ class ConvertSampleDescriptor(Converter):
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
         if ngi_model:
-            return cls.sra_model_class.create_object(refname=ngi_model.sample_id)
+            return cls.sra_model_class.create_object(refname=ngi_model.sample_library_id)
 
     @classmethod
     @catch_exception
@@ -355,7 +355,11 @@ class ConvertExperimentRef(Converter):
             # this alias should ideally be the same regardless if it's created from the LIMS
             # object or from the NGI object. Currently, it's not straightforward since there's not
             # enough specific information
-            alias = f"{project.project_id}-{sample.sample_id}-{platform.model_name}"
+            alias = f"{project.project_id}-" \
+                    f"{sample.sample_name}-" \
+                    f"{sample.sample_library_id}-" \
+                    f"{sample.sample_library_tag}-" \
+                    f"{platform.model_name}"
             return cls.ngi_model_class(
                 alias=alias,
                 sample=sample,

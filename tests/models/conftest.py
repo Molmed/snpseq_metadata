@@ -612,7 +612,7 @@ def sra_result_file_manifest(sra_result_file_json):
 
 @pytest.fixture
 def sra_sample_json(test_values):
-    return {"refname": test_values["sample_id"]}
+    return {"refname": test_values["sample_library_id"]}
 
 
 @pytest.fixture

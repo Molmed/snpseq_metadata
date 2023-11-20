@@ -2,17 +2,17 @@ udf_id,2-2275
 
 udf_species,"Human (Homo sapiens, GRCh37)"
 udf_data_analysis,NGI-pipeline WGS
-udf_seq_data_coverage_x,60x
+udf_seq_data_coverage_x,65x
 
-udf_volume_ul,50
+udf_volume_ul,55
 udf_current_sample_volume_ul,18.1
-udf_conc_fc,150 pM
+udf_conc_fc,155 pM
 udf_sample_conc,94.8
-udf_plate_,CD-5678 #1 180322
-udf_phix_,1
-udf_fragment_size,430
-udf_fragment_lower,230
-udf_fragment_upper,630
+udf_plate_,CD-5678 #15 180322
+udf_phix_,5
+udf_fragment_size,435
+udf_fragment_lower,235
+udf_fragment_upper,635
 
 udf_special_info_seq,No
 udf_special_info_prep,No
@@ -31,9 +31,9 @@ project_id,Project_CD-5678
 sample_name,CD-5678-SampleA-2
 sample_id,CD-5678-SampleA-2
 sample_library_id,CD-5678-SampleA-2_2-2275
-experiment_alias,Project_CD-5678-CD-5678-SampleA-2-CD-5678-SampleA-2-CD-5678-SampleA-2_2-2275-ATCCACTG+ACGCACCT
+experiment_alias,Project_CD-5678-CD-5678-SampleA-2-CD-5678-SampleA-2_2-2275-ATCCACTG+ACGCACCT
 experiment_title,Project_CD-5678 - CD-5678-SampleA-2 - epigenetics - gDNA - nebnext enzymatic methyl-seq kit
-sequencing_run_alias,Project_CD-5678-CD-5678-SampleA-2-CD-5678-SampleA-2-CD-5678-SampleA-2_2-2275-ATCCACTG+ACGCACCT-XYZ321XY
+sequencing_run_alias,Project_CD-5678-CD-5678-SampleA-2-CD-5678-SampleA-2_2-2275-ATCCACTG+ACGCACCT-XYZ321XY
 
 experiment_application,epigenetics
 experiment_library_strategy_key,BISULFITE_SEQ
@@ -50,7 +50,7 @@ sample_library_tag,ATCCACTG+ACGCACCT
 
 read_configuration,151x2
 read_configuration_paired,true
-insert_size,350
+insert_size,355
 
 instrument_platform,ILLUMINA
 illumina_model_value,Illumina NovaSeq 6000

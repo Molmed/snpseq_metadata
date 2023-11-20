@@ -2,17 +2,17 @@ udf_id,2-2272
 
 udf_species,"Human (Homo sapiens, GRCh37)"
 udf_data_analysis,NGI-pipeline WGS
-udf_seq_data_coverage_x,60x
+udf_seq_data_coverage_x,62x
 
-udf_volume_ul,50
+udf_volume_ul,52
 udf_current_sample_volume_ul,12
-udf_conc_fc,150 pM
+udf_conc_fc,152 pM
 udf_sample_conc,83.2
-udf_plate_,AB-1234 #1 180322
-udf_phix_,1
-udf_fragment_size,430
-udf_fragment_lower,230
-udf_fragment_upper,630
+udf_plate_,AB-1234 #12 180322
+udf_phix_,2
+udf_fragment_size,432
+udf_fragment_lower,232
+udf_fragment_upper,632
 
 udf_special_info_seq,No
 udf_special_info_prep,No
@@ -31,9 +31,9 @@ project_id,AB-1234
 sample_name,AB-1234-SampleA-2
 sample_id,AB-1234-SampleA-2
 sample_library_id,AB-1234-SampleA-2_2-2272
-experiment_alias,AB-1234-AB-1234-SampleA-2-AB-1234-SampleA-2-AB-1234-SampleA-2_2-2272-TTATAACC+TCGATATC
+experiment_alias,AB-1234-AB-1234-SampleA-2-AB-1234-SampleA-2_2-2272-TTATAACC+TCGATATC
 experiment_title,AB-1234 - AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit
-sequencing_run_alias,AB-1234-AB-1234-SampleA-2-AB-1234-SampleA-2-AB-1234-SampleA-2_2-2272-TTATAACC+TCGATATC-XYZ321XY
+sequencing_run_alias,AB-1234-AB-1234-SampleA-2-AB-1234-SampleA-2_2-2272-TTATAACC+TCGATATC-XYZ321XY
 
 experiment_application,WG re-seq
 experiment_library_strategy_key,WGS
@@ -50,7 +50,7 @@ sample_library_tag,TTATAACC+TCGATATC
 
 read_configuration,151x2
 read_configuration_paired,true
-insert_size,350
+insert_size,352
 
 instrument_platform,ILLUMINA
 illumina_model_value,Illumina NovaSeq 6000
