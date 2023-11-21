@@ -8,6 +8,12 @@ import sys
 from functools import cmp_to_key
 
 
+class DefaultField(dict):
+
+    def __missing__(self, key):
+        return json.dumps("")
+
+
 class MetaObj:
 
     model_source = ""
@@ -22,18 +28,22 @@ class MetaObj:
         self._fields = fields.copy()
         self.fields = fields.copy()
 
-        for cls_key, meta_key in self.MAPPING.items():
-            self.fields[cls_key] = self.fields[meta_key]
+        for cls_key in filter(
+                lambda k: self.MAPPING[k] in self.fields,
+                self.MAPPING.keys()
+        ):
+            self.fields[cls_key] = self.fields[
+                self.MAPPING[cls_key]
+            ]
 
     def flowcell_id(self):
         return self.fields.get("flowcell_id", "FCID")
 
     def structure_to_str(self, structure, fields=None):
         d = fields or self.fields
-        return structure.format(**d)
+        return structure.format_map(DefaultField(d))
 
     def to_json(self):
-
         json_dumped_fields = {}
         for k, v in self.fields.items():
             if f'{k}' in self.JSON_STRUCTURE:
@@ -315,10 +325,23 @@ class SnpseqDataSampleObj(MetaObj):
 class ExperimentObj(MetaObj):
 
     def export_manifest(self, outdir, outname=None):
-        return super(ExperimentObj, self).export_manifest(
-            outdir,
-            outname=f"{outname or ''}.{self.fields['sample_library_id']}"
-        )
+        if "sample_library_id" in self.fields:
+            return super(ExperimentObj, self).export_manifest(
+                outdir,
+                outname=f"{outname or ''}.{self.fields['sample_library_id']}"
+            )
+
+    def to_xml(self):
+        if "sample_library_id" in self.fields:
+            return super(ExperimentObj, self).to_xml()
+
+    def to_json(self):
+        if "sample_library_id" in self.fields:
+            return super(ExperimentObj, self).to_json()
+
+    def to_manifest(self, extra_rows=None):
+        if "sample_library_id" in self.fields:
+            return super(ExperimentObj, self).to_manifest(extra_rows=extra_rows)
 
 
 class NGIExperimentObj(ExperimentObj):
@@ -462,10 +485,11 @@ class RunObj(ExperimentObj):
                 }
             )
             for filepath, filetype, checksum, checksum_method in zip(
-                self.fields["filepaths"],
-                self.fields["filetypes"],
-                self.fields["checksums"],
-                self.fields["checksum_methods"])
+                self.fields.get("filepaths", []),
+                self.fields.get("filetypes", []),
+                self.fields.get("checksums", []),
+                self.fields.get("checksum_methods", [])
+            )
         ]
 
     def to_json(self):
@@ -658,10 +682,15 @@ class RunSetObj(MetaObj):
 
     def to_manifest(self, extra_rows=None):
         extra_rows = extra_rows or []
-        rows = [
-            sample.to_manifest()
-            for sample in self.fields["sample_objects"]
-        ] + extra_rows
+        rows = list(
+            filter(
+                lambda x: x is not None,
+                [
+                    sample.to_manifest()
+                    for sample in self.fields["sample_objects"]
+                ] + extra_rows
+            )
+        )
         return super(RunSetObj, self).to_manifest(extra_rows=rows)
 
     def _export_to_format(self, super_fn, outdir, outname=None):
