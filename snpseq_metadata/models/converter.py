@@ -355,11 +355,13 @@ class ConvertExperimentRef(Converter):
             # this alias should ideally be the same regardless if it's created from the LIMS
             # object or from the NGI object. Currently, it's not straightforward since there's not
             # enough specific information
+            #alias = f"{project.project_id}-" \
+            #        f"{sample.sample_name}-" \
+            #        f"{sample.sample_library_id}-" \
+            #        f"{sample.sample_library_tag}-" \
+            #        f"{platform.model_name}"
             alias = f"{project.project_id}-" \
-                    f"{sample.sample_name}-" \
-                    f"{sample.sample_library_id}-" \
-                    f"{sample.sample_library_tag}-" \
-                    f"{platform.model_name}"
+                    f"{sample.sample_library_id}"
             return cls.ngi_model_class(
                 alias=alias,
                 sample=sample,

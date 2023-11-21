@@ -18,14 +18,15 @@ class NGISampleDescriptor(NGIMetadataModel):
         self.sample_library_tag = sample_library_tag
 
     def sample_alias(self):
-        return "-".join(
-            filter(
-                lambda x: x,
-                [
-                    self.sample_name,
-                    self.sample_library_id,
-                    self.sample_library_tag
-                ]))
+        return self.sample_library_id
+        #return "-".join(
+        #    filter(
+        #        lambda x: x,
+        #        [
+        #            self.sample_name,
+        #            self.sample_library_id,
+        #            self.sample_library_tag
+        #        ]))
 
     @classmethod
     def from_json(cls: Type[T], json_obj: Dict) -> T:
