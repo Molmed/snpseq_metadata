@@ -31,9 +31,9 @@ project_id,Project_CD-5678
 sample_name,CD-5678-SampleB
 sample_id,CD-5678-SampleB-2
 sample_library_id,CD-5678-SampleB_2-2277
-experiment_alias,Project_CD-5678-CD-5678-SampleB-CD-5678-SampleB_2-2277-CCTGATAG+TAACGCGA
+experiment_alias,Project_CD-5678-CD-5678-SampleB_2-2277
 experiment_title,Project_CD-5678 - CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
-sequencing_run_alias,Project_CD-5678-CD-5678-SampleB-CD-5678-SampleB_2-2277-CCTGATAG+TAACGCGA-XYZ321XY
+sequencing_run_alias,Project_CD-5678-CD-5678-SampleB_2-2277-XYZ321XY
 
 experiment_application,WG re-seq Human
 experiment_library_strategy_key,WGS

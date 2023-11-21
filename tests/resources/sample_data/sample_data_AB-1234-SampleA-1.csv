@@ -31,9 +31,9 @@ project_id,AB-1234
 sample_name,AB-1234-SampleA-1
 sample_id,AB-1234-SampleA-1
 sample_library_id,AB-1234-SampleA-1_2-2271
-experiment_alias,AB-1234-AB-1234-SampleA-1-AB-1234-SampleA-1_2-2271-CCGCGGTT+CTAGCGCT
+experiment_alias,AB-1234-AB-1234-SampleA-1_2-2271
 experiment_title,AB-1234 - AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
-sequencing_run_alias,AB-1234-AB-1234-SampleA-1-AB-1234-SampleA-1_2-2271-CCGCGGTT+CTAGCGCT-XYZ321XY
+sequencing_run_alias,AB-1234-AB-1234-SampleA-1_2-2271-XYZ321XY
 
 experiment_application,WG re-seq Human
 experiment_library_strategy_key,WGS
