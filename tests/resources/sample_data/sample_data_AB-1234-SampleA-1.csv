@@ -29,7 +29,7 @@ udf_progress,Library preparation and QC validation complete
 flowcell_id,XYZ321XY
 project_id,AB-1234
 sample_name,AB-1234-SampleA-1
-sample_id,AB-1234-SampleA-1
+sample_id,Sample_AB-1234-SampleA-1
 sample_library_id,AB-1234-SampleA-1_2-2271
 experiment_alias,AB-1234-AB-1234-SampleA-1_2-2271
 experiment_title,AB-1234 - AB-1234-SampleA-1 - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT

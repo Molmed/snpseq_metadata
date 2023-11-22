@@ -29,7 +29,7 @@ udf_progress,Library preparation and QC validation complete
 flowcell_id,XYZ321XY
 project_id,AB-1234
 sample_name,AB-1234-SampleB
-sample_id,AB-1234-SampleB
+sample_id,Sample_AB-1234-SampleB
 sample_library_id,AB-1234-SampleB_2-2283
 experiment_alias,AB-1234-AB-1234-SampleB_2-2283
 experiment_title,AB-1234 - AB-1234-SampleB - olink explore - serum - olink explore 1536

@@ -40,7 +40,7 @@ def sra_experiment_set_manifest(
     for experiment in sra_experiment_set_from_ngi.experiments:
         manifest_file = \
             f'{".".join(experiment_set_sra_json_file.split(".")[0:-2])}.' \
-            f'{experiment.library.sample.refname}.sra.manifest'
+            f'{experiment.alias}.sra.manifest'
         manifest.extend(_parse_manifest(manifest_file))
     return manifest
 
@@ -58,7 +58,8 @@ class TestLIMSSequencingContainer:
         assert lims_experiment_set_from_disk.name == experiment_set_name
         assert len(lims_experiment_set_from_disk.samples) == len(experiment_set_samples)
         for lims_experiment_set_sample in lims_experiment_set_from_disk.samples:
-            sample_id = f"{lims_experiment_set_sample.sample_id}_{lims_experiment_set_sample.udf_id}"
+            sample_id = f"{lims_experiment_set_sample.sample_name}_" \
+                        f"{lims_experiment_set_sample.udf_id}"
             assert sample_id in samples_dict
             sample = samples_dict[sample_id]
             assert lims_experiment_set_sample.project_id == sample["project"]
