@@ -15,6 +15,7 @@ from snpseq_metadata.models.ngi_models import (
     NGIExperiment,
     NGIExperimentSet,
     NGILibrary,
+    NGILibraryLayout,
     NGIAttribute
 )
 from snpseq_metadata.models.sra_models import (
@@ -29,6 +30,7 @@ from snpseq_metadata.models.sra_models import (
     SRAExperiment,
     SRAExperimentSet,
     SRALibrary,
+    SRALibraryLayout,
     SRAAttribute
 )
 
@@ -411,6 +413,42 @@ class ConvertExperimentSet(Converter):
             return cls.ngi_model_class(experiments=experiments)
 
 
+class ConvertLibraryLayout(Converter):
+    """
+    Conversion between NGILibraryLayout, SRALibraryLayout and LIMSSample
+    """
+
+    ngi_model_class = NGILibraryLayout
+    sra_model_class = SRALibraryLayout
+    lims_model_class = LIMSSample
+
+    @classmethod
+    @catch_exception
+    def ngi_to_sra(
+        cls: Type[T], ngi_model: ngi_model_class
+    ) -> Optional[sra_model_class]:
+        if ngi_model:
+            return cls.sra_model_class.create_object(
+                is_paired=ngi_model.is_paired,
+                fragment_size=ngi_model.fragment_size,
+                fragment_upper=ngi_model.fragment_upper,
+                fragment_lower=ngi_model.fragment_lower
+            )
+
+    @classmethod
+    @catch_exception
+    def lims_to_ngi(
+        cls: Type[T], lims_model: lims_model_class
+    ) -> Optional[ngi_model_class]:
+        if lims_model:
+            return cls.ngi_model_class(
+                is_paired=lims_model.is_paired(),
+                fragment_size=lims_model.udf_fragment_size,
+                fragment_lower=lims_model.udf_fragment_lower,
+                fragment_upper=lims_model.udf_fragment_upper
+            )
+
+
 class ConvertLibrary(Converter):
     """
     Conversion between NGILibrary, SRALibrary and LIMSSample
@@ -441,7 +479,7 @@ class ConvertLibrary(Converter):
                 strategy=library_strategy,
                 source=library_source,
                 selection=library_selection,
-                is_paired=ngi_model.is_paired,
+                layout=Converter.ngi_to_sra(ngi_model.layout),
             )
 
     @classmethod
@@ -455,14 +493,14 @@ class ConvertLibrary(Converter):
             sample_type = lims_model.udf_sample_type
             library_kit = lims_model.udf_library_preparation_kit
             description = None
-            is_paired = lims_model.is_paired()
+            layout = ConvertLibraryLayout.lims_to_ngi(lims_model=lims_model)
             return cls.ngi_model_class(
                 sample=sample,
                 description=description,
                 application=application,
                 sample_type=sample_type,
                 library_kit=library_kit,
-                is_paired=is_paired,
+                layout=layout,
             )
 
     @classmethod

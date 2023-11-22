@@ -127,18 +127,16 @@ def illumina_sequencing_platforms(illumina_model_prefixes):
 
 @pytest.fixture
 def lims_sample_json(test_values):
-    return {
+    json_obj = {
         "name": test_values["sample_name"],
-        "project": test_values["project_id"],
-        "udf_sample_id": test_values["udf_sample_id"],
-        "udf_sequencing_instrument": test_values["udf_sequencing_instrument"],
-        "udf_application": test_values["udf_application"],
-        "udf_sample_type": test_values["udf_sample_type"],
-        "udf_library_preparation_kit": test_values["udf_library_preparation_kit"],
-        "udf_read_length": test_values["udf_read_length"],
-        "udf_index": test_values["sample_library_tag"],
-        "udf_id": test_values["udf_id"]
+        "project": test_values["project_id"]
     }
+    for attr in filter(
+            lambda k: k.startswith("udf_"),
+            test_values.keys()
+    ):
+        json_obj[attr] = test_values[attr]
+    return json_obj
 
 
 @pytest.fixture
@@ -277,26 +275,43 @@ def ngi_illumina_platform_obj(ngi_illumina_platform_json):
 
 
 @pytest.fixture
-def ngi_library_json(test_values, ngi_sample_json):
+def ngi_library_layout_json(test_values):
+    return {
+        "is_paired": test_values["read_configuration_paired"],
+        "fragment_size": test_values.get("udf_fragment_size"),
+        "fragment_upper": test_values.get("udf_fragment_upper"),
+        "fragment_lower": test_values.get("udf_fragment_lower")
+    }
+
+
+@pytest.fixture
+def ngi_library_layout_obj(ngi_library_layout_json):
+    return NGILibraryLayout(
+        **ngi_library_layout_json
+    )
+
+
+@pytest.fixture
+def ngi_library_json(test_values, ngi_library_layout_json, ngi_sample_json):
     return {
         "description": test_values["library_description"],
         "sample_type": test_values["experiment_sample_type"],
         "application": test_values["experiment_application"],
         "library_kit": test_values["experiment_library_kit"],
-        "is_paired": test_values["read_configuration_paired"],
+        "layout": ngi_library_layout_json,
         "sample": ngi_sample_json,
     }
 
 
 @pytest.fixture
-def ngi_library_obj(ngi_sample_obj, ngi_library_json):
+def ngi_library_obj(ngi_sample_obj, ngi_library_layout_obj, ngi_library_json):
     return NGILibrary(
         sample=ngi_sample_obj,
         description=ngi_library_json["description"],
         sample_type=ngi_library_json["sample_type"],
         application=ngi_library_json["application"],
         library_kit=ngi_library_json["library_kit"],
-        is_paired=ngi_library_json["is_paired"],
+        layout=ngi_library_layout_obj,
     )
 
 
@@ -519,8 +534,38 @@ def sra_experiment_set_xml(sra_experiment_xml):
 
 
 @pytest.fixture
-def sra_library_json(test_values, sra_sample_json):
-    layout = "PAIRED" if test_values["read_configuration_paired"] else "SINGLE"
+def sra_library_layout_json(test_values):
+    return {
+        "PAIRED": {
+            "NOMINAL_LENGTH": test_values.get("udf_fragment_size")
+        }
+    }
+
+
+@pytest.fixture
+def sra_library_layout_obj(sra_library_layout_json):
+    return SRALibraryLayout.create_object(
+        is_paired="PAIRED" in sra_library_layout_json,
+        fragment_size=sra_library_layout_json.get(
+            "PAIRED", {}).get(
+            "NOMINAL_LENGTH"
+        )
+    )
+
+
+@pytest.fixture
+def sra_library_layout_xml(sra_library_layout_json):
+    # in the experiment context, the tag name will be SAMPLE_DESCRIPTOR but when exported as a
+    # stand-alone object, it will use the name of the python class, i.e. SAMPLEDESCRIPTORTYPE
+    mode = "PAIRED" if "PAIRED" in sra_library_layout_json else "SINGLE"
+    len = f" NOMINAL_LENGTH=\"{sra_library_layout_json['PAIRED']['NOMINAL_LENGTH']}\"" \
+        if mode == "PAIRED" and "NOMINAL_LENGTH" in sra_library_layout_json["PAIRED"] \
+        else ""
+    return f"<{mode}{len}/>"
+
+
+@pytest.fixture
+def sra_library_json(test_values, sra_library_layout_json, sra_sample_json):
     return {
         "DESIGN_DESCRIPTION": test_values["library_description"],
         "SAMPLE_DESCRIPTOR": sra_sample_json,
@@ -528,23 +573,20 @@ def sra_library_json(test_values, sra_sample_json):
             "LIBRARY_STRATEGY": test_values["experiment_sra_library_strategy"],
             "LIBRARY_SOURCE": test_values["experiment_sra_library_source"],
             "LIBRARY_SELECTION": test_values["experiment_sra_library_selection"],
-            "LIBRARY_LAYOUT": {layout: {}},
+            "LIBRARY_LAYOUT": sra_library_layout_json,
         },
     }
 
 
 @pytest.fixture
-def sra_library_obj(sra_library_json, sra_sample_obj):
+def sra_library_obj(sra_library_json, sra_library_layout_obj, sra_sample_obj):
     return SRALibrary.create_object(
         sample=sra_sample_obj,
         description=sra_library_json["DESIGN_DESCRIPTION"],
         strategy=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_STRATEGY"],
         source=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SOURCE"],
         selection=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SELECTION"],
-        is_paired=list(sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_LAYOUT"].keys())[
-            0
-        ]
-        == "PAIRED",
+        layout=sra_library_layout_obj,
     )
 
 
@@ -564,7 +606,7 @@ def sra_library_manifest(sra_library_json, sra_sample_manifest):
 
 
 @pytest.fixture
-def sra_library_xml(sra_library_json, sra_sample_xml):
+def sra_library_xml(sra_library_json, sra_library_layout_xml, sra_sample_xml):
     return f"""<LIBRARYTYPE>
       <DESIGN_DESCRIPTION>{sra_library_json["DESIGN_DESCRIPTION"]}</DESIGN_DESCRIPTION>
       {sra_sample_xml.replace("SAMPLEDESCRIPTORTYPE", "SAMPLE_DESCRIPTOR")}
@@ -573,7 +615,7 @@ def sra_library_xml(sra_library_json, sra_sample_xml):
         <LIBRARY_SOURCE>{sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SOURCE"]}</LIBRARY_SOURCE>
         <LIBRARY_SELECTION>{sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SELECTION"]}</LIBRARY_SELECTION>
         <LIBRARY_LAYOUT>
-          <{list(sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_LAYOUT"].keys())[0]}/>
+          {sra_library_layout_xml}
         </LIBRARY_LAYOUT>
       </LIBRARY_DESCRIPTOR>
     </LIBRARYTYPE>"""

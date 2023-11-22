@@ -34,3 +34,6 @@ illumina_model_value,novaseqx
 instrument_platform,this-is-an-instrument-platform
 experiment_library_strategy_value,OTHER
 experiment_library_selection_value,other
+udf_fragment_size,222
+udf_fragment_lower,111
+udf_fragment_upper,333

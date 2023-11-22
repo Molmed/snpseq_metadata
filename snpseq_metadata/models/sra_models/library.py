@@ -12,7 +12,7 @@ from snpseq_metadata.models.xsdata import (
     TypeLibrarySource,
     TypeLibrarySelection,
     LibraryDescriptorType,
-    LibraryType,
+    LibraryType
 )
 from snpseq_metadata.models.sra_models.sample import SRASampleDescriptor
 
@@ -20,25 +20,52 @@ T = TypeVar("T", bound="SRALibrary")
 TLS = TypeVar("TLS", TypeLibraryStrategy, TypeLibrarySelection, TypeLibrarySource)
 
 
+class SRALibraryLayout(SRAMetadataModel):
+    model_object_class: ClassVar[Type] = LibraryDescriptorType.LibraryLayout
+
+    def __init__(
+            self,
+            model_object: model_object_class,
+            fragment_upper: Optional[int] = None,
+            fragment_lower: Optional[int] = None
+    ) -> None:
+        super().__init__(model_object)
+        self.fragment_upper = fragment_upper
+        self.fragment_lower = fragment_lower
+
+    @classmethod
+    def create_object(
+        cls: Type[T],
+        is_paired: bool,
+        fragment_size: Optional[int] = None,
+        fragment_upper: Optional[int] = None,
+        fragment_lower: Optional[int] = None
+    ) -> T:
+        if is_paired:
+            model_object = LibraryDescriptorType.LibraryLayout(
+                paired=LibraryDescriptorType.LibraryLayout.Paired(
+                    nominal_length=fragment_size
+                )
+            )
+        else:
+            model_object = LibraryDescriptorType.LibraryLayout(
+                single=""
+            )
+        return cls(
+            model_object=model_object,
+            fragment_lower=fragment_lower,
+            fragment_upper=fragment_upper
+        )
+
+    def to_manifest(self) -> List[Tuple[str, str]]:
+        return []
+
+
 class SRALibrary(SRAMetadataModel):
     model_object_class: ClassVar[Type] = LibraryType
 
     def __init__(self, model_object: model_object_class):
         super().__init__(model_object)
-
-    @classmethod
-    def object_from_paired(
-        cls: Type[T], is_paired: bool
-    ) -> LibraryDescriptorType.LibraryLayout:
-        if is_paired:
-            layout = LibraryDescriptorType.LibraryLayout(
-                paired=LibraryDescriptorType.LibraryLayout.Paired()
-            )
-        else:
-            layout = LibraryDescriptorType.LibraryLayout(
-                single=""
-            )
-        return layout
 
     @classmethod
     def object_from_source(cls: Type[T], source: str) -> TypeLibrarySource:
@@ -76,10 +103,10 @@ class SRALibrary(SRAMetadataModel):
         strategy: str,
         source: str,
         selection: str,
-        is_paired: bool = True,
+        layout: SRALibraryLayout,
     ) -> T:
         xsdlibrary = LibraryDescriptorType(
-            library_layout=cls.object_from_paired(is_paired=is_paired),
+            library_layout=layout.model_object,
             library_source=cls.object_from_source(source=source),
             library_selection=cls.object_from_selection(selection=selection),
             library_strategy=cls.object_from_strategy(strategy=strategy),

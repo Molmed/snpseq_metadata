@@ -10,7 +10,7 @@ from snpseq_metadata.models.sra_models.file_models import (
     SRAResultFile,
 )
 from snpseq_metadata.models.sra_models.run_set import SRARunSet
-from snpseq_metadata.models.sra_models.library import SRALibrary
+from snpseq_metadata.models.sra_models.library import SRALibrary, SRALibraryLayout
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.sra_models.sequencing_platform import (
     SRASequencingPlatform,

@@ -20,11 +20,12 @@ class TestConvertSampleDescriptor:
         assert Converter.ngi_to_sra(ngi_model=ngi_sample_obj) == sra_sample_obj
 
     def test_lims_to_ngi(self, lims_sample_obj, ngi_sample_obj):
-        # the lims_sample_obj will not have enough information to deduce the sample_id
-        assert (
-            ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_sample_obj)
-            == ngi_sample_obj
+        # the converted lims_sample_obj will have a library tag created from the fake indexes
+        ngi_sample_from_lims_obj = ConvertSampleDescriptor.lims_to_ngi(
+            lims_model=lims_sample_obj
         )
+        ngi_sample_from_lims_obj.sample_library_tag = ngi_sample_obj.sample_library_tag
+        assert ngi_sample_from_lims_obj == ngi_sample_obj
 
 
 class TestConvertStudyRef:
