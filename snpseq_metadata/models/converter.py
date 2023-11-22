@@ -1,7 +1,7 @@
 
 import logging
 from functools import wraps
-from typing import ClassVar, Tuple, Type, TypeVar, Optional
+from typing import ClassVar, List, Tuple, Type, TypeVar, Optional
 
 from snpseq_metadata.models.ngi_models import (
     NGIMetadataModel,
@@ -15,7 +15,11 @@ from snpseq_metadata.models.ngi_models import (
     NGIExperiment,
     NGIExperimentSet,
     NGILibrary,
-    NGIAttribute
+    NGILibraryLayout,
+    NGIAttribute,
+    NGIPool,
+    NGIPoolMember,
+    NGIReadLabel
 )
 from snpseq_metadata.models.sra_models import (
     SRAMetadataModel,
@@ -29,6 +33,7 @@ from snpseq_metadata.models.sra_models import (
     SRAExperiment,
     SRAExperimentSet,
     SRALibrary,
+    SRALibraryLayout,
     SRAAttribute
 )
 
@@ -197,6 +202,79 @@ class ConvertSampleDescriptor(Converter):
                 sample_library_id=sample_library_id,
                 sample_library_tag=lims_model.index_tag())
         return None
+
+
+class ConvertReadLabel(Converter):
+    """
+    Conversion between NGIReadLabel and LIMSSample
+    """
+
+    ngi_model_class = NGIReadLabel
+    sra_model_class = SRASampleDescriptor
+    lims_model_class = LIMSSample
+
+    @classmethod
+    @catch_exception
+    def ngi_to_sra(
+        cls: Type[T], ngi_model: ngi_model_class
+    ) -> Optional[sra_model_class]:
+        pass
+
+    @classmethod
+    @catch_exception
+    def lims_to_ngi(
+        cls: Type[T], lims_model: lims_model_class
+    ) -> Optional[List[ngi_model_class]]:
+        sample = ConvertPoolMember.lims_to_ngi(lims_model)
+        if sample:
+            return sample.read_labels()
+
+
+class ConvertPoolMember(ConvertSampleDescriptor):
+    """
+    Conversion between NGIPoolMember and LIMSSample
+    """
+
+    ngi_model_class = NGIPoolMember
+    sra_model_class = SRASampleDescriptor
+    lims_model_class = LIMSSample
+
+
+class ConvertPool(Converter):
+    """
+    Conversion between NGIPool and LIMSSample
+    """
+
+    ngi_model_class = NGIPool
+    sra_model_class = SRASampleDescriptor
+    lims_model_class = LIMSSequencingContainer
+
+    @classmethod
+    @catch_exception
+    def lims_to_ngi(
+        cls: Type[T], lims_model: lims_model_class
+    ) -> Optional[ngi_model_class]:
+        if lims_model:
+            samples = []
+            for lims_sample in lims_model.samples or []:
+                try:
+                    samples.append(
+                        ConvertPoolMember.lims_to_ngi(
+                            lims_model=lims_sample
+                        )
+                    )
+                except ModelConversionException as ex:
+                    # log this as an error but continue with the other samples
+                    LOG.error(f"{lims_sample} skipped - {str(ex)}")
+
+            return cls.ngi_model_class(
+                samples=list(
+                    filter(
+                        lambda s: s is not None,
+                        samples
+                    )
+                )
+            )
 
 
 class ConvertStudyRef(Converter):
@@ -411,6 +489,44 @@ class ConvertExperimentSet(Converter):
             return cls.ngi_model_class(experiments=experiments)
 
 
+class ConvertLibraryLayout(Converter):
+    """
+    Conversion between NGILibraryLayout, SRALibraryLayout and LIMSSample
+    """
+
+    ngi_model_class = NGILibraryLayout
+    sra_model_class = SRALibraryLayout
+    lims_model_class = LIMSSample
+
+    @classmethod
+    @catch_exception
+    def ngi_to_sra(
+        cls: Type[T], ngi_model: ngi_model_class
+    ) -> Optional[sra_model_class]:
+        if ngi_model:
+            return cls.sra_model_class.create_object(
+                is_paired=ngi_model.is_paired,
+                fragment_size=ngi_model.fragment_size,
+                fragment_upper=ngi_model.fragment_upper,
+                fragment_lower=ngi_model.fragment_lower,
+                target_insert_size=ngi_model.target_insert_size
+            )
+
+    @classmethod
+    @catch_exception
+    def lims_to_ngi(
+        cls: Type[T], lims_model: lims_model_class
+    ) -> Optional[ngi_model_class]:
+        if lims_model:
+            return cls.ngi_model_class(
+                is_paired=lims_model.is_paired(),
+                fragment_size=lims_model.udf_fragment_size,
+                fragment_lower=lims_model.udf_fragment_lower,
+                fragment_upper=lims_model.udf_fragment_upper,
+                target_insert_size=lims_model.udf_insert_size_bp
+            )
+
+
 class ConvertLibrary(Converter):
     """
     Conversion between NGILibrary, SRALibrary and LIMSSample
@@ -441,7 +557,7 @@ class ConvertLibrary(Converter):
                 strategy=library_strategy,
                 source=library_source,
                 selection=library_selection,
-                is_paired=ngi_model.is_paired,
+                layout=Converter.ngi_to_sra(ngi_model.layout),
             )
 
     @classmethod
@@ -455,14 +571,14 @@ class ConvertLibrary(Converter):
             sample_type = lims_model.udf_sample_type
             library_kit = lims_model.udf_library_preparation_kit
             description = None
-            is_paired = lims_model.is_paired()
+            layout = ConvertLibraryLayout.lims_to_ngi(lims_model=lims_model)
             return cls.ngi_model_class(
                 sample=sample,
                 description=description,
                 application=application,
                 sample_type=sample_type,
                 library_kit=library_kit,
-                is_paired=is_paired,
+                layout=layout,
             )
 
     @classmethod

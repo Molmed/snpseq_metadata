@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Type, TypeVar
+from typing import Dict, List, Optional, Type, TypeVar
 
 from snpseq_metadata.models.ngi_models.metadata_model import NGIMetadataModel
 
@@ -19,19 +19,15 @@ class NGISampleDescriptor(NGIMetadataModel):
 
     def sample_alias(self):
         return self.sample_library_id
-        #return "-".join(
-        #    filter(
-        #        lambda x: x,
-        #        [
-        #            self.sample_name,
-        #            self.sample_library_id,
-        #            self.sample_library_tag
-        #        ]))
+
+    def library_tags(self) -> List[str]:
+        return self.sample_library_tag.split("+")
 
     @classmethod
     def from_json(cls: Type[T], json_obj: Dict) -> T:
-        return cls(
-            sample_name=json_obj.get("sample_name"),
-            sample_id=json_obj.get("sample_id"),
-            sample_library_id=json_obj.get("sample_library_id"),
-            sample_library_tag=json_obj.get("sample_library_tag"))
+        if json_obj:
+            return cls(
+                sample_name=json_obj.get("sample_name"),
+                sample_id=json_obj.get("sample_id"),
+                sample_library_id=json_obj.get("sample_library_id"),
+                sample_library_tag=json_obj.get("sample_library_tag"))

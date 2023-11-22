@@ -303,6 +303,9 @@ class SnpseqDataSampleObj(MetaObj):
         'udf_special_info_prep',
         'udf_special_info_seq',
         'udf_species',
+        'udf_fragment_size',
+        'udf_fragment_lower',
+        'udf_fragment_upper',
         'udf_volume_ul'
     ]
 
@@ -370,7 +373,13 @@ class NGIExperimentObj(ExperimentObj):
             "application": {experiment_ngi_application},
             "sample_type": {experiment_ngi_sample_type},
             "library_kit": {experiment_ngi_library_kit},
-            "is_paired": {experiment_ngi_is_paired}
+            "layout": {{
+              "is_paired": {experiment_ngi_is_paired},
+              "fragment_size": {experiment_ngi_fragment_size},
+              "fragment_lower": {experiment_ngi_fragment_lower},
+              "fragment_upper": {experiment_ngi_fragment_upper},
+              "target_insert_size": {experiment_ngi_insert_size}
+            }}
           }}
         }}
     """
@@ -387,7 +396,11 @@ class NGIExperimentObj(ExperimentObj):
         "experiment_ngi_application": "experiment_application",
         "experiment_ngi_sample_type": "experiment_sample_type",
         "experiment_ngi_library_kit": "experiment_library_kit",
-        "experiment_ngi_is_paired": "read_configuration_paired"
+        "experiment_ngi_is_paired": "read_configuration_paired",
+        "experiment_ngi_fragment_size": "udf_fragment_size",
+        "experiment_ngi_fragment_lower": "udf_fragment_lower",
+        "experiment_ngi_fragment_upper": "udf_fragment_upper",
+        "experiment_ngi_insert_size": "insert_size"
     }
 
 
@@ -411,7 +424,9 @@ class SRAExperimentObj(ExperimentObj):
               "LIBRARY_SOURCE": {experiment_sra_library_source},
               "LIBRARY_SELECTION": {experiment_sra_library_selection},
               "LIBRARY_LAYOUT": {{
-                "PAIRED": {experiment_sra_library_layout}
+                "PAIRED": {{
+                  "NOMINAL_LENGTH": {experiment_sra_insert_size}
+                }}
               }}
             }}
           }},
@@ -434,7 +449,7 @@ class SRAExperimentObj(ExperimentObj):
         <LIBRARY_SOURCE>{experiment_sra_library_source}</LIBRARY_SOURCE>
         <LIBRARY_SELECTION>{experiment_sra_library_selection}</LIBRARY_SELECTION>
         <LIBRARY_LAYOUT>
-          <PAIRED/>
+          <PAIRED NOMINAL_LENGTH="{experiment_sra_insert_size}"/>
         </LIBRARY_LAYOUT>
       </LIBRARY_DESCRIPTOR>
     </DESIGN>
@@ -465,12 +480,12 @@ class SRAExperimentObj(ExperimentObj):
         "experiment_sra_platform": "instrument_platform",
         "experiment_sra_library_strategy": "experiment_library_strategy_value",
         "experiment_sra_library_source": "experiment_sample_source",
-        "experiment_sra_library_selection": "experiment_library_selection_value"
+        "experiment_sra_library_selection": "experiment_library_selection_value",
+        "experiment_sra_insert_size": "insert_size"
     }
 
     def __init__(self, fields):
         super(SRAExperimentObj, self).__init__(fields)
-        self.fields["experiment_sra_library_layout"] = {}
 
 
 class RunObj(ExperimentObj):
@@ -552,20 +567,6 @@ class NGIRunObj(RunObj):
                 "model_name": {experiment_instrument_model_name}
             }},
             "run_date": {sequencing_run_date},
-            "run_attributes": [
-                {{
-                    "tag": "project_id",
-                    "value": {project_id}
-                }},
-                {{
-                    "tag": "sample_id",
-                    "value": {sample_id}
-                }},
-                {{
-                    "tag": "sample_library_id",
-                    "value": {sample_library_id}
-                }}
-            ],
             "fastqfiles": {fastq_files_json}
         }}
     """
@@ -589,22 +590,6 @@ class SRARunObj(RunObj):
             "EXPERIMENT_REF": {{
                 "refname": {experiment_alias}
             }},
-            "RUN_ATTRIBUTES": {{
-                "RUN_ATTRIBUTE": [
-                    {{
-                        "TAG": "project_id",
-                        "VALUE": {project_id}
-                    }},
-                    {{
-                        "TAG": "sample_id",
-                        "VALUE": {sample_id}
-                    }},
-                    {{
-                        "TAG": "sample_library_id",
-                        "VALUE": {sample_library_id}
-                    }}
-                ]
-            }},
             "DATA_BLOCK": {{
                 "FILES": {{
                     "FILE": {fastq_files_json}
@@ -623,20 +608,6 @@ class SRARunObj(RunObj):
             <FILES>{fastq_files_xml}
             </FILES>
         </DATA_BLOCK>
-        <RUN_ATTRIBUTES>
-            <RUN_ATTRIBUTE>
-                <TAG>project_id</TAG>
-                <VALUE>{project_id}</VALUE>
-            </RUN_ATTRIBUTE>
-            <RUN_ATTRIBUTE>
-                <TAG>sample_id</TAG>
-                <VALUE>{sample_id}</VALUE>
-            </RUN_ATTRIBUTE>
-            <RUN_ATTRIBUTE>
-                <TAG>sample_library_id</TAG>
-                <VALUE>{sample_library_id}</VALUE>
-            </RUN_ATTRIBUTE>
-        </RUN_ATTRIBUTES>
     </RUN>"""
 
     MANIFEST = []

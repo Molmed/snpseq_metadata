@@ -20,6 +20,10 @@ class LIMSSample(LIMSMetadataModel):
         # udf_library_preparation_kit is missing
         if name == "udf_library_preparation_kit":
             return self.udf_rml_kitprotocol
+        if name == "udf_fragment_size" or \
+                name == "udf_fragment_lower" or \
+                name == "udf_fragment_upper":
+            return None
         raise AttributeError(f"{str(self)} is missing attribute '{name}'")
 
     def is_paired(self) -> Optional[bool]:
