@@ -567,20 +567,6 @@ class NGIRunObj(RunObj):
                 "model_name": {experiment_instrument_model_name}
             }},
             "run_date": {sequencing_run_date},
-            "run_attributes": [
-                {{
-                    "tag": "project_id",
-                    "value": {project_id}
-                }},
-                {{
-                    "tag": "sample_id",
-                    "value": {sample_id}
-                }},
-                {{
-                    "tag": "sample_library_id",
-                    "value": {sample_library_id}
-                }}
-            ],
             "fastqfiles": {fastq_files_json}
         }}
     """
@@ -604,22 +590,6 @@ class SRARunObj(RunObj):
             "EXPERIMENT_REF": {{
                 "refname": {experiment_alias}
             }},
-            "RUN_ATTRIBUTES": {{
-                "RUN_ATTRIBUTE": [
-                    {{
-                        "TAG": "project_id",
-                        "VALUE": {project_id}
-                    }},
-                    {{
-                        "TAG": "sample_id",
-                        "VALUE": {sample_id}
-                    }},
-                    {{
-                        "TAG": "sample_library_id",
-                        "VALUE": {sample_library_id}
-                    }}
-                ]
-            }},
             "DATA_BLOCK": {{
                 "FILES": {{
                     "FILE": {fastq_files_json}
@@ -638,20 +608,6 @@ class SRARunObj(RunObj):
             <FILES>{fastq_files_xml}
             </FILES>
         </DATA_BLOCK>
-        <RUN_ATTRIBUTES>
-            <RUN_ATTRIBUTE>
-                <TAG>project_id</TAG>
-                <VALUE>{project_id}</VALUE>
-            </RUN_ATTRIBUTE>
-            <RUN_ATTRIBUTE>
-                <TAG>sample_id</TAG>
-                <VALUE>{sample_id}</VALUE>
-            </RUN_ATTRIBUTE>
-            <RUN_ATTRIBUTE>
-                <TAG>sample_library_id</TAG>
-                <VALUE>{sample_library_id}</VALUE>
-            </RUN_ATTRIBUTE>
-        </RUN_ATTRIBUTES>
     </RUN>"""
 
     MANIFEST = []

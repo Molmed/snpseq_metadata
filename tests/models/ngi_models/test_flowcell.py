@@ -128,6 +128,7 @@ class TestNGIFlowcell:
         obs_run_obj = ngi_flowcell_obj.get_sequencing_run_for_experiment_ref(
             experiment_ref=ngi_experiment_ref_obj
         )
+        exp_run_obj.run_attributes = None
         assert obs_run_obj == exp_run_obj
 
     def test_get_fastqdir_for_experiment_ref(

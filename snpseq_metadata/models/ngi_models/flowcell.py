@@ -215,7 +215,7 @@ class NGIFlowcell(NGIMetadataModel):
             platform=self.platform,
             run_date=self.run_date,
             fastqfiles=fastqfiles,
-            run_attributes=run_attribute
+            run_attributes=None  # run_attribute
         )
 
     def get_sequencing_run_for_experiment(
