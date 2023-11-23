@@ -12,6 +12,11 @@ from snpseq_metadata.models.ngi_models.file_models import (
 from snpseq_metadata.models.ngi_models.flowcell import NGIFlowcell
 from snpseq_metadata.models.ngi_models.library import NGILibrary, NGILibraryLayout
 from snpseq_metadata.models.ngi_models.metadata_model import NGIMetadataModel
+from snpseq_metadata.models.ngi_models.pool import (
+    NGIPool,
+    NGIPoolMember,
+    NGIReadLabel
+)
 from snpseq_metadata.models.ngi_models.sequencing_platform import (
     NGISequencingPlatform,
     NGIIlluminaSequencingPlatform,

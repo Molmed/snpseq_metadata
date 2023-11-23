@@ -28,6 +28,70 @@ class TestConvertSampleDescriptor:
         assert ngi_sample_from_lims_obj == ngi_sample_obj
 
 
+class TestConvertReadLabel:
+    def test_ngi_to_sra(self, ngi_sample_obj, sra_sample_obj):
+        pass
+
+    def test_lims_to_ngi(self, lims_sample_obj, ngi_read_label_obj):
+        ngi_read_label_from_lims_obj = ConvertReadLabel.lims_to_ngi(lims_sample_obj)
+        self.compare_lims_to_ngi(
+            ngi_read_label_from_lims_obj,
+            ngi_read_label_obj,
+            lims_sample_obj
+        )
+
+    @staticmethod
+    def compare_lims_to_ngi(ngi_read_label_from_lims_obj, ngi_read_label_obj, lims_sample_obj):
+        assert ngi_read_label_from_lims_obj[0] == ngi_read_label_obj
+
+
+class TestConvertPoolMember:
+    def test_ngi_to_sra(self, ngi_sample_obj, sra_sample_obj):
+        pass
+
+    def test_lims_to_ngi(self, lims_sample_obj, ngi_pool_member_obj):
+        # the converted lims_sample_obj will have a library tag created from the fake indexes
+        ngi_pool_member_from_lims_obj = ConvertPoolMember.lims_to_ngi(lims_sample_obj)
+        self.compare_lims_to_ngi(
+            ngi_pool_member_from_lims_obj,
+            ngi_pool_member_obj,
+            lims_sample_obj
+        )
+
+    @staticmethod
+    def compare_lims_to_ngi(ngi_pool_member_from_lims_obj, ngi_pool_member_obj, lims_sample_obj):
+        assert ngi_pool_member_from_lims_obj.sample_library_tag == lims_sample_obj.index_tag()
+        ngi_pool_member_obj.sample_library_tag = ngi_pool_member_from_lims_obj.sample_library_tag
+        assert ngi_pool_member_from_lims_obj == ngi_pool_member_obj
+
+
+class TestConvertPool:
+    def test_ngi_to_sra(self, ngi_sample_obj, sra_sample_obj):
+        pass
+
+    def test_lims_to_ngi(self, lims_sequencing_container_obj, ngi_pool_obj):
+        ngi_pool_from_lims_obj = ConvertPool.lims_to_ngi(lims_sequencing_container_obj)
+        self.compare_lims_to_ngi(
+            ngi_pool_from_lims_obj,
+            ngi_pool_obj,
+            lims_sequencing_container_obj
+        )
+
+    @staticmethod
+    def compare_lims_to_ngi(ngi_pool_from_lims_obj, ngi_pool_obj, lims_sequencing_container_obj):
+        assert len(ngi_pool_from_lims_obj.samples) == len(ngi_pool_obj.samples)
+        for ngi_pool_sample_from_lims, ngi_pool_sample, lims_sample in zip(
+                ngi_pool_from_lims_obj.samples,
+                ngi_pool_obj.samples,
+                lims_sequencing_container_obj.samples
+        ):
+            TestConvertPoolMember.compare_lims_to_ngi(
+                ngi_pool_sample_from_lims,
+                ngi_pool_sample,
+                lims_sample
+            )
+
+
 class TestConvertStudyRef:
     def test_ngi_to_sra(self, ngi_study_obj, sra_study_obj):
         assert Converter.ngi_to_sra(ngi_model=ngi_study_obj) == sra_study_obj

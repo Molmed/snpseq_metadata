@@ -431,6 +431,50 @@ def ngi_attribute_obj(ngi_attribute_json):
         units=ngi_attribute_json["units"])
 
 
+@pytest.fixture
+def ngi_read_label_json(test_values):
+    return {
+        "label": test_values["index_i7"],
+        "read_group_tag": test_values["sample_library_id"]
+    }
+
+
+@pytest.fixture
+def ngi_read_label_obj(ngi_read_label_json):
+    return NGIReadLabel(
+        label=ngi_read_label_json["label"],
+        read_group_tag=ngi_read_label_json["read_group_tag"]
+    )
+
+
+@pytest.fixture
+def ngi_pool_member_json(ngi_sample_json):
+    return ngi_sample_json
+
+
+@pytest.fixture
+def ngi_pool_member_obj(ngi_sample_obj):
+    return NGIPoolMember(
+        **vars(ngi_sample_obj)
+    )
+
+
+@pytest.fixture
+def ngi_pool_json(ngi_sample_json):
+    return {
+        "samples": [
+            ngi_sample_json
+            ]
+    }
+
+
+@pytest.fixture
+def ngi_pool_obj(ngi_pool_json):
+    return NGIPool.from_json(
+        json_obj=ngi_pool_json
+    )
+
+
 # SRA models
 
 

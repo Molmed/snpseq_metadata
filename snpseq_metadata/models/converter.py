@@ -1,7 +1,7 @@
 
 import logging
 from functools import wraps
-from typing import ClassVar, Tuple, Type, TypeVar, Optional
+from typing import ClassVar, List, Tuple, Type, TypeVar, Optional
 
 from snpseq_metadata.models.ngi_models import (
     NGIMetadataModel,
@@ -16,7 +16,10 @@ from snpseq_metadata.models.ngi_models import (
     NGIExperimentSet,
     NGILibrary,
     NGILibraryLayout,
-    NGIAttribute
+    NGIAttribute,
+    NGIPool,
+    NGIPoolMember,
+    NGIReadLabel
 )
 from snpseq_metadata.models.sra_models import (
     SRAMetadataModel,
@@ -199,6 +202,79 @@ class ConvertSampleDescriptor(Converter):
                 sample_library_id=sample_library_id,
                 sample_library_tag=lims_model.index_tag())
         return None
+
+
+class ConvertReadLabel(Converter):
+    """
+    Conversion between NGIReadLabel and LIMSSample
+    """
+
+    ngi_model_class = NGIReadLabel
+    sra_model_class = SRASampleDescriptor
+    lims_model_class = LIMSSample
+
+    @classmethod
+    @catch_exception
+    def ngi_to_sra(
+        cls: Type[T], ngi_model: ngi_model_class
+    ) -> Optional[sra_model_class]:
+        pass
+
+    @classmethod
+    @catch_exception
+    def lims_to_ngi(
+        cls: Type[T], lims_model: lims_model_class
+    ) -> Optional[List[ngi_model_class]]:
+        sample = ConvertPoolMember.lims_to_ngi(lims_model)
+        if sample:
+            return sample.read_labels()
+
+
+class ConvertPoolMember(ConvertSampleDescriptor):
+    """
+    Conversion between NGIPoolMember and LIMSSample
+    """
+
+    ngi_model_class = NGIPoolMember
+    sra_model_class = SRASampleDescriptor
+    lims_model_class = LIMSSample
+
+
+class ConvertPool(Converter):
+    """
+    Conversion between NGIPool and LIMSSample
+    """
+
+    ngi_model_class = NGIPool
+    sra_model_class = SRASampleDescriptor
+    lims_model_class = LIMSSequencingContainer
+
+    @classmethod
+    @catch_exception
+    def lims_to_ngi(
+        cls: Type[T], lims_model: lims_model_class
+    ) -> Optional[ngi_model_class]:
+        if lims_model:
+            samples = []
+            for lims_sample in lims_model.samples or []:
+                try:
+                    samples.append(
+                        ConvertPoolMember.lims_to_ngi(
+                            lims_model=lims_sample
+                        )
+                    )
+                except ModelConversionException as ex:
+                    # log this as an error but continue with the other samples
+                    LOG.error(f"{lims_sample} skipped - {str(ex)}")
+
+            return cls.ngi_model_class(
+                samples=list(
+                    filter(
+                        lambda s: s is not None,
+                        samples
+                    )
+                )
+            )
 
 
 class ConvertStudyRef(Converter):
