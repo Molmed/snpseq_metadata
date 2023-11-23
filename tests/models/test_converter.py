@@ -50,7 +50,6 @@ class TestConvertPoolMember:
         pass
 
     def test_lims_to_ngi(self, lims_sample_obj, ngi_pool_member_obj):
-        # the converted lims_sample_obj will have a library tag created from the fake indexes
         ngi_pool_member_from_lims_obj = ConvertPoolMember.lims_to_ngi(lims_sample_obj)
         self.compare_lims_to_ngi(
             ngi_pool_member_from_lims_obj,
@@ -60,6 +59,7 @@ class TestConvertPoolMember:
 
     @staticmethod
     def compare_lims_to_ngi(ngi_pool_member_from_lims_obj, ngi_pool_member_obj, lims_sample_obj):
+        # the converted lims_sample_obj will have a library tag created from the fake indexes
         assert ngi_pool_member_from_lims_obj.sample_library_tag == lims_sample_obj.index_tag()
         ngi_pool_member_obj.sample_library_tag = ngi_pool_member_from_lims_obj.sample_library_tag
         assert ngi_pool_member_from_lims_obj == ngi_pool_member_obj

@@ -404,6 +404,17 @@ class NGIExperimentObj(ExperimentObj):
     }
 
 
+class NGIExperimentPoolObj(NGIExperimentObj):
+
+    JSON_STRUCTURE = """{{
+              "sample_id": {experiment_ngi_sample_id},
+              "sample_name": {experiment_ngi_sample_name},
+              "sample_library_id": {experiment_ngi_sample_library_id},
+              "sample_library_tag": {experiment_ngi_sample_library_tag}
+            }}
+    """
+
+
 class SRAExperimentObj(ExperimentObj):
 
     model_source = "sra"
@@ -621,13 +632,18 @@ class RunSetObj(MetaObj):
 
     def __init__(self, fields):
         super(RunSetObj, self).__init__(fields)
-        sample_csv_files = self.fields["sample_csv_files"]
-        sample_csv_files = [sample_csv_files] \
-            if type(sample_csv_files) is str else sample_csv_files
-        self.fields["sample_objects"] = [
-            self.sample_cls.create_from_csv(
-                sample_csv
-            ) for sample_csv in sample_csv_files
+        self.fields["sample_objects"] = self.parse_csv_files(
+            self.fields["sample_csv_files"]
+        )
+
+    @classmethod
+    def parse_csv_files(cls, csv_files):
+        csv_files = [csv_files] \
+            if type(csv_files) is str else csv_files
+        return [
+            cls.sample_cls.create_from_csv(
+                csv_file
+            ) for csv_file in csv_files
         ]
 
     def to_json(self):
@@ -867,6 +883,58 @@ class NGIExperimentSetObj(ExperimentSetObj):
     """
 
 
+class NGIExperimentSetPoolObj(ExperimentSetObj):
+
+    sample_cls = NGIExperimentPoolObj
+    model_source = "ngi"
+
+    JSON_STRUCTURE = """
+    {{
+        "experiments": {{
+          "alias": {experiment_ngi_alias},
+          "project": {{
+            "project_id": {experiment_ngi_project_id}
+          }},
+          "title": {experiment_ngi_title},
+          "platform": {{
+            "model_name": {experiment_ngi_model_name}
+          }},
+          "library": {{
+            "pool": {{
+              "samples": {experiment_ngi_pool_samples}
+            }},
+            "application": {experiment_ngi_application},
+            "sample_type": {experiment_ngi_sample_type},
+            "library_kit": {experiment_ngi_library_kit},
+            "layout": {{
+              "is_paired": {experiment_ngi_is_paired},
+              "fragment_size": {experiment_ngi_fragment_size},
+              "fragment_lower": {experiment_ngi_fragment_lower},
+              "fragment_upper": {experiment_ngi_fragment_upper}
+            }}
+          }}
+        }}
+    }}
+    """
+
+    def to_json(self):
+        pool_json = []
+        for sample in self.fields["sample_objects"]:
+            pool_json.append(sample.to_json())
+            self.fields.update(sample.fields)
+
+        self.fields["experiment_ngi_pool_samples"] = json.dumps(
+            list(
+                filter(
+                    lambda x: x is not None,
+                    pool_json
+                )
+            )
+        )
+
+        return super(NGIExperimentSetPoolObj, self).to_json()
+
+
 class SRAExperimentSetObj(ExperimentSetObj):
 
     sample_cls = SRAExperimentObj
@@ -886,22 +954,27 @@ class SRAExperimentSetObj(ExperimentSetObj):
 
 if __name__ == '__main__':
     csvfile = sys.argv[1]
-    obj = SnpseqDataExperimentSetObj.create_from_csv(csvfile)
-    obj.export_json("export", outname="snpseq_data_")
+    obj = NGIExperimentSetPoolObj.create_from_csv(csvfile)
+    j = obj.to_json()
+    import pprint
+    pprint.pprint(j)
 
-    obj = obj.to_class(NGIRunSetObj)
-    obj.export_json("export")
-    obj.create_runfolder("export")
+#    obj = SnpseqDataExperimentSetObj.create_from_csv(csvfile)
+#    obj.export_json("export", outname="snpseq_data_")
 
-    obj = obj.to_class(NGIExperimentSetObj)
-    obj.export_json("export", outname="snpseq_data_")
+#    obj = obj.to_class(NGIRunSetObj)
+#    obj.export_json("export")
+#    obj.create_runfolder("export")
 
-    obj = obj.to_class(SRARunSetObj)
-    obj.export_json("export")
-    obj.export_xml("export")
-    obj.export_manifest("export")
+#    obj = obj.to_class(NGIExperimentSetObj)
+#    obj.export_json("export", outname="snpseq_data_")
 
-    obj = obj.to_class(SRAExperimentSetObj)
-    obj.export_json("export", outname="snpseq_data_")
-    obj.export_xml("export", outname="snpseq_data_")
-    obj.export_manifest("export", outname="snpseq_data_")
+#    obj = obj.to_class(SRARunSetObj)
+#    obj.export_json("export")
+#    obj.export_xml("export")
+#    obj.export_manifest("export")
+
+#    obj = obj.to_class(SRAExperimentSetObj)
+#    obj.export_json("export", outname="snpseq_data_")
+#    obj.export_xml("export", outname="snpseq_data_")
+#    obj.export_manifest("export", outname="snpseq_data_")
