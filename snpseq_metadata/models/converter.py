@@ -508,7 +508,8 @@ class ConvertLibraryLayout(Converter):
                 is_paired=ngi_model.is_paired,
                 fragment_size=ngi_model.fragment_size,
                 fragment_upper=ngi_model.fragment_upper,
-                fragment_lower=ngi_model.fragment_lower
+                fragment_lower=ngi_model.fragment_lower,
+                target_insert_size=ngi_model.target_insert_size
             )
 
     @classmethod
@@ -521,7 +522,8 @@ class ConvertLibraryLayout(Converter):
                 is_paired=lims_model.is_paired(),
                 fragment_size=lims_model.udf_fragment_size,
                 fragment_lower=lims_model.udf_fragment_lower,
-                fragment_upper=lims_model.udf_fragment_upper
+                fragment_upper=lims_model.udf_fragment_upper,
+                target_insert_size=lims_model.udf_insert_size_bp
             )
 
 

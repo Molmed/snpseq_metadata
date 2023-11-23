@@ -29,7 +29,8 @@ class TestSRALibraryLayout:
             is_paired=is_paired,
             fragment_size=fragment_size,
             fragment_lower=fragment_lower,
-            fragment_upper=fragment_upper
+            fragment_upper=fragment_upper,
+            target_insert_size=sra_library_layout_json.get("PAIRED", {}).get("NOMINAL_LENGTH")
         )
         assert layout == sra_library_layout_obj
 

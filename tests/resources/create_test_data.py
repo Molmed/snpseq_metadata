@@ -377,7 +377,8 @@ class NGIExperimentObj(ExperimentObj):
               "is_paired": {experiment_ngi_is_paired},
               "fragment_size": {experiment_ngi_fragment_size},
               "fragment_lower": {experiment_ngi_fragment_lower},
-              "fragment_upper": {experiment_ngi_fragment_upper}
+              "fragment_upper": {experiment_ngi_fragment_upper},
+              "target_insert_size": {experiment_ngi_insert_size}
             }}
           }}
         }}
@@ -398,7 +399,8 @@ class NGIExperimentObj(ExperimentObj):
         "experiment_ngi_is_paired": "read_configuration_paired",
         "experiment_ngi_fragment_size": "udf_fragment_size",
         "experiment_ngi_fragment_lower": "udf_fragment_lower",
-        "experiment_ngi_fragment_upper": "udf_fragment_upper"
+        "experiment_ngi_fragment_upper": "udf_fragment_upper",
+        "experiment_ngi_insert_size": "insert_size"
     }
 
 
@@ -423,7 +425,7 @@ class SRAExperimentObj(ExperimentObj):
               "LIBRARY_SELECTION": {experiment_sra_library_selection},
               "LIBRARY_LAYOUT": {{
                 "PAIRED": {{
-                  "NOMINAL_LENGTH": {experiment_sra_library_layout}
+                  "NOMINAL_LENGTH": {experiment_sra_insert_size}
                 }}
               }}
             }}
@@ -447,7 +449,7 @@ class SRAExperimentObj(ExperimentObj):
         <LIBRARY_SOURCE>{experiment_sra_library_source}</LIBRARY_SOURCE>
         <LIBRARY_SELECTION>{experiment_sra_library_selection}</LIBRARY_SELECTION>
         <LIBRARY_LAYOUT>
-          <PAIRED NOMINAL_LENGTH="{experiment_sra_library_layout}"/>
+          <PAIRED NOMINAL_LENGTH="{experiment_sra_insert_size}"/>
         </LIBRARY_LAYOUT>
       </LIBRARY_DESCRIPTOR>
     </DESIGN>
@@ -479,7 +481,7 @@ class SRAExperimentObj(ExperimentObj):
         "experiment_sra_library_strategy": "experiment_library_strategy_value",
         "experiment_sra_library_source": "experiment_sample_source",
         "experiment_sra_library_selection": "experiment_library_selection_value",
-        "experiment_sra_library_layout": "udf_fragment_size"
+        "experiment_sra_insert_size": "insert_size"
     }
 
     def __init__(self, fields):

@@ -30,10 +30,12 @@ class SRALibraryLayout(SRAMetadataModel):
     def __init__(
             self,
             model_object: model_object_class,
+            fragment_size: Optional[int] = None,
             fragment_upper: Optional[int] = None,
             fragment_lower: Optional[int] = None
     ) -> None:
         super().__init__(model_object)
+        self.fragment_size = fragment_size
         self.fragment_upper = fragment_upper
         self.fragment_lower = fragment_lower
 
@@ -43,12 +45,13 @@ class SRALibraryLayout(SRAMetadataModel):
         is_paired: bool,
         fragment_size: Optional[int] = None,
         fragment_upper: Optional[int] = None,
-        fragment_lower: Optional[int] = None
+        fragment_lower: Optional[int] = None,
+        target_insert_size: Optional[int] = None
     ) -> T:
         if is_paired:
             model_object = LibraryDescriptorType.LibraryLayout(
                 paired=LibraryDescriptorType.LibraryLayout.Paired(
-                    nominal_length=fragment_size
+                    nominal_length=target_insert_size
                 )
             )
         else:
@@ -57,6 +60,7 @@ class SRALibraryLayout(SRAMetadataModel):
             )
         return cls(
             model_object=model_object,
+            fragment_size=fragment_size,
             fragment_lower=fragment_lower,
             fragment_upper=fragment_upper
         )

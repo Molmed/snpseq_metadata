@@ -23,7 +23,7 @@ flowcell_id,ABC123XYZ
 sequencing_run_date,2021-08-09T00:00:00
 index_i7,this-is-index-i7
 index_i5,this-is-index-i5
-insert_size,this-is-the-insert-size
+insert_size,250
 sample_library_id,this-is-a-sample-name_library-id
 sample_library_tag,this-is-a-sample-library-tag
 udf_id,library-id

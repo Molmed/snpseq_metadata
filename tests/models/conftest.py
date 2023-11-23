@@ -280,7 +280,8 @@ def ngi_library_layout_json(test_values):
         "is_paired": test_values["read_configuration_paired"],
         "fragment_size": test_values.get("udf_fragment_size"),
         "fragment_upper": test_values.get("udf_fragment_upper"),
-        "fragment_lower": test_values.get("udf_fragment_lower")
+        "fragment_lower": test_values.get("udf_fragment_lower"),
+        "target_insert_size": test_values.get("udf_insert_size_bp")
     }
 
 
@@ -581,7 +582,7 @@ def sra_experiment_set_xml(sra_experiment_xml):
 def sra_library_layout_json(test_values):
     return {
         "PAIRED": {
-            "NOMINAL_LENGTH": test_values.get("udf_fragment_size")
+            "NOMINAL_LENGTH": test_values.get("udf_insert_size_bp")
         }
     }
 
@@ -589,17 +590,20 @@ def sra_library_layout_json(test_values):
 @pytest.fixture
 def sra_library_layout_obj(test_values, sra_library_layout_json):
     is_paired = "PAIRED" in sra_library_layout_json
-    fragment_size = sra_library_layout_json.get(
+    target_insert_size = sra_library_layout_json.get(
         "PAIRED", {}).get(
         "NOMINAL_LENGTH"
     )
+
+    fragment_size = test_values.get("udf_fragment_size")
     fragment_lower = test_values.get("udf_fragment_lower")
     fragment_upper = test_values.get("udf_fragment_upper")
     return SRALibraryLayout.create_object(
         is_paired=is_paired,
         fragment_size=fragment_size,
         fragment_lower=fragment_lower,
-        fragment_upper=fragment_upper
+        fragment_upper=fragment_upper,
+        target_insert_size=target_insert_size
     )
 
 

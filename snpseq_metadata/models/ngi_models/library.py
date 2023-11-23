@@ -15,12 +15,14 @@ class NGILibraryLayout(NGIMetadataModel):
             is_paired: bool,
             fragment_size: Optional[int] = None,
             fragment_upper: Optional[int] = None,
-            fragment_lower: Optional[int] = None
+            fragment_lower: Optional[int] = None,
+            target_insert_size: Optional[int] = None
     ) -> None:
         self.is_paired = is_paired
         self.fragment_size = fragment_size
         self.fragment_upper = fragment_upper
         self.fragment_lower = fragment_lower
+        self.target_insert_size = target_insert_size
 
     @classmethod
     def from_json(cls: Type[T], json_obj: Dict) -> T:
@@ -28,11 +30,13 @@ class NGILibraryLayout(NGIMetadataModel):
         fragment_size = json_obj.get("fragment_size")
         fragment_upper = json_obj.get("fragment_upper")
         fragment_lower = json_obj.get("fragment_lower")
+        target_insert_size = json_obj.get("target_insert_size")
         return cls(
             is_paired=is_paired,
             fragment_size=fragment_size,
             fragment_upper=fragment_upper,
-            fragment_lower=fragment_lower
+            fragment_lower=fragment_lower,
+            target_insert_size=target_insert_size
         )
 
 
