@@ -22,6 +22,10 @@ TLS = TypeVar("TLS", TypeLibraryStrategy, TypeLibrarySelection, TypeLibrarySourc
 
 class SRALibraryLayout(SRAMetadataModel):
     model_object_class: ClassVar[Type] = LibraryDescriptorType.LibraryLayout
+    model_object_parent_field: ClassVar[Optional[Tuple[Type, str]]] = (
+        LibraryDescriptorType,
+        "library_layout"
+    )
 
     def __init__(
             self,

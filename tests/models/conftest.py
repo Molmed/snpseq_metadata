@@ -543,13 +543,19 @@ def sra_library_layout_json(test_values):
 
 
 @pytest.fixture
-def sra_library_layout_obj(sra_library_layout_json):
+def sra_library_layout_obj(test_values, sra_library_layout_json):
+    is_paired = "PAIRED" in sra_library_layout_json
+    fragment_size = sra_library_layout_json.get(
+        "PAIRED", {}).get(
+        "NOMINAL_LENGTH"
+    )
+    fragment_lower = test_values.get("udf_fragment_lower")
+    fragment_upper = test_values.get("udf_fragment_upper")
     return SRALibraryLayout.create_object(
-        is_paired="PAIRED" in sra_library_layout_json,
-        fragment_size=sra_library_layout_json.get(
-            "PAIRED", {}).get(
-            "NOMINAL_LENGTH"
-        )
+        is_paired=is_paired,
+        fragment_size=fragment_size,
+        fragment_lower=fragment_lower,
+        fragment_upper=fragment_upper
     )
 
 
@@ -561,7 +567,9 @@ def sra_library_layout_xml(sra_library_layout_json):
     len = f" NOMINAL_LENGTH=\"{sra_library_layout_json['PAIRED']['NOMINAL_LENGTH']}\"" \
         if mode == "PAIRED" and "NOMINAL_LENGTH" in sra_library_layout_json["PAIRED"] \
         else ""
-    return f"<{mode}{len}/>"
+    return f"""<LIBRARY_LAYOUT>
+            <{mode}{len}/>
+        </LIBRARY_LAYOUT>"""
 
 
 @pytest.fixture
@@ -614,9 +622,7 @@ def sra_library_xml(sra_library_json, sra_library_layout_xml, sra_sample_xml):
         <LIBRARY_STRATEGY>{sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_STRATEGY"]}</LIBRARY_STRATEGY>
         <LIBRARY_SOURCE>{sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SOURCE"]}</LIBRARY_SOURCE>
         <LIBRARY_SELECTION>{sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SELECTION"]}</LIBRARY_SELECTION>
-        <LIBRARY_LAYOUT>
-          {sra_library_layout_xml}
-        </LIBRARY_LAYOUT>
+        {sra_library_layout_xml}
       </LIBRARY_DESCRIPTOR>
     </LIBRARYTYPE>"""
 
