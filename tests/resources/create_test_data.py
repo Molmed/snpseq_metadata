@@ -181,7 +181,7 @@ class MetaObj:
                 f"FRAGMENT_SIZE:{self.fields['fragment_size']}",
                 f"FRAGMENT_LOWER:{self.fields['fragment_lower']}",
                 f"FRAGMENT_UPPER:{self.fields['fragment_upper']}",
-                f"LIBRARY_NAME:{self.fields['sample_library_id']}",
+                f"LIBRARY_NAME:{self.fields['sample_library_name']}",
             ])
             entries.append(entry)
 
@@ -276,7 +276,7 @@ class SnpseqDataSampleObj(MetaObj):
     FIELDNAMES = [
         'name',
         'project',
-        'udf_sample_id',
+        'sample_id',
         'udf_application',
         'udf_conc_fc',
         'udf_current_sample_volume_ul',
@@ -297,6 +297,8 @@ class SnpseqDataSampleObj(MetaObj):
         'udf_read_length',
         'udf_rml_kitprotocol',
         'udf_sample_conc',
+        'udf_sample_library_name',
+        'udf_sample_library_id',
         'udf_sample_type',
         'udf_seq_data_coverage_x',
         'udf_sequencing_instrument',
@@ -312,7 +314,6 @@ class SnpseqDataSampleObj(MetaObj):
     MAPPING = {
         "name": "sample_name",
         "project": "project_id",
-        "udf_sample_id": "sample_id",
         "udf_read_length": "read_configuration",
         "udf_sequencing_instrument": "experiment_instrument_model_name",
         "udf_index": "index_i7",
@@ -320,7 +321,9 @@ class SnpseqDataSampleObj(MetaObj):
         "udf_insert_size_bp": "insert_size",
         "udf_library_preparation_kit": "experiment_library_kit",
         "udf_sample_type": "experiment_sample_type",
-        "udf_application": "experiment_application"
+        "udf_application": "experiment_application",
+        "udf_sample_library_id": "sample_library_id",
+        "udf_sample_library_name": "sample_library_name"
     }
 
     def to_json(self):

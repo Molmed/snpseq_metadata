@@ -59,8 +59,8 @@ class NGIExperimentRef(NGIExperimentBase):
 
         project_id = samplesheet_row.get("sample_project")
         sample_id = samplesheet_row.get("sample_id")
-        # CHANGEME: parse the lims id from the description instead
-        sample_library_id = description.get("LIBRARY_NAME", sample_id)
+        sample_library_name = description.get("LIBRARY_NAME", sample_id)
+        sample_library_id = f"{sample_id}_{sample_library_name}"
         sample_name = samplesheet_row.get(
             "sample_name",
             sample_id.replace("Sample_", ""))
@@ -70,13 +70,13 @@ class NGIExperimentRef(NGIExperimentBase):
                 [
                     samplesheet_row.get("index"),
                     samplesheet_row.get("index2")]))
-        sample_library_tag = sample_library_tag if len(sample_library_id.strip()) > 1 else ""
+        sample_library_tag = sample_library_tag if len(sample_library_name.strip()) > 1 else ""
         sample = NGISampleDescriptor(
             sample_name=sample_name,
             sample_id=sample_id,
             sample_library_id=sample_library_id,
             sample_library_tag=sample_library_tag)
-        alias = f"{project_id}-{sample.sample_alias()}"
+        alias = sample.sample_alias()
         return cls(
             alias=alias,
             project=NGIStudyRef(project_id=project_id),

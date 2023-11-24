@@ -26,14 +26,12 @@ class TestNGIExperimentBase:
 
 class TestNGIExperimentRef:
     def test_from_samplesheet_row(
-        self, samplesheet_row, ngi_experiment_ref_obj
+        self, samplesheet_row, ngi_experiment_ref_obj, test_values
     ):
         experiment_ref = NGIExperimentRef.from_samplesheet_row(
             samplesheet_row=samplesheet_row
         )
-        # the experiment alias won't match so fix that
-        experiment_ref.alias = ngi_experiment_ref_obj.alias
-        assert experiment_ref == ngi_experiment_ref_obj
+        self.compare_object(experiment_ref, ngi_experiment_ref_obj, test_values)
 
     def test_from_json(self, ngi_experiment_ref_obj, ngi_experiment_ref_json):
         experiment_ref = NGIExperimentRef.from_json(ngi_experiment_ref_json)
@@ -44,6 +42,15 @@ class TestNGIExperimentRef:
 
     def test_get_reference(self, ngi_experiment_ref_obj):
         assert ngi_experiment_ref_obj.get_reference() == ngi_experiment_ref_obj
+
+    @staticmethod
+    def compare_object(cmp_experiment_ref, src_experiment_ref, test_values):
+        assert cmp_experiment_ref.project == src_experiment_ref.project
+        assert cmp_experiment_ref.alias == cmp_experiment_ref.sample.sample_library_id
+        assert cmp_experiment_ref.sample.sample_library_id == \
+               f"{cmp_experiment_ref.sample.sample_id}_{test_values['sample_library_name']}"
+        cmp_experiment_ref.sample.sample_library_id = src_experiment_ref.sample.sample_library_id
+        assert cmp_experiment_ref.sample == src_experiment_ref.sample
 
 
 class TestNGIExperiment:

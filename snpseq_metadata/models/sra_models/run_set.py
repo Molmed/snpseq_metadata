@@ -52,9 +52,8 @@ class SRARunSet(SRAMetadataModel):
         try:
             return next(
                 filter(
-                    lambda run: run.is_project(experiment.study_ref.refname)
-                                and run.is_sample(experiment.library.sample.refname),
-                    self.runs,
+                    lambda run: run.experiment_ref.is_reference_to(experiment),
+                    self.runs
                 )
             )
         except StopIteration:

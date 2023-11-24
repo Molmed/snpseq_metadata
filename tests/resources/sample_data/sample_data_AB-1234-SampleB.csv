@@ -30,10 +30,11 @@ flowcell_id,XYZ321XY
 project_id,AB-1234
 sample_name,AB-1234-SampleB
 sample_id,Sample_AB-1234-SampleB
-sample_library_id,AB-1234-SampleB_2-2283
-experiment_alias,AB-1234-AB-1234-SampleB_2-2283
+sample_library_name,AB-1234-SampleB_2-2283
+sample_library_id,Sample_AB-1234-SampleB_AB-1234-SampleB_2-2283
+experiment_alias,Sample_AB-1234-SampleB_AB-1234-SampleB_2-2283
 experiment_title,AB-1234 - AB-1234-SampleB - olink explore - serum - olink explore 1536
-sequencing_run_alias,AB-1234-AB-1234-SampleB_2-2283-XYZ321XY
+sequencing_run_alias,Sample_AB-1234-SampleB_AB-1234-SampleB_2-2283-XYZ321XY
 
 experiment_application,olink explore
 experiment_library_strategy_key,OTHER

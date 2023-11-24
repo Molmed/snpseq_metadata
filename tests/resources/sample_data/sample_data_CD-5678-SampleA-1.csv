@@ -30,10 +30,11 @@ flowcell_id,XYZ321XY
 project_id,Project_CD-5678
 sample_name,CD-5678-SampleA-1
 sample_id,Sample_CD-5678-SampleA-1
-sample_library_id,CD-5678-SampleA-1_2-2274
-experiment_alias,Project_CD-5678-CD-5678-SampleA-1_2-2274
+sample_library_name,CD-5678-SampleA-1_2-2274
+sample_library_id,Sample_CD-5678-SampleA-1_CD-5678-SampleA-1_2-2274
+experiment_alias,Sample_CD-5678-SampleA-1_CD-5678-SampleA-1_2-2274
 experiment_title,Project_CD-5678 - CD-5678-SampleA-1 - target re-seq - gDNA - twist human core exome
-sequencing_run_alias,Project_CD-5678-CD-5678-SampleA-1_2-2274-XYZ321XY
+sequencing_run_alias,Sample_CD-5678-SampleA-1_CD-5678-SampleA-1_2-2274-XYZ321XY
 
 experiment_application,target re-seq
 experiment_library_strategy_key,TARGETED_CAPTURE

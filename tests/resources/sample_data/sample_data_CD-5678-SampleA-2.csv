@@ -30,10 +30,11 @@ flowcell_id,XYZ321XY
 project_id,Project_CD-5678
 sample_name,CD-5678-SampleA-2
 sample_id,Sample_CD-5678-SampleA-2
-sample_library_id,CD-5678-SampleA-2_2-2275
-experiment_alias,Project_CD-5678-CD-5678-SampleA-2_2-2275
+sample_library_name,CD-5678-SampleA-2_2-2275
+sample_library_id,Sample_CD-5678-SampleA-2_CD-5678-SampleA-2_2-2275
+experiment_alias,Sample_CD-5678-SampleA-2_CD-5678-SampleA-2_2-2275
 experiment_title,Project_CD-5678 - CD-5678-SampleA-2 - epigenetics - gDNA - nebnext enzymatic methyl-seq kit
-sequencing_run_alias,Project_CD-5678-CD-5678-SampleA-2_2-2275-XYZ321XY
+sequencing_run_alias,Sample_CD-5678-SampleA-2_CD-5678-SampleA-2_2-2275-XYZ321XY
 
 experiment_application,epigenetics
 experiment_library_strategy_key,BISULFITE_SEQ

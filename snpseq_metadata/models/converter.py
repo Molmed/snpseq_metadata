@@ -191,14 +191,12 @@ class ConvertSampleDescriptor(Converter):
     ) -> Optional[ngi_model_class]:
         if lims_model:
             try:
-                sample_library_id = f"{lims_model.sample_name}_{lims_model.udf_id}" \
-                    if lims_model.udf_id \
-                    else lims_model.udf_sample_id
+                sample_library_id = lims_model.udf_sample_library_id
             except AttributeError:
-                pass
+                sample_library_id = f"{lims_model.sample_name}_{lims_model.udf_id}"
             return cls.ngi_model_class(
                 sample_name=lims_model.sample_name,
-                sample_id=lims_model.udf_sample_id,
+                sample_id=lims_model.sample_id,
                 sample_library_id=sample_library_id,
                 sample_library_tag=lims_model.index_tag())
         return None
@@ -438,8 +436,7 @@ class ConvertExperimentRef(Converter):
             #        f"{sample.sample_library_id}-" \
             #        f"{sample.sample_library_tag}-" \
             #        f"{platform.model_name}"
-            alias = f"{project.project_id}-" \
-                    f"{sample.sample_library_id}"
+            alias = lims_model.udf_sample_library_id
             return cls.ngi_model_class(
                 alias=alias,
                 sample=sample,
@@ -646,7 +643,7 @@ class ConvertExperiment(Converter):
             sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
             project = ConvertStudyRef.lims_to_ngi(lims_model=lims_model)
             platform = ConvertSequencingPlatform.lims_to_ngi(lims_model=lims_model)
-            alias = f"{project.project_id}-{sample.sample_library_id}"
+            alias = lims_model.udf_sample_library_id
             library = ConvertLibrary.lims_to_ngi(lims_model=lims_model)
             title = f"{project.project_id} - " \
                     f"{sample.sample_name} - " \

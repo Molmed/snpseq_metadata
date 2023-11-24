@@ -30,10 +30,11 @@ flowcell_id,XYZ321XY
 project_id,AB-1234
 sample_name,AB-1234-SampleA-2
 sample_id,Sample_AB-1234-SampleA-2
-sample_library_id,AB-1234-SampleA-2_2-2272
-experiment_alias,AB-1234-AB-1234-SampleA-2_2-2272
+sample_library_name,AB-1234-SampleA-2_2-2272
+sample_library_id,Sample_AB-1234-SampleA-2_AB-1234-SampleA-2_2-2272
+experiment_alias,Sample_AB-1234-SampleA-2_AB-1234-SampleA-2_2-2272
 experiment_title,AB-1234 - AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit
-sequencing_run_alias,AB-1234-AB-1234-SampleA-2_2-2272-XYZ321XY
+sequencing_run_alias,Sample_AB-1234-SampleA-2_AB-1234-SampleA-2_2-2272-XYZ321XY
 
 experiment_application,WG re-seq
 experiment_library_strategy_key,WGS

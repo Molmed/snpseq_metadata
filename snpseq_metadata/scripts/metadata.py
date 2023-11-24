@@ -4,7 +4,7 @@ import os
 
 from snpseq_metadata.models.ngi_models import NGIFlowcell, NGIExperimentSet
 from snpseq_metadata.models.lims_models import LIMSSequencingContainer
-from snpseq_metadata.models.converter import Converter
+from snpseq_metadata.models.converter import Converter, ConvertExperimentSet
 
 
 def common_options(function):
@@ -56,7 +56,7 @@ def extract_runfolder(processors, outdir, runfolder_path):
 def extract_snpseq_data(processors, outdir, snpseq_data_file):
     with open(snpseq_data_file, "rb") as fh:
         lims_experiments = LIMSSequencingContainer.from_json(json.load(fh))
-        ngi_experiments = Converter.lims_to_ngi(lims_model=lims_experiments)
+        ngi_experiments = ConvertExperimentSet.lims_to_ngi(lims_model=lims_experiments)
     outfile_prefix = os.path.join(
         outdir, ".".join(os.path.basename(snpseq_data_file).split(".")[0:-1])
     )
@@ -91,7 +91,9 @@ def export_pipeline(processors, outdir, runfolder_data, snpseq_data):
 
     projects = list(set(map(lambda exp: exp.study_ref, sra_experiment_set.experiments)))
     for project in projects:
-        project_experiment_set = sra_experiment_set.restrict_to_study(study_ref=project)
+        project_experiment_set = sra_experiment_set.restrict_to_study(
+            study_ref=project
+        )
         project_run_set = sra_run_set.restrict_to_experiments(
             experiments=project_experiment_set
         )

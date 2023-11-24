@@ -129,7 +129,8 @@ def illumina_sequencing_platforms(illumina_model_prefixes):
 def lims_sample_json(test_values):
     json_obj = {
         "name": test_values["sample_name"],
-        "project": test_values["project_id"]
+        "project": test_values["project_id"],
+        "sample_id": test_values["sample_id"]
     }
     for attr in filter(
             lambda k: k.startswith("udf_"),
@@ -143,8 +144,13 @@ def lims_sample_json(test_values):
 def lims_sample_obj(lims_sample_json):
     return LIMSSample(
         sample_name=lims_sample_json["name"],
+        sample_id=lims_sample_json["sample_id"],
         project_id=lims_sample_json["project"],
-        **{k: v for k, v in lims_sample_json.items() if k not in ["name", "project"]},
+        **{
+            k: v
+            for k, v in lims_sample_json.items()
+            if k not in LIMSSample.non_udf_fields.values()
+        },
     )
 
 
