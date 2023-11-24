@@ -908,9 +908,7 @@ class NGIExperimentSetPoolObj(ExperimentSetObj):
             "library_kit": {experiment_ngi_library_kit},
             "layout": {{
               "is_paired": {experiment_ngi_is_paired},
-              "fragment_size": {experiment_ngi_fragment_size},
-              "fragment_lower": {experiment_ngi_fragment_lower},
-              "fragment_upper": {experiment_ngi_fragment_upper}
+              "target_insert_size": {experiment_ngi_insert_size}
             }}
           }}
         }}
