@@ -29,7 +29,7 @@ udf_progress,Library preparation and QC validation complete
 flowcell_id,XYZ321XY
 project_id,AB-1234
 sample_name,AB-1234-SampleA-2
-sample_id,AB-1234-SampleA-2
+sample_id,Sample_AB-1234-SampleA-2
 sample_library_id,AB-1234-SampleA-2_2-2272
 experiment_alias,AB-1234-AB-1234-SampleA-2_2-2272
 experiment_title,AB-1234 - AB-1234-SampleA-2 - WG re-seq - gDNA - thruplex smarter dna-seq kit

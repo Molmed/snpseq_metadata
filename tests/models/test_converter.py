@@ -21,8 +21,6 @@ class TestConvertSampleDescriptor:
 
     def test_lims_to_ngi(self, lims_sample_obj, ngi_sample_obj):
         # the lims_sample_obj will not have enough information to deduce the sample_id
-        ngi_sample_obj.sample_id = None
-        ngi_sample_obj.sample_name = lims_sample_obj.sample_id
         assert (
             ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_sample_obj)
             == ngi_sample_obj

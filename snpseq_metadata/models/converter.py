@@ -177,7 +177,7 @@ class ConvertSampleDescriptor(Converter):
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
         if ngi_model:
-            return cls.sra_model_class.create_object(refname=ngi_model.sample_library_id)
+            return cls.sra_model_class.create_object(refname=ngi_model.sample_name)
 
     @classmethod
     @catch_exception
@@ -185,15 +185,15 @@ class ConvertSampleDescriptor(Converter):
         cls: Type[T], lims_model: lims_model_class
     ) -> Optional[ngi_model_class]:
         if lims_model:
-            sample_library_id = lims_model.sample_id
             try:
-                sample_library_id = f"{lims_model.sample_id}_{lims_model.udf_id}" \
+                sample_library_id = f"{lims_model.sample_name}_{lims_model.udf_id}" \
                     if lims_model.udf_id \
-                    else sample_library_id
+                    else lims_model.udf_sample_id
             except AttributeError:
                 pass
             return cls.ngi_model_class(
-                sample_name=lims_model.sample_id,
+                sample_name=lims_model.sample_name,
+                sample_id=lims_model.udf_sample_id,
                 sample_library_id=sample_library_id,
                 sample_library_tag=lims_model.index_tag())
         return None
@@ -530,7 +530,7 @@ class ConvertExperiment(Converter):
             sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
             project = ConvertStudyRef.lims_to_ngi(lims_model=lims_model)
             platform = ConvertSequencingPlatform.lims_to_ngi(lims_model=lims_model)
-            alias = f"{project.project_id}-{sample.sample_alias()}"
+            alias = f"{project.project_id}-{sample.sample_library_id}"
             library = ConvertLibrary.lims_to_ngi(lims_model=lims_model)
             title = f"{project.project_id} - " \
                     f"{sample.sample_name} - " \

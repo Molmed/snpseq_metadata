@@ -128,8 +128,9 @@ def illumina_sequencing_platforms(illumina_model_prefixes):
 @pytest.fixture
 def lims_sample_json(test_values):
     return {
-        "name": test_values["sample_id"],
+        "name": test_values["sample_name"],
         "project": test_values["project_id"],
+        "udf_sample_id": test_values["udf_sample_id"],
         "udf_sequencing_instrument": test_values["udf_sequencing_instrument"],
         "udf_application": test_values["udf_application"],
         "udf_sample_type": test_values["udf_sample_type"],
@@ -143,7 +144,7 @@ def lims_sample_json(test_values):
 @pytest.fixture
 def lims_sample_obj(lims_sample_json):
     return LIMSSample(
-        sample_id=lims_sample_json["name"],
+        sample_name=lims_sample_json["name"],
         project_id=lims_sample_json["project"],
         **{k: v for k, v in lims_sample_json.items() if k not in ["name", "project"]},
     )
@@ -612,7 +613,7 @@ def sra_result_file_manifest(sra_result_file_json):
 
 @pytest.fixture
 def sra_sample_json(test_values):
-    return {"refname": test_values["sample_library_id"]}
+    return {"refname": test_values["sample_name"]}
 
 
 @pytest.fixture

@@ -6,14 +6,14 @@ L = TypeVar("L", bound="LIMSSample")
 
 
 class LIMSSample(LIMSMetadataModel):
-    def __init__(self, sample_id: str, project_id: str, **udf: str):
-        self.sample_id = sample_id
+    def __init__(self, sample_name: str, project_id: str, **udf: str):
+        self.sample_name = sample_name
         self.project_id = project_id
         for udf_name, udf_value in udf.items():
             setattr(self, udf_name, udf_value)
 
     def __str__(self) -> str:
-        return f"LIMSSample: '{self.sample_id}'"
+        return f"LIMSSample: '{self.sample_name}'"
 
     def __getattr__(self, name: str) -> object:
         # override the __getattr__ in order to return udf_rml_kitprotocol if
@@ -44,18 +44,22 @@ class LIMSSample(LIMSMetadataModel):
 
     @classmethod
     def from_json(cls: Type[L], json_obj: Dict[str, str]) -> L:
-        sample_id = json_obj.get("name")
+        sample_name = json_obj.get("name")
         project_id = json_obj.get("project")
         udf = {k: v for k, v in json_obj.items() if k not in ["name", "project"]}
-        return cls(sample_id=sample_id, project_id=project_id, **udf)
+        return cls(
+            sample_name=sample_name,
+            project_id=project_id,
+            **udf
+        )
 
     def to_json(self) -> Dict:
-        json_obj = {"name": self.sample_id, "project": self.project_id}
+        json_obj = {"name": self.sample_name, "project": self.project_id}
         json_obj.update(
             {
                 k: v
                 for k, v in vars(self).items()
-                if k not in ["sample_id", "project_id"]
+                if k not in ["sample_name", "project_id"]
             }
         )
         return json_obj
