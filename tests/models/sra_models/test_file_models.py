@@ -40,11 +40,20 @@ class TestSRAResultFile:
             assert (other_obj == sra_result_file_obj) is should_match
 
         _check_match(
-            {"filepath": os.path.join("/this", "is", "..", "is", "a", "file.path")}
+            {
+                "filepath": os.path.join(
+                    os.path.dirname(sra_result_file_json["filename"]),
+                    "..",
+                    os.path.basename(
+                        os.path.dirname(sra_result_file_json["filename"])
+                    ),
+                    os.path.basename(sra_result_file_json["filename"])
+                )
+            }
         )
 
         variations = {
-            "filepath": os.path.join("/this", "is", "another", "file.path"),
+            "filepath": os.path.join("/this", "is", "a", "file.path"),
             "filetype": "bam",
             "checksum_method": "sha-256",
             "checksum": "this-does-not-match",

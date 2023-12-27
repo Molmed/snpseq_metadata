@@ -40,7 +40,7 @@ def sra_experiment_set_manifest(
     for experiment in sra_experiment_set_from_ngi.experiments:
         manifest_file = \
             f'{".".join(experiment_set_sra_json_file.split(".")[0:-2])}.' \
-            f'{experiment.library.sample.refname}.sra.manifest'
+            f'{experiment.alias}.sra.manifest'
         manifest.extend(_parse_manifest(manifest_file))
     return manifest
 
@@ -50,23 +50,23 @@ class TestLIMSSequencingContainer:
         self, lims_experiment_set_from_disk, experiment_set_name, experiment_set_samples
     ):
         # create a samples dict with sample names as keys
-        samples_dict = {sample["name"]: sample for sample in experiment_set_samples}
+        samples_dict = {
+            f'{sample["name"]}_{sample["udf_id"]}': sample
+            for sample in experiment_set_samples
+        }
         assert type(lims_experiment_set_from_disk) is LIMSSequencingContainer
         assert lims_experiment_set_from_disk.name == experiment_set_name
         assert len(lims_experiment_set_from_disk.samples) == len(experiment_set_samples)
         for lims_experiment_set_sample in lims_experiment_set_from_disk.samples:
-            sample_id = lims_experiment_set_sample.sample_id
+            sample_id = f"{lims_experiment_set_sample.sample_name}_" \
+                        f"{lims_experiment_set_sample.udf_id}"
             assert sample_id in samples_dict
-            assert (
-                lims_experiment_set_sample.project_id
-                == samples_dict[sample_id]["project"]
-            )
-            for udf_name in samples_dict[sample_id].keys():
+            sample = samples_dict[sample_id]
+            assert lims_experiment_set_sample.project_id == sample["project"]
+
+            for udf_name in sample.keys():
                 if udf_name not in ["project", "name"]:
-                    assert (
-                        getattr(lims_experiment_set_sample, udf_name)
-                        == samples_dict[sample_id][udf_name]
-                    )
+                    assert getattr(lims_experiment_set_sample, udf_name) == sample[udf_name]
 
     def test_lims_experiment_set_to_json(
         self, lims_experiment_set_from_disk, experiment_set_lims_json
@@ -83,10 +83,10 @@ class TestNGIExperimentSet:
         )
 
     def test_to_json(
-        self, ngi_experiment_set_from_lims_sequencing_container, experiment_set_ngi_json
+        self, ngi_experiment_set_from_json, experiment_set_ngi_json
     ):
         assert (
-            ngi_experiment_set_from_lims_sequencing_container.to_json()
+            ngi_experiment_set_from_json.to_json()
             == experiment_set_ngi_json
         )
 
@@ -95,6 +95,8 @@ class TestNGIExperimentSet:
         ngi_experiment_set_from_json,
         ngi_experiment_set_from_lims_sequencing_container,
     ):
+        # the library sample will not match because the lims sequencing container doesn't have
+        # the sample_id
         assert (
             ngi_experiment_set_from_json
             == ngi_experiment_set_from_lims_sequencing_container
