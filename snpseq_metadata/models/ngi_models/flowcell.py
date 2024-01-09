@@ -98,9 +98,8 @@ class NGIFlowcell(NGIMetadataModel):
                 f"Project_{experiment_ref.project.project_id}",
             ],
             [
-                experiment_ref.sample.sample_library_id or experiment_ref.sample.sample_id,
-                f"Sample_"
-                f"{experiment_ref.sample.sample_library_id or experiment_ref.sample.sample_id}"
+                experiment_ref.sample.sample_id,
+                f"Sample_{experiment_ref.sample.sample_id}"
             ],
         ]
         try:
@@ -173,6 +172,9 @@ class NGIFlowcell(NGIMetadataModel):
                     filepath=fastqpath,
                     checksum=checksum,
                     checksum_method=self.checksum_method,
+                    relative_path=os.path.dirname(
+                        self.runfolder_path
+                    )
                 )
             )
         return sorted(fastqfiles, key=lambda f: f.filepath)
@@ -213,7 +215,7 @@ class NGIFlowcell(NGIMetadataModel):
             platform=self.platform,
             run_date=self.run_date,
             fastqfiles=fastqfiles,
-            run_attributes=run_attribute
+            run_attributes=None  # run_attribute
         )
 
     def get_sequencing_run_for_experiment(

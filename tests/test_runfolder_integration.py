@@ -50,7 +50,7 @@ class TestSRAFlowcell:
 
     def test_to_xml(self, sra_run_set_from_ngi_flowcell, runfolder_sra_xml):
         observed_xml = ignore_xml_namespace_attributes(sra_run_set_from_ngi_flowcell.to_xml())
-        assert "".join(observed_xml.split()) == "".join(
+        assert "\n".join(observed_xml.split()) == "\n".join(
             runfolder_sra_xml.split()
         )
 

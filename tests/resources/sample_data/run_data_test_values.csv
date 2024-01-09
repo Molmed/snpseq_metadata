@@ -1,0 +1,8 @@
+flowcell_instrument_model_name,this-is-a-platform-model-name
+samplesheet,this-is-the-samplesheet-file
+run_parameters,this-is-the-run-parameters-file
+flowcell_id,ABC123XYZ
+runfolder_path,/this/is/a/runfolder/path
+runfolder_name,210809_A00123_0001_AABC123XYZ
+run_date,2021-08-09T00:00:00
+sample_csv_files,tests/resources/sample_data/sample_data_test_values.csv

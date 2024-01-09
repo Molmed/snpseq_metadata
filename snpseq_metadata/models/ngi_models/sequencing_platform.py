@@ -11,6 +11,7 @@ class NGISequencingPlatform(NGIMetadataModel):
     def __init__(self, model_name: str) -> None:
         # split on whitespace
         self.model_name = model_name.split()[0]
+        # self.model_name = model_name
 
     @classmethod
     def from_json(cls: Type[T], json_obj: Dict) -> T:

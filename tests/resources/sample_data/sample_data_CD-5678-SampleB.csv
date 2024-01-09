@@ -1,0 +1,65 @@
+udf_id,2-2276
+
+udf_species,Homo sapiens
+udf_data_analysis,NGI-pipeline WGS
+udf_seq_data_coverage_x,36x
+
+udf_volume_ul,36
+udf_current_sample_volume_ul,18.6
+udf_conc_fc,156 pM
+udf_sample_conc,276
+udf_plate_,CD-5678 #36 180223
+udf_phix_,6
+udf_fragment_size,436
+udf_fragment_lower,236
+udf_fragment_upper,636
+
+udf_special_info_seq,No
+udf_special_info_prep,No
+udf_custom_sequencing_primer,No
+udf_genotyping_idpanel,Yes
+
+udf_rml_kitprotocol,
+udf_of_libraries_per_sample,2
+udf_number_of_lanes,1 lane/library
+udf_pooling,No
+
+udf_progress,Library preparation and QC validation complete
+
+flowcell_id,XYZ321XY
+project_id,Project_CD-5678
+sample_name,CD-5678-SampleB
+sample_id,Sample_CD-5678-SampleB
+sample_library_name,CD-5678-SampleB_2-2276
+sample_library_id,Sample_CD-5678-SampleB_CD-5678-SampleB_2-2276
+experiment_alias,Sample_CD-5678-SampleB_CD-5678-SampleB_2-2276
+experiment_title,Project_CD-5678 - CD-5678-SampleB - WG re-seq Human - gDNA - TruSeq DNA PCR-Free Sample Preparation kit LT
+sequencing_run_alias,Sample_CD-5678-SampleB_CD-5678-SampleB_2-2276-XYZ321XY
+
+experiment_application,WG re-seq Human
+experiment_library_strategy_key,WGS
+experiment_library_strategy_value,WGS
+experiment_sample_type,gDNA
+experiment_sample_source,GENOMIC
+experiment_library_selection_key,RANDOM
+experiment_library_selection_value,RANDOM
+experiment_library_kit,TruSeq DNA PCR-Free Sample Preparation kit LT
+
+index_i7,GCTTGTCA
+index_i5,GTATGTTC
+sample_library_tag,GCTTGTCA+GTATGTTC
+
+read_configuration,151x2
+read_configuration_paired,true
+insert_size,356
+
+instrument_platform,ILLUMINA
+illumina_model_value,Illumina NovaSeq 6000
+experiment_instrument_model_name,NovaSeq
+sequencing_run_center,"National Genomics Infrastructure, Uppsala"
+sequencing_run_date,2021-04-15T00:00:00
+
+filepaths,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/Sample_CD-5678-SampleB/CD-5678-SampleB_S6_L001_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/Sample_CD-5678-SampleB/CD-5678-SampleB_S6_L001_R2_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/Sample_CD-5678-SampleB/CD-5678-SampleB_S6_L003_R1_001.fastq.gz,210415_A00001_0123_BXYZ321XY/Unaligned/Project_CD-5678/Sample_CD-5678-SampleB/CD-5678-SampleB_S6_L003_R2_001.fastq.gz
+filetypes,fastq,fastq,fastq,fastq
+checksums,8820f6ff98ed4da12200ff472552d17d,c7e460d24f81375ab25a8a5485a6d279,37435fbea7ccbb85784b8fa79e49427b,566006c970f7dcaf37441ccc31450d02
+checksum_methods,MD5,MD5,MD5,MD5
