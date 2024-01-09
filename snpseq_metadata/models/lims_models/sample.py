@@ -7,7 +7,7 @@ L = TypeVar("L", bound="LIMSSample")
 
 class LIMSSample(LIMSMetadataModel):
 
-    non_udf_fields: dict[str, str] = {
+    non_udf_fields: Dict[str, str] = {
         "sample_name": "name",
         "sample_id": "sample_id",
         "project_id": "project"
