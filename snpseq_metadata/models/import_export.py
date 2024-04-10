@@ -1,7 +1,8 @@
 import json
 from typing import Dict, Generic, Optional, Tuple, TypeVar, Type
 
-from xsdata.formats.dataclass.serializers.json import JsonSerializer, DictFactory
+from xsdata.formats.dataclass.serializers.json import JsonSerializer
+from xsdata.formats.dataclass.serializers.dict import DictFactory
 from xsdata.formats.dataclass.serializers.xml import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.formats.dataclass.context import XmlContext
@@ -29,13 +30,17 @@ class ModelExporter(Generic[T]):
             cls: Type[ME],
             obj_entity: Optional[str] = None,
             meta_name: Optional[str] = None,
-            xml_declaration: Optional[bool] = True) -> Tuple[SerializerConfig, XmlContext]:
+            xml_declaration: Optional[bool] = True,
+            indent: Optional[int] = None
+    ) -> Tuple[SerializerConfig, XmlContext]:
         context = XmlContext(
             element_name_generator=lambda x: obj_entity or meta_name or x.upper())
         config = SerializerConfig(
             pretty_print=True,
             ignore_default_attributes=True,
-            xml_declaration=xml_declaration)
+            xml_declaration=xml_declaration,
+            indent=indent
+        )
         return config, context
 
     @classmethod
@@ -49,9 +54,10 @@ class ModelExporter(Generic[T]):
         config, context = cls.serializer_config_context(
             obj_entity=obj_entity,
             meta_name=meta_name,
-            xml_declaration=xml_declaration)
+            xml_declaration=xml_declaration,
+            indent=2)
         serializer = JsonSerializer(
-            context=context, indent=2, dict_factory=cls.filter_none_empty, config=config)
+            context=context, dict_factory=cls.filter_none_empty, config=config)
         return json.loads(serializer.render(obj))
 
     @classmethod

@@ -1,7 +1,7 @@
 
 from typing import Any, Dict, Iterable, Type
 
-from xsdata.formats.bindings import T
+from xsdata.formats.types import T
 from xsdata.formats.dataclass.parsers import JsonParser
 from xsdata.exceptions import ParserError
 

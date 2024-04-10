@@ -6,7 +6,6 @@ import re
 from snpseq_metadata.models.lims_models import *
 from snpseq_metadata.models.ngi_models import *
 from snpseq_metadata.models.sra_models import *
-
 from tests.resources.create_test_data import \
     SnpseqDataExperimentSetObj, \
     SRAExperimentSetObj, \
@@ -102,6 +101,27 @@ def test_values(snpseqdata_experiment_set, sra_experiment_set, sra_run_set):
 @pytest.fixture
 def run_date():
     return datetime.datetime(year=2021, month=8, day=9)
+
+
+@pytest.fixture
+def illumina_model_names():
+    return {
+        "HiSeq2500 High Output": "HiSeq2500",
+        "HiSeq2500 Rapid": "HiSeq2500",
+        "HiSeqX": "HiSeqX",
+        "MiSeq": "MiSeq",
+        "MiSeq Nano": "MiSeq",
+        "More than one type of sequencing instrument(FoU only)": None,
+        "NovaSeq S1": "NovaSeq",
+        "NovaSeq S2": "NovaSeq",
+        "NovaSeq S4": "NovaSeq",
+        "NovaSeq SP": "NovaSeq",
+        "NovaSeq X 10B": "NovaSeqX",
+        "NovaSeq X 25B": "NovaSeqX",
+        "iSeq": "iSeq",
+        "": None,
+        None: None,
+    }
 
 
 @pytest.fixture
@@ -302,9 +322,15 @@ def ngi_library_layout_obj(ngi_library_layout_json):
 def ngi_library_json(test_values, ngi_library_layout_json, ngi_sample_json):
     return {
         "description": test_values["library_description"],
-        "sample_type": test_values["experiment_sample_type"],
-        "application": test_values["experiment_application"],
-        "library_kit": test_values["experiment_library_kit"],
+        "sample_type": {
+            "description": test_values["experiment_sample_type"],
+        },
+        "application": {
+            "description": test_values["experiment_application"],
+        },
+        "library_kit": {
+            "description": test_values["experiment_library_kit"],
+        },
         "layout": ngi_library_layout_json,
         "sample": ngi_sample_json,
     }
@@ -315,9 +341,9 @@ def ngi_library_obj(ngi_sample_obj, ngi_library_layout_obj, ngi_library_json):
     return NGILibrary(
         sample=ngi_sample_obj,
         description=ngi_library_json["description"],
-        sample_type=ngi_library_json["sample_type"],
-        application=ngi_library_json["application"],
-        library_kit=ngi_library_json["library_kit"],
+        sample_type=NGISource.match(ngi_library_json["sample_type"]["description"]),
+        application=NGIApplication.match(ngi_library_json["application"]["description"]),
+        library_kit=NGILibraryKit.match(ngi_library_json["library_kit"]["description"]),
         layout=ngi_library_layout_obj,
     )
 

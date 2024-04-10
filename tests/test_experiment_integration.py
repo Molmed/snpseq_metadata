@@ -66,7 +66,9 @@ class TestLIMSSequencingContainer:
 
             for udf_name in sample.keys():
                 if udf_name not in ["project", "name"]:
-                    assert getattr(lims_experiment_set_sample, udf_name) == sample[udf_name]
+                    assert \
+                        str(getattr(lims_experiment_set_sample, udf_name)) == \
+                        str(sample[udf_name])
 
     def test_lims_experiment_set_to_json(
         self, lims_experiment_set_from_disk, experiment_set_lims_json

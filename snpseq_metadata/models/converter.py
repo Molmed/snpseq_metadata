@@ -19,7 +19,10 @@ from snpseq_metadata.models.ngi_models import (
     NGIAttribute,
     NGIPool,
     NGIPoolMember,
-    NGIReadLabel
+    NGIReadLabel,
+    NGILibraryKit,
+    NGISource,
+    NGIApplication,
 )
 from snpseq_metadata.models.sra_models import (
     SRAMetadataModel,
@@ -41,10 +44,12 @@ from snpseq_metadata.models.lims_models import (
     LIMSSequencingContainer,
     LIMSSample,
     LIMSMetadataModel,
+    LIMSLibraryKit,
+    LIMSApplication,
+    LIMSSampleType,
 )
-from snpseq_metadata.models.ngi_to_sra_library_mapping import (
-    ApplicationSampleTypeMapping,
-)
+from snpseq_metadata.models.ngi_to_sra_mapping import ModelMapper
+
 from snpseq_metadata.exceptions import (
     LibraryStrategyNotRecognizedException,
     InstrumentModelNotRecognizedException,
@@ -539,21 +544,18 @@ class ConvertLibrary(Converter):
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
         if ngi_model:
-            (
-                library_selection,
-                library_source,
-                library_strategy,
-            ) = cls.objects_from_application_info(
+            sra_library_design = ModelMapper.map_library(
+                source=ngi_model.sample_type,
                 application=ngi_model.application,
-                sample_type=ngi_model.sample_type,
                 library_kit=ngi_model.library_kit,
             )
+
             return cls.sra_model_class.create_object(
                 sample=Converter.ngi_to_sra(ngi_model.sample),
                 description=ngi_model.description,
-                strategy=library_strategy,
-                source=library_source,
-                selection=library_selection,
+                strategy=sra_library_design.strategy.value,
+                source=sra_library_design.source.value,
+                selection=sra_library_design.selection.value,
                 layout=Converter.ngi_to_sra(ngi_model.layout),
             )
 
@@ -564,9 +566,15 @@ class ConvertLibrary(Converter):
     ) -> Optional[ngi_model_class]:
         if lims_model:
             sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
-            application = lims_model.udf_application
-            sample_type = lims_model.udf_sample_type
-            library_kit = lims_model.udf_library_preparation_kit
+            application = NGIApplication.match(
+                str(lims_model.udf_application)
+            )
+            sample_type = NGISource.match(
+                str(lims_model.udf_sample_type)
+            )
+            library_kit = NGILibraryKit.match(
+                str(lims_model.udf_library_preparation_kit)
+            )
             description = None
             layout = ConvertLibraryLayout.lims_to_ngi(lims_model=lims_model)
             return cls.ngi_model_class(
@@ -577,38 +585,6 @@ class ConvertLibrary(Converter):
                 library_kit=library_kit,
                 layout=layout,
             )
-
-    @classmethod
-    def objects_from_application_info(
-        cls: Type[T], application: str, sample_type: str, library_kit: str
-    ) -> Tuple[str, str, str]:
-        """
-        Look up the SRA values for library strategy, source and selection corresponding to the
-        supplied NGI application, sample_type and library_kit, by using the
-        ApplicationSampleTypeMapping class.
-
-        :param application: the sample application, specified in e.g. Clarity LIMS
-        :param sample_type: the sample type, specified in e.g. Clarity LIMS
-        :param library_kit: the library kit, specified in e.g. Clarity LIMS
-        :return: a tuple with the corresponding SRA library selection, library source and libnrary
-        strategy
-        :raises LibraryStrategyNotRecognizedException: if corresponding values could not be
-        determined
-        """
-        mapping_obj = ApplicationSampleTypeMapping.create_object(
-            application=application,
-            sample_type=sample_type,
-            sample_prep_kit=library_kit,
-        )
-        if not mapping_obj:
-            raise LibraryStrategyNotRecognizedException(
-                needle=f"{application}:{sample_type}:{library_kit}"
-            )
-        return (
-            mapping_obj.sra_library_selection.value,
-            mapping_obj.sra_library_source.value,
-            mapping_obj.sra_library_strategy.value,
-        )
 
 
 class ConvertExperiment(Converter):
@@ -647,9 +623,9 @@ class ConvertExperiment(Converter):
             library = ConvertLibrary.lims_to_ngi(lims_model=lims_model)
             title = f"{project.project_id} - " \
                     f"{sample.sample_name} - " \
-                    f"{library.application} - " \
-                    f"{library.sample_type} - " \
-                    f"{library.library_kit}"
+                    f"{str(library.application)} - " \
+                    f"{str(library.sample_type)} - " \
+                    f"{str(library.library_kit)}"
             return cls.ngi_model_class(
                 alias=alias,
                 title=title,

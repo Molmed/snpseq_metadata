@@ -41,8 +41,8 @@ experiment_library_strategy_key,TARGETED_CAPTURE
 experiment_library_strategy_value,Targeted-Capture
 experiment_sample_type,gDNA
 experiment_sample_source,GENOMIC
-experiment_library_selection_key,OTHER
-experiment_library_selection_value,other
+experiment_library_selection_key,HYBRID_SELECTION
+experiment_library_selection_value,Hybrid Selection
 experiment_library_kit,twist human core exome
 
 index_i7,AAGTCCAA

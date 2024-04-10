@@ -125,7 +125,10 @@ class MetaObj:
         return cls(self._fields)
 
     def _export_to_file(self, contents, ext, outdir, outname=None):
-        outfile = os.path.join(outdir, f"{outname or ''}.{self.model_source}.{ext}")
+        outfile = os.path.join(
+            outdir,
+            f"{outname or ''}.{self.model_source}{'.' if self.model_source else ''}{ext}"
+        )
         os.makedirs(outdir, exist_ok=True)
         with open(outfile, "w") as fh:
             fh.write(contents)
@@ -373,9 +376,15 @@ class NGIExperimentObj(ExperimentObj):
               "sample_library_id": {experiment_ngi_sample_library_id},
               "sample_library_tag": {experiment_ngi_sample_library_tag}
             }},
-            "application": {experiment_ngi_application},
-            "sample_type": {experiment_ngi_sample_type},
-            "library_kit": {experiment_ngi_library_kit},
+            "application": {{
+                "description": {experiment_ngi_application}
+            }},
+            "sample_type": {{
+                "description": {experiment_ngi_sample_type}
+            }},
+            "library_kit": {{
+                "description": {experiment_ngi_library_kit}
+            }},
             "layout": {{
               "is_paired": {experiment_ngi_is_paired},
               "fragment_size": {experiment_ngi_fragment_size},
@@ -846,7 +855,7 @@ class ExperimentSetObj(RunSetObj):
 class SnpseqDataExperimentSetObj(ExperimentSetObj):
 
     sample_cls = SnpseqDataSampleObj
-    model_source = "snpseq"
+    model_source = ""
 
     JSON_STRUCTURE = """
     {{
