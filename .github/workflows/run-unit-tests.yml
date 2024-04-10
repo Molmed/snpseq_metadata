@@ -17,6 +17,9 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
+      - name: Upgrade pip
+        run: "pip install --upgrade pip"
+
       - name: Install snpseq_metadata
         run: "pip install ."
 
@@ -31,8 +34,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          mkdir python_out
-          tests/validate_test_data.sh "$(pwd)" "python_out"
+          tests/validate_test_data.sh "$(pwd)" "$(pwd)/python_out"
         shell: bash
 
       - name: Build docker image

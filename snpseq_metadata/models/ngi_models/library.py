@@ -1,8 +1,10 @@
-from typing import Dict, Optional, Type, TypeVar, Union
+from typing import Dict, Optional, Type, TypeVar
 
 from snpseq_metadata.models.ngi_models.metadata_model import NGIMetadataModel
 from snpseq_metadata.models.ngi_models.sample import NGISampleDescriptor
 from snpseq_metadata.models.ngi_models.pool import NGIPool
+from snpseq_metadata.models.ngi_models.library_design import \
+    NGISource, NGIApplication, NGILibraryKit
 
 
 T = TypeVar("T", bound="NGILibrary")
@@ -44,9 +46,9 @@ class NGILibrary(NGIMetadataModel):
     def __init__(
         self,
         description: str,
-        application: str,
-        sample_type: str,
-        library_kit: str,
+        application: NGIApplication,
+        sample_type: NGISource,
+        library_kit: NGILibraryKit,
         layout: NGILibraryLayout,
         sample: Optional[NGISampleDescriptor] = None,
         pool: Optional[NGIPool] = None
@@ -68,9 +70,9 @@ class NGILibrary(NGIMetadataModel):
             json_obj=json_obj.get("pool")
         )
         description = json_obj.get("description")
-        sample_type = json_obj.get("sample_type")
-        application = json_obj.get("application")
-        library_kit = json_obj.get("library_kit")
+        sample_type = NGISource.from_json(json_obj.get("sample_type"))
+        application = NGIApplication.from_json(json_obj.get("application"))
+        library_kit = NGILibraryKit.from_json(json_obj.get("library_kit"))
         layout = NGILibraryLayout.from_json(json_obj=json_obj.get("layout"))
         return cls(
             description=description,

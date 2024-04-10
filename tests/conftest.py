@@ -77,7 +77,7 @@ def run_data_csv(sample_data_path):
 
 @pytest.fixture
 def experiment_set_lims_json_file(test_resources_path):
-    return os.path.join(test_resources_path, "snpseq_data_XYZ321XY.snpseq.json")
+    return os.path.join(test_resources_path, "snpseq_data_XYZ321XY.json")
 
 
 @pytest.fixture
@@ -170,8 +170,8 @@ def experiment_set_ngi_json_file(experiment_set_lims_json_file):
     return os.path.join(
         os.path.dirname(experiment_set_lims_json_file),
         os.path.basename(experiment_set_lims_json_file).replace(
-            ".snpseq.",
-            ".ngi."
+            ".json",
+            ".ngi.json"
         )
     )
 
@@ -186,8 +186,8 @@ def experiment_set_sra_json_file(experiment_set_lims_json_file):
     return os.path.join(
         os.path.dirname(experiment_set_lims_json_file),
         os.path.basename(experiment_set_lims_json_file).replace(
-            ".snpseq.",
-            ".sra."
+            ".json",
+            ".sra.json"
         )
     )
 
