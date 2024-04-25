@@ -104,6 +104,27 @@ def run_date():
 
 
 @pytest.fixture
+def illumina_model_names():
+    return {
+        "HiSeq2500 High Output": "HiSeq2500",
+        "HiSeq2500 Rapid": "HiSeq2500",
+        "HiSeqX": "HiSeqX",
+        "MiSeq": "MiSeq",
+        "MiSeq Nano": "MiSeq",
+        "More than one type of sequencing instrument(FoU only)": None,
+        "NovaSeq S1": "NovaSeq",
+        "NovaSeq S2": "NovaSeq",
+        "NovaSeq S4": "NovaSeq",
+        "NovaSeq SP": "NovaSeq",
+        "NovaSeq X 10B": "NovaSeqX",
+        "NovaSeq X 25B": "NovaSeqX",
+        "iSeq": "iSeq",
+        "": None,
+        None: None,
+    }
+
+
+@pytest.fixture
 def illumina_model_prefixes():
     return {
         "Lh": "NovaSeqX",
