@@ -68,6 +68,13 @@ class SRALibraryLayout(SRAMetadataModel):
     def to_manifest(self) -> List[Tuple[str, str]]:
         return []
 
+    def to_tsv(self) -> List[Dict[str, str]]:
+        return [
+            {
+                "insert_size": self.fragment_size
+            }
+        ]
+
 
 class SRALibrary(SRAMetadataModel):
     model_object_class: ClassVar[Type] = LibraryType
@@ -151,8 +158,22 @@ class SRALibrary(SRAMetadataModel):
         attr = super().__getattr__(item)
         if attr:
             return attr
-        if item in ("library_source", "library_selection", "library_strategy", "library_layout"):
+        if item in (
+                "library_source",
+                "library_selection",
+                "library_strategy",
+                "library_layout",
+                "insert_size"
+        ):
             library_descriptor = getattr(self.model_object, "library_descriptor")
+            if item == "insert_size":
+                attr = getattr(library_descriptor, "library_layout")
+                p = getattr(attr, "paired")
+                if p:
+                    return p.nominal_length
+                else:
+                    return None
+
             attr = getattr(library_descriptor, item)
             if item == "library_layout":
                 field = next(filter(lambda x: getattr(attr, x.name), dataclasses.fields(attr)))
@@ -162,3 +183,17 @@ class SRALibrary(SRAMetadataModel):
             attr = getattr(self.model_object, "sample_descriptor")
             return SRASampleDescriptor.from_model_object(attr)
 
+    def to_tsv(self) -> List[Dict[str, str]]:
+        tsv_dict = {
+            "design_description": self.description
+        }
+        for attr in "library_source", \
+                    "library_selection", \
+                    "library_strategy", \
+                    "library_layout", \
+                    "insert_size":
+            tsv_dict[attr] = self.__getattr__(attr)
+        tsv_dict.update(
+            self.sample.to_tsv()[0]
+        )
+        return [tsv_dict]

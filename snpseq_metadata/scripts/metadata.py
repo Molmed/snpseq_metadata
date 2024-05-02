@@ -1,9 +1,11 @@
 import click
+import csv
 import json
 import os
 
 from snpseq_metadata.models.ngi_models import NGIFlowcell, NGIExperimentSet
 from snpseq_metadata.models.lims_models import LIMSSequencingContainer
+from snpseq_metadata.models.sra_models import SRAMetadataModel
 from snpseq_metadata.models.converter import Converter, ConvertExperimentSet
 
 
@@ -12,7 +14,7 @@ def common_options(function):
         "-o",
         "--outdir",
         type=click.Path(dir_okay=True),
-        default="current working directory",
+        default=os.curdir,
         show_default=True,
     )(function)
     return function
@@ -138,9 +140,61 @@ def to_manifest():
     return processor
 
 
+@click.command("tsv")
+def to_tsv():
+    def processor(project_id, experiment_set, run_set, outdir):
+        for sra_run in run_set.runs:
+            experiment_tsv = sra_run.experiment.to_tsv()
+            run_tsv = sra_run.to_tsv()
+            # combine each entry in the experiment_tsv with all entries in run_tsv
+            tsv = []
+            for experiment_dict in experiment_tsv:
+                for run_dict in run_tsv:
+                    tsv_dict = {}
+                    tsv_dict.update(experiment_dict)
+                    tsv_dict.update(run_dict)
+                    tsv.append(tsv_dict)
+
+            outfile = os.path.join(
+                outdir, f"{sra_run.experiment.alias}.tsv"
+            )
+            # set the dialect separator to tab
+            dialect_tab = csv.unix_dialect
+            dialect_tab.delimiter = "\t"
+
+            # write the first line specifying the file type
+            with open(outfile, "w", newline='') as fh:
+                w = csv.writer(
+                    fh,
+                    dialect=dialect_tab
+                )
+                w.writerow(
+                    [
+                        "FileType",
+                        tsv[0].get("FileType", ''),
+                        "Read submission file type",
+                    ]
+                )
+
+            # write the data header and rows
+            with open(outfile, "a", newline='') as fh:
+                dw = csv.DictWriter(
+                    fh,
+                    SRAMetadataModel.sra_tsv_fields,
+                    dialect=dialect_tab,
+                    restval='',
+                    extrasaction='ignore',
+                )
+                dw.writeheader()
+                dw.writerows(tsv)
+
+    return processor
+
+
 export.add_command(to_xml)
 export.add_command(to_json)
 export.add_command(to_manifest)
+export.add_command(to_tsv)
 metadata.add_command(export)
 
 snpseq_data.add_command(extract_to_json)
@@ -154,7 +208,7 @@ def entry_point():
     # catch any exceptions and write a comprehensive message to stdout and raise the exception for
     # stacktrace and exit code etc.
     try:
-        metadata.main(standalone_mode=False)
+        return metadata.main(standalone_mode=False, obj={})
     except Exception as ex:
         print(str(ex))
         raise

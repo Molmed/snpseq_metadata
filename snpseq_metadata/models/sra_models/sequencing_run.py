@@ -1,4 +1,4 @@
-from typing import ClassVar, List, Optional, TypeVar, Type, Tuple, Union
+from typing import ClassVar, List, Optional, TypeVar, Type, Tuple, Union, Dict
 import datetime
 from xsdata.models.datatype import XmlDateTime
 
@@ -80,3 +80,17 @@ class SRARun(SRAMetadataModel):
         for run_attribute in self.run_attributes or []:
             if run_attribute.tag == "sample_id":
                 return run_attribute.value == sample_id
+
+    def to_tsv(self) -> List[Dict[str, str]]:
+        # this should return multiple dicts if more than one forward-reverse file pair
+        tsv = []
+        tsv_dict = {}
+        for fastqfile in self.fastqfiles:
+            t = fastqfile.to_tsv()[0]
+            # if header entries have already been seen, add a new dict for values
+            if all(map(lambda k: k in tsv_dict.keys(), t.keys())):
+                tsv.append(tsv_dict)
+                tsv_dict = {}
+            tsv_dict.update(t)
+        tsv.append(tsv_dict)
+        return tsv

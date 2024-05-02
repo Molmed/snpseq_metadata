@@ -1,6 +1,6 @@
 import os
 
-from typing import ClassVar, Optional, TypeVar, Type, List, Tuple
+from typing import ClassVar, Optional, TypeVar, Type, List, Tuple, Dict
 
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.xsdata import Run, FileFiletype, FileChecksumMethod
@@ -66,6 +66,24 @@ class SRAResultFile(SRAMetadataModel):
 
     def to_manifest(self) -> List[Tuple[str, str]]:
         return [(self.model_object.filetype.name, self.filename)]
+
+    def to_tsv(self) -> List[Dict[str, str]]:
+        prefix_dict = {
+            "_R1_": "forward",
+            "_R2_": "reverse",
+        }
+        prefix = ""
+        for k, v in prefix_dict.items():
+            if k in self.filename:
+                prefix = v
+
+        return [
+            {
+                f"{prefix}_file_name": self.filename,
+                f"{prefix}_file_md5": self.checksum,
+                "FileType": self.filetype,
+            }
+        ]
 
 
 class SRAFastqFile(SRAResultFile):

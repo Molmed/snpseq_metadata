@@ -1,5 +1,5 @@
 import dataclasses
-from typing import ClassVar, Dict, Optional, Type, TypeVar, List, Tuple
+from typing import ClassVar, Dict, Optional, Type, TypeVar, List, Tuple, Iterable
 
 from snpseq_metadata.models.import_export import ModelExporter, ModelImporter
 from snpseq_metadata.models.metadata_model import MetadataModel
@@ -12,6 +12,24 @@ class SRAMetadataModel(MetadataModel):
     model_object_class: ClassVar[Type] = Type[X]
     model_object_meta_class: ClassVar[Optional[Type]] = None
     model_object_parent_field: ClassVar[Optional[Tuple[Type, str]]] = None
+
+    sra_tsv_fields: ClassVar[List[str]] = [
+        "study",
+        "sample",
+        "design_description",
+        "library_construction_protocol",
+        "library_name",
+        "library_strategy",
+        "library_source",
+        "library_selection",
+        "library_layout",
+        "insert_size",
+        "instrument_model",
+        "forward_file_name",
+        "forward_file_md5",
+        "reverse_file_name",
+        "reverse_file_md5",
+    ]
 
     def __init__(self, model_object: model_object_class):
         self.model_object = model_object
@@ -55,6 +73,9 @@ class SRAMetadataModel(MetadataModel):
 
     def to_manifest(self) -> List[Tuple[str, str]]:
         raise NotImplementedError
+
+    def to_tsv(self) -> List[Dict[str, str]]:
+        return [{}]
 
     @classmethod
     def create_object(cls: Type[T], *args, **kwargs) -> T:
