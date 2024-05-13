@@ -104,7 +104,7 @@ class MetaObj:
 
         # parse a boolean
         if val.lower() in truths + falses:
-            return val in truths #str(val in truths).lower()
+            return val in truths
 
         # nothing worked, return a string
         return str(val)
@@ -385,6 +385,7 @@ class NGIExperimentObj(ExperimentObj):
             "library_kit": {{
                 "description": {experiment_ngi_library_kit}
             }},
+            "library_protocol": {experiment_ngi_library_kit},
             "layout": {{
               "is_paired": {experiment_ngi_is_paired},
               "fragment_size": {experiment_ngi_fragment_size},
@@ -439,7 +440,8 @@ class SRAExperimentObj(ExperimentObj):
                 "PAIRED": {{
                   "NOMINAL_LENGTH": {experiment_sra_insert_size}
                 }}
-              }}
+              }},
+              "LIBRARY_CONSTRUCTION_PROTOCOL": {experiment_sra_library_kit}
             }}
           }},
           "PLATFORM": {{
@@ -463,6 +465,7 @@ class SRAExperimentObj(ExperimentObj):
         <LIBRARY_LAYOUT>
           <PAIRED NOMINAL_LENGTH="{experiment_sra_insert_size}"/>
         </LIBRARY_LAYOUT>
+        <LIBRARY_CONSTRUCTION_PROTOCOL>{experiment_sra_library_kit}</LIBRARY_CONSTRUCTION_PROTOCOL>
       </LIBRARY_DESCRIPTOR>
     </DESIGN>
     <PLATFORM>
@@ -483,6 +486,22 @@ class SRAExperimentObj(ExperimentObj):
         ["SAMPLE", "{experiment_sra_sample_refname}"]
     ]
 
+    TSV = [
+        {
+            "library_name": "{experiment_sra_alias}",
+            "insert_size": "{experiment_sra_insert_size:n}",
+            "library_source": "{experiment_sra_library_source}",
+            "library_selection": "{experiment_library_selection_key}",
+            "library_strategy": "{experiment_library_strategy_key}",
+            "library_layout": "{experiment_sra_library_layout}",
+            "instrument_model": "{experiment_sra_instrument_model}",
+            "design_description": "",
+            "library_construction_protocol": "{experiment_sra_library_kit}",
+            "sample": "{experiment_sra_sample_refname}",
+            "study": "{experiment_sra_study_refname}",
+        }
+    ]
+
     MAPPING = {
         "experiment_sra_alias": "experiment_alias",
         "experiment_sra_study_refname": "project_id",
@@ -493,7 +512,8 @@ class SRAExperimentObj(ExperimentObj):
         "experiment_sra_library_strategy": "experiment_library_strategy_value",
         "experiment_sra_library_source": "experiment_sample_source",
         "experiment_sra_library_selection": "experiment_library_selection_value",
-        "experiment_sra_insert_size": "insert_size"
+        "experiment_sra_insert_size": "insert_size",
+        "experiment_sra_library_kit": "experiment_library_kit",
     }
 
     def __init__(self, fields):

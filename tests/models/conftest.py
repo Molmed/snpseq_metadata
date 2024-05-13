@@ -333,6 +333,7 @@ def ngi_library_json(test_values, ngi_library_layout_json, ngi_sample_json):
         },
         "layout": ngi_library_layout_json,
         "sample": ngi_sample_json,
+        "library_protocol": test_values["experiment_library_kit"]
     }
 
 
@@ -345,6 +346,7 @@ def ngi_library_obj(ngi_sample_obj, ngi_library_layout_obj, ngi_library_json):
         application=NGIApplication.match(ngi_library_json["application"]["description"]),
         library_kit=NGILibraryKit.match(ngi_library_json["library_kit"]["description"]),
         layout=ngi_library_layout_obj,
+        library_protocol=ngi_library_json["library_protocol"],
     )
 
 
@@ -662,6 +664,7 @@ def sra_library_json(test_values, sra_library_layout_json, sra_sample_json):
             "LIBRARY_SOURCE": test_values["experiment_sra_library_source"],
             "LIBRARY_SELECTION": test_values["experiment_sra_library_selection"],
             "LIBRARY_LAYOUT": sra_library_layout_json,
+            "LIBRARY_CONSTRUCTION_PROTOCOL": test_values["experiment_library_kit"]
         },
     }
 
@@ -675,6 +678,7 @@ def sra_library_obj(sra_library_json, sra_library_layout_obj, sra_sample_obj):
         source=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SOURCE"],
         selection=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SELECTION"],
         layout=sra_library_layout_obj,
+        library_protocol=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_CONSTRUCTION_PROTOCOL"]
     )
 
 
@@ -703,6 +707,7 @@ def sra_library_xml(sra_library_json, sra_library_layout_xml, sra_sample_xml):
         <LIBRARY_SOURCE>{sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SOURCE"]}</LIBRARY_SOURCE>
         <LIBRARY_SELECTION>{sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SELECTION"]}</LIBRARY_SELECTION>
         {sra_library_layout_xml}
+        <LIBRARY_CONSTRUCTION_PROTOCOL>{sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_CONSTRUCTION_PROTOCOL"]}</LIBRARY_CONSTRUCTION_PROTOCOL>
       </LIBRARY_DESCRIPTOR>
     </LIBRARYTYPE>"""
 

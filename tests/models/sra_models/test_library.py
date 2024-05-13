@@ -64,5 +64,7 @@ class TestSRALibrary:
             source=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SOURCE"],
             selection=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SELECTION"],
             layout=sra_library_layout_obj,
+            library_protocol=sra_library_json["LIBRARY_DESCRIPTOR"][
+                "LIBRARY_CONSTRUCTION_PROTOCOL"],
         )
         assert library == sra_library_obj

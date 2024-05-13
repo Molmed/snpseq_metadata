@@ -557,6 +557,7 @@ class ConvertLibrary(Converter):
                 source=sra_library_design.source.value,
                 selection=sra_library_design.selection.value,
                 layout=Converter.ngi_to_sra(ngi_model.layout),
+                library_protocol=ngi_model.library_protocol,
             )
 
     @classmethod
@@ -577,6 +578,7 @@ class ConvertLibrary(Converter):
             )
             description = None
             layout = ConvertLibraryLayout.lims_to_ngi(lims_model=lims_model)
+            library_protocol = str(lims_model.udf_library_preparation_kit or "")
             return cls.ngi_model_class(
                 sample=sample,
                 description=description,
@@ -584,6 +586,7 @@ class ConvertLibrary(Converter):
                 sample_type=sample_type,
                 library_kit=library_kit,
                 layout=layout,
+                library_protocol=library_protocol
             )
 
 

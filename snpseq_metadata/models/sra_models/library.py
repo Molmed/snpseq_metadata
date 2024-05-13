@@ -71,7 +71,7 @@ class SRALibraryLayout(SRAMetadataModel):
     def to_tsv(self) -> List[Dict[str, str]]:
         return [
             {
-                "insert_size": self.fragment_size
+                "insert_size": str(self.fragment_size)
             }
         ]
 
@@ -119,12 +119,14 @@ class SRALibrary(SRAMetadataModel):
         source: str,
         selection: str,
         layout: SRALibraryLayout,
+        library_protocol: Optional[str] = None,
     ) -> T:
         xsdlibrary = LibraryDescriptorType(
             library_layout=layout.model_object,
             library_source=cls.object_from_source(source=source),
             library_selection=cls.object_from_selection(selection=selection),
             library_strategy=cls.object_from_strategy(strategy=strategy),
+            library_construction_protocol=library_protocol,
         )
         model_object = LibraryType(
             design_description=description,
@@ -163,7 +165,8 @@ class SRALibrary(SRAMetadataModel):
                 "library_selection",
                 "library_strategy",
                 "library_layout",
-                "insert_size"
+                "library_construction_protocol",
+                "insert_size",
         ):
             library_descriptor = getattr(self.model_object, "library_descriptor")
             if item == "insert_size":
@@ -175,6 +178,8 @@ class SRALibrary(SRAMetadataModel):
                     return None
 
             attr = getattr(library_descriptor, item)
+            if item == "library_construction_protocol":
+                return attr
             if item == "library_layout":
                 field = next(filter(lambda x: getattr(attr, x.name), dataclasses.fields(attr)))
                 return field.metadata["name"]
@@ -185,12 +190,13 @@ class SRALibrary(SRAMetadataModel):
 
     def to_tsv(self) -> List[Dict[str, str]]:
         tsv_dict = {
-            "design_description": self.description
+            "design_description": self.description or "",
         }
         for attr in "library_source", \
                     "library_selection", \
                     "library_strategy", \
                     "library_layout", \
+                    "library_construction_protocol", \
                     "insert_size":
             tsv_dict[attr] = self.__getattr__(attr)
         tsv_dict.update(
