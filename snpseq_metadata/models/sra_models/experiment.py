@@ -148,3 +148,9 @@ class SRAExperimentSet(SRAMetadataModel):
             filter(lambda exp: study_ref == exp.study_ref, self.experiments)
         )
         return self.create_object(experiments=experiments)
+
+    def to_tsv(self) -> List[Dict[str, str]]:
+        tsv_list = []
+        for experiment in self.experiments:
+            tsv_list += experiment.to_tsv()
+        return tsv_list

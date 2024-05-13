@@ -555,6 +555,22 @@ def sra_experiment_manifest(
 
 
 @pytest.fixture
+def sra_experiment_tsv(
+    sra_experiment_json,
+    sra_study_tsv,
+    sra_sequencing_platform_tsv,
+    sra_library_tsv,
+):
+    tsv_dict = {
+        "library_name": sra_experiment_json["alias"],
+    }
+    tsv_dict.update(sra_study_tsv[0])
+    tsv_dict.update(sra_sequencing_platform_tsv[0])
+    tsv_dict.update(sra_library_tsv[0])
+    return [tsv_dict]
+
+
+@pytest.fixture
 def sra_experiment_xml(
     sra_experiment_json, sra_study_xml, sra_sequencing_platform_xml, sra_library_xml
 ):
@@ -596,6 +612,11 @@ def sra_experiment_set_json(sra_experiment_json):
 
 
 @pytest.fixture
+def sra_experiment_set_tsv(sra_experiment_tsv):
+    return sra_experiment_tsv
+
+
+@pytest.fixture
 def sra_experiment_set_manifest(sra_experiment_manifest):
     return sra_experiment_manifest
 
@@ -619,6 +640,13 @@ def sra_library_layout_json(test_values):
             "NOMINAL_LENGTH": test_values.get("udf_insert_size_bp")
         }
     }
+
+
+@pytest.fixture
+def sra_library_layout_tsv(test_values):
+    return [{
+        "insert_size": test_values.get("udf_insert_size_bp")
+        }]
 
 
 @pytest.fixture
@@ -680,6 +708,21 @@ def sra_library_obj(sra_library_json, sra_library_layout_obj, sra_sample_obj):
         layout=sra_library_layout_obj,
         library_protocol=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_CONSTRUCTION_PROTOCOL"]
     )
+
+
+@pytest.fixture
+def sra_library_tsv(test_values, sra_library_layout_tsv, sra_sample_tsv):
+    tsv = {
+        "design_description": test_values["library_description"],
+        "library_source": test_values["experiment_sra_library_source"],
+        "library_selection": test_values["experiment_sra_library_selection"].upper(),
+        "library_strategy": test_values["experiment_sra_library_strategy"],
+        "library_layout": "PAIRED",
+        "library_construction_protocol": test_values["experiment_library_kit"],
+    }
+    tsv.update(sra_library_layout_tsv[0])
+    tsv.update(sra_sample_tsv[0])
+    return [tsv]
 
 
 @pytest.fixture
@@ -745,8 +788,24 @@ def sra_result_file_manifest(sra_result_file_json):
 
 
 @pytest.fixture
+def sra_result_file_tsv(sra_result_file_json):
+    return [
+        {
+            "FileType": sra_result_file_json["filetype"],
+            "_file_name": sra_result_file_json["filename"],
+            "_file_md5": sra_result_file_json["checksum"],
+        }
+    ]
+
+
+@pytest.fixture
 def sra_sample_json(test_values):
     return {"refname": test_values["sample_name"]}
+
+
+@pytest.fixture
+def sra_sample_tsv(sra_sample_json):
+    return [{"sample": sra_sample_json["refname"]}]
 
 
 @pytest.fixture
@@ -804,6 +863,14 @@ def sra_sequencing_platform_xml(sra_sequencing_platform_json):
 
 
 @pytest.fixture
+def sra_sequencing_platform_tsv(sra_sequencing_platform_json):
+    platform = list(sra_sequencing_platform_json.keys())[0]
+    return [{
+        "instrument_model": sra_sequencing_platform_json[platform]["INSTRUMENT_MODEL"]
+    }]
+
+
+@pytest.fixture
 def sra_sequencing_run_json(
         test_values, sra_experiment_ref_json, sra_result_file_json, sra_attribute_json):
     return {
@@ -815,6 +882,11 @@ def sra_sequencing_run_json(
         "run_center": test_values["sequencing_run_center"],
         "center_name": test_values["sequencing_run_center"],
     }
+
+
+@pytest.fixture
+def sra_sequencing_run_tsv(sra_result_file_tsv):
+    return sra_result_file_tsv
 
 
 @pytest.fixture
@@ -860,6 +932,11 @@ def sra_sequencing_run_set_json(sra_sequencing_run_json):
 
 
 @pytest.fixture
+def sra_sequencing_run_set_tsv(sra_sequencing_run_tsv):
+    return sra_sequencing_run_tsv
+
+
+@pytest.fixture
 def sra_sequencing_run_set_manifest(sra_sequencing_run_manifest):
     return sra_sequencing_run_manifest
 
@@ -883,6 +960,11 @@ def sra_study_json(test_values):
 @pytest.fixture
 def sra_study_manifest(sra_study_json):
     return [("STUDY", sra_study_json["refname"])]
+
+
+@pytest.fixture
+def sra_study_tsv(sra_study_json):
+    return [{"study": sra_study_json["refname"]}]
 
 
 @pytest.fixture

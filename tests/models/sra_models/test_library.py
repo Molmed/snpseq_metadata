@@ -10,6 +10,9 @@ class TestSRALibraryLayout:
     def test_to_json(self, sra_library_layout_obj, sra_library_layout_json):
         assert sra_library_layout_obj.to_json() == sra_library_layout_json
 
+    def test_to_tsv(self, sra_library_layout_obj, sra_library_layout_tsv):
+        assert sra_library_layout_obj.to_tsv() == sra_library_layout_tsv
+
     def test_to_xml(self, sra_library_layout_obj, sra_library_layout_xml):
         xml_from_obj = sra_library_layout_obj.to_xml(xml_declaration=False)
         assert xml_from_obj.split() == \
@@ -49,6 +52,9 @@ class TestSRALibrary:
     def test_to_xml(self, sra_library_obj, sra_library_xml):
         assert sra_library_obj.to_xml(xml_declaration=False).split() == \
                sra_library_xml.split()
+
+    def test_to_tsv(self, sra_library_obj, sra_library_tsv):
+        assert sra_library_obj.to_tsv() == sra_library_tsv
 
     def test_create_object(
             self,

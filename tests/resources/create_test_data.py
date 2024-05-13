@@ -6,6 +6,7 @@ import re
 import sys
 
 from functools import cmp_to_key
+from io import StringIO
 
 
 class DefaultField(dict):
@@ -20,6 +21,7 @@ class MetaObj:
 
     JSON_STRUCTURE = ""
     XML_STRUCTURE = ""
+    TSV = ""
     MANIFEST = ""
 
     MAPPING = {}
@@ -81,6 +83,20 @@ class MetaObj:
                 rows + extra_rows
             )
         )
+
+    def to_tsv(self, extra_tsv_list=None):
+        tsv_list = []
+        for tsv_dict in self.TSV:
+            tsv = {
+                self.structure_to_str(tsvkey): self.structure_to_str(tsvval)
+                for tsvkey, tsvval in tsv_dict.items()
+            }
+            for extra_tsv in extra_tsv_list or [{}]:
+                ex_tsv = tsv.copy()
+                ex_tsv.update(extra_tsv)
+                tsv_list.append(ex_tsv)
+
+        return tsv_list
 
     @staticmethod
     def _parse_value(val):
@@ -161,6 +177,58 @@ class MetaObj:
             outname=outname
         )
 
+    def export_tsv(self, outdir, outname=None):
+        tsv_list = self.to_tsv()
+        contents = StringIO()
+        dialect_tab = csv.unix_dialect
+        dialect_tab.delimiter = "\t"
+        # write the first row
+        w = csv.writer(
+            contents,
+            dialect=dialect_tab,
+            quoting=csv.QUOTE_MINIMAL,
+        )
+        w.writerow(
+            [
+                "FileType",
+                tsv_list[0].get("FileType", ''),
+                "Read submission file type",
+            ]
+        )
+        # write the remaining rows, including the header
+        dw = csv.DictWriter(
+            contents,
+            fieldnames=[
+                "study",
+                "sample",
+                "design_description",
+                "library_construction_protocol",
+                "library_name",
+                "library_strategy",
+                "library_source",
+                "library_selection",
+                "library_layout",
+                "insert_size",
+                "instrument_model",
+                "forward_file_name",
+                "forward_file_md5",
+                "reverse_file_name",
+                "reverse_file_md5",
+            ],
+            dialect=dialect_tab,
+            restval='',
+            extrasaction='ignore',
+            quoting=csv.QUOTE_MINIMAL,
+        )
+        dw.writeheader()
+        dw.writerows(tsv_list)
+        return self._export_to_file(
+            contents.getvalue(),
+            "tsv",
+            outdir,
+            outname=outname
+        )
+
     def create_sample_folder(self, outdir):
         for fqfile in self.fields["sequencing_run_fastq_files"]:
             fqfile.create_file(outdir)
@@ -192,6 +260,11 @@ class MetaObj:
 
 
 class FastqFile(MetaObj):
+
+    def __init__(self, fields):
+        super(FastqFile, self).__init__(fields)
+        self.fields["prefix"] = "forward" \
+            if "_R1_" in os.path.basename(self.fields["filepath"]) else "reverse"
 
     def _filepath(self, outdir):
         return os.path.join(
@@ -266,6 +339,14 @@ class SRAFastqFile(FastqFile):
         ["FASTQ", "{filename}"]
     ]
 
+    TSV = [
+        {
+            "{prefix}_file_name": "{filename}",
+            "{prefix}_file_md5": "{checksum}",
+            "FileType": "{filetype}",
+        }
+    ]
+
     MAPPING = {
         "filename": "filepath"
     }
@@ -335,9 +416,25 @@ class SnpseqDataSampleObj(MetaObj):
 
 class ExperimentObj(MetaObj):
 
+    def is_run_obj_match(self, run_obj):
+        return self.fields.get("experiment_alias", "expobj") == \
+               run_obj.fields.get("experiment_alias", "runobj")
+
+    def run_obj(self, run_obj=None):
+        if run_obj:
+            self.fields["RunObj"] = run_obj
+        return self.fields.get("RunObj")
+
     def export_manifest(self, outdir, outname=None):
         if "sample_library_id" in self.fields:
             return super(ExperimentObj, self).export_manifest(
+                outdir,
+                outname=f"{outname or ''}.{self.fields['experiment_alias']}"
+            )
+
+    def export_tsv(self, outdir, outname=None):
+        if "sample_library_id" in self.fields:
+            return super(ExperimentObj, self).export_tsv(
                 outdir,
                 outname=f"{outname or ''}.{self.fields['experiment_alias']}"
             )
@@ -353,6 +450,11 @@ class ExperimentObj(MetaObj):
     def to_manifest(self, extra_rows=None):
         if "sample_library_id" in self.fields:
             return super(ExperimentObj, self).to_manifest(extra_rows=extra_rows)
+
+    def to_tsv(self, extra_tsv_list=None):
+        robj = self.run_obj()
+        fq_tsv_list = None if not robj else robj.to_tsv()
+        return super(ExperimentObj, self).to_tsv(extra_tsv_list=fq_tsv_list)
 
 
 class NGIExperimentObj(ExperimentObj):
@@ -518,6 +620,8 @@ class SRAExperimentObj(ExperimentObj):
 
     def __init__(self, fields):
         super(SRAExperimentObj, self).__init__(fields)
+        self.fields["experiment_sra_library_layout"] = "PAIRED" \
+            if self.fields.get("read_configuration_paired", True) else "SINGLE"
 
 
 class RunObj(ExperimentObj):
@@ -572,6 +676,31 @@ class RunObj(ExperimentObj):
             for fastq in self.fields["sequencing_run_fastq_files"]
         ] + extra_rows
         return super(RunObj, self).to_manifest(extra_rows=rows)
+
+    def to_tsv(self, extra_tsv_list=None):
+        fq_tsv_list = [{}]
+        for fastq in self.fields["sequencing_run_fastq_files"]:
+            fq_tsv = fastq.to_tsv()[0]
+            # if the dict keys have already been added, add a new dict to the list
+            # ignore the "FileType" key since it is expected to be present in all entries
+            if any(
+                    map(
+                        lambda k: k in fq_tsv_list[-1] and k != "FileType",
+                        fq_tsv.keys()
+                    )
+            ):
+                fq_tsv_list.append({})
+            fq_tsv_list[-1].update(fq_tsv)
+
+        # for each extra tsv list element, create a copy of the fq_tsv and add the extra items
+        tsv_list = []
+        for fq_tsv in fq_tsv_list:
+            for extra_tsv in extra_tsv_list or [{}]:
+                ex_tsv = fq_tsv.copy()
+                ex_tsv.update(extra_tsv)
+                tsv_list.append(ex_tsv)
+
+        return tsv_list
 
 
 class NGIRunObj(RunObj):
@@ -644,6 +773,8 @@ class SRARunObj(RunObj):
 
     MANIFEST = []
 
+    TSV = [{}]
+
     MAPPING = {}
 
 
@@ -699,6 +830,19 @@ class RunSetObj(MetaObj):
             )
         )
         return super(RunSetObj, self).to_manifest(extra_rows=rows)
+
+    def to_tsv(self, extra_tsv_list=None):
+        tsv_list = []
+        for sample in self.fields["sample_objects"]:
+            # for each extra tsv list element, create a copy of the sample_tsv and
+            # add the extra items
+            for sample_tsv in sample.to_tsv():
+                for extra_tsv in extra_tsv_list or [{}]:
+                    ex_tsv = sample_tsv.copy()
+                    ex_tsv.update(extra_tsv)
+                    tsv_list.append(ex_tsv)
+
+        return super(RunSetObj, self).to_tsv(extra_tsv_list=tsv_list)
 
     def _export_to_format(self, super_fn, outdir, outname=None):
         outname = outname or self.fields['runfolder_name']
@@ -850,10 +994,24 @@ class SRARunSetObj(RunSetObj):
 </RUN_SET>
     """
 
+    TSV = [{}]
+
     MANIFEST = []
 
 
 class ExperimentSetObj(RunSetObj):
+
+    def run_set_obj(self, run_set_obj=None):
+        if run_set_obj:
+            # match each ExperimentObj to the corresponding RunObj
+            for experiment_obj in self.fields["sample_objects"]:
+                for run_obj in run_set_obj.fields["sample_objects"]:
+                    if experiment_obj.is_run_obj_match(run_obj):
+                        experiment_obj.run_obj(run_obj=run_obj)
+                        break
+
+            self.fields["RunSetObj"] = run_set_obj
+        return self.fields["RunSetObj"]
 
     def _export_to_format(self, super_fn, outdir, outname=None):
         outname = f"{outname or ''}{self.fields['flowcell_id']}"
@@ -870,6 +1028,44 @@ class ExperimentSetObj(RunSetObj):
             for sample in self.fields["sample_objects"]
         ]
         return manifest_files
+
+    def export_tsv(self, outdir, outname=None):
+        tsv_files = []
+
+        # for all projects and samples, do export_tsv but don't call super function
+        for project_id in set(
+                map(
+                    lambda s: s.fields["project_id"].replace("Project_", ""),
+                    self.fields["sample_objects"]
+                )
+        ):
+            if not project_id:
+                continue
+
+            project_fields = self.fields.copy()
+            project_fields["sample_csv_files"] = list(
+                filter(
+                    lambda f: project_id in f,
+                    self.fields["sample_csv_files"]
+                )
+            )
+            project_fields["sample_objects"] = []
+            project_fields["RunSetObj"] = None
+            project_fields["samples_json"] = []
+            project_fields["samples_xml"] = []
+
+            project_experiment_set_obj = type(self)(project_fields)
+            project_experiment_set_obj.run_set_obj(
+                self.fields["RunSetObj"]
+            )
+            tsv_files.append(
+                super(ExperimentSetObj, project_experiment_set_obj).export_tsv(
+                    outdir=outdir,
+                    outname=f"{outname or ''}{project_id}"
+                )
+            )
+
+        return tsv_files
 
 
 class SnpseqDataExperimentSetObj(ExperimentSetObj):
@@ -915,6 +1111,8 @@ class SRAExperimentSetObj(ExperimentSetObj):
 </EXPERIMENT_SET>
 """
 
+    TSV = [{}]
+
 
 if __name__ == '__main__':
     csvfile = sys.argv[1]
@@ -928,12 +1126,14 @@ if __name__ == '__main__':
     obj = obj.to_class(NGIExperimentSetObj)
     obj.export_json("export", outname="snpseq_data_")
 
-    obj = obj.to_class(SRARunSetObj)
-    obj.export_json("export")
-    obj.export_xml("export")
-    obj.export_manifest("export")
+    run_set_obj = obj.to_class(SRARunSetObj)
+    run_set_obj.export_json("export")
+    run_set_obj.export_xml("export")
+    run_set_obj.export_manifest("export")
 
-    obj = obj.to_class(SRAExperimentSetObj)
+    obj = run_set_obj.to_class(SRAExperimentSetObj)
+    obj.run_set_obj(run_set_obj)
     obj.export_json("export", outname="snpseq_data_")
     obj.export_xml("export", outname="snpseq_data_")
     obj.export_manifest("export", outname="snpseq_data_")
+    obj.export_tsv("export", outname="snpseq_data_")

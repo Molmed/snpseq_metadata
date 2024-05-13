@@ -1,4 +1,4 @@
-from typing import ClassVar, List, Type, TypeVar, Optional, Tuple, Union
+from typing import ClassVar, Dict, List, Type, TypeVar, Optional, Tuple, Union
 
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.sra_models.sequencing_run import SRARun
@@ -36,6 +36,12 @@ class SRARunSet(SRAMetadataModel):
         for run in self.runs:
             manifest.extend(run.to_manifest())
         return manifest
+
+    def to_tsv(self) -> List[Dict[str, str]]:
+        tsv_list = []
+        for run in self.runs:
+            tsv_list += run.to_tsv()
+        return tsv_list
 
     def restrict_to_experiments(self, experiments: SRAExperimentSet) -> T:
         runs = []

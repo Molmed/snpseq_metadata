@@ -143,26 +143,28 @@ def to_manifest():
 @click.command("tsv")
 def to_tsv():
     def processor(project_id, experiment_set, run_set, outdir):
+        project_tsv_list = []
+        # add all samples to the project tsv list
         for sra_run in run_set.runs:
             experiment_tsv = sra_run.experiment.to_tsv()
             run_tsv = sra_run.to_tsv()
             # combine each entry in the experiment_tsv with all entries in run_tsv
-            tsv = []
             for experiment_dict in experiment_tsv:
                 for run_dict in run_tsv:
                     tsv_dict = {}
                     tsv_dict.update(experiment_dict)
                     tsv_dict.update(run_dict)
-                    tsv.append(tsv_dict)
+                    project_tsv_list.append(tsv_dict)
 
-            outfile = os.path.join(
-                outdir, f"{sra_run.experiment.alias}.tsv"
-            )
-            # set the dialect separator to tab
-            dialect_tab = csv.unix_dialect
-            dialect_tab.delimiter = "\t"
+        outfile = os.path.join(
+            outdir, f"{project_id}.metadata.ena.tsv"
+        )
+        # set the dialect separator to tab
+        dialect_tab = csv.unix_dialect
+        dialect_tab.delimiter = "\t"
 
-            # write the first line specifying the file type
+        # write the first line specifying the file type
+        try:
             with open(outfile, "w", newline='') as fh:
                 w = csv.writer(
                     fh,
@@ -171,7 +173,7 @@ def to_tsv():
                 w.writerow(
                     [
                         "FileType",
-                        tsv[0].get("FileType", ''),
+                        project_tsv_list[0].get("FileType", ''),
                         "Read submission file type",
                     ]
                 )
@@ -186,7 +188,9 @@ def to_tsv():
                     extrasaction='ignore',
                 )
                 dw.writeheader()
-                dw.writerows(tsv)
+                dw.writerows(project_tsv_list)
+        except IndexError:
+            print(f"No TSV data to export for {project_id}")
 
     return processor
 

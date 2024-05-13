@@ -56,3 +56,6 @@ class TestSRAFlowcell:
 
     def test_to_manifest(self, sra_run_set_from_ngi_flowcell, runfolder_sra_manifest):
         assert sra_run_set_from_ngi_flowcell.to_manifest() == runfolder_sra_manifest
+
+    def test_to_tsv(self, sra_run_set_from_ngi_flowcell):
+        sra_run_set_from_ngi_flowcell.to_tsv()
