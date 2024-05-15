@@ -76,7 +76,7 @@ def parse_tsv(tsv_file):
         for row in reader:
             tsv_list.append(
                 {
-                    k: _parse_int(v)
+                    k: str(_parse_int(v))
                     for k, v in row.items()
                 }
             )

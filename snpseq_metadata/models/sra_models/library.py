@@ -182,14 +182,16 @@ class SRALibrary(SRAMetadataModel):
                 "library_descriptor"
             )
             if item == "insert_size":
-                return getattr(
-                    SRALibraryLayout.from_model_object(
-                        getattr(
-                            library_descriptor,
-                            "library_layout"
-                        )
-                    ),
-                    item
+                return str(
+                    getattr(
+                        SRALibraryLayout.from_model_object(
+                            getattr(
+                                library_descriptor,
+                                "library_layout"
+                            )
+                        ),
+                        item
+                    ) or ""
                 )
 
             attr = getattr(library_descriptor, item)

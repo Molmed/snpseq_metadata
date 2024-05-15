@@ -645,7 +645,7 @@ def sra_library_layout_json(test_values):
 @pytest.fixture
 def sra_library_layout_tsv(test_values):
     return [{
-        "insert_size": test_values.get("udf_insert_size_bp")
+        "insert_size": str(test_values.get("udf_insert_size_bp"))
         }]
 
 
