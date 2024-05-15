@@ -7,8 +7,7 @@ This is a Python project that allows parsing of metadata associated with sequenc
 
 ## Prerequisites
 
-- Python 3.7 or greater
-- [xsdata](https://xsdata.readthedocs.io/en/latest/)
+- Python >= 3.8
 
 ## Installation
 Clone the repo to your local machine and deploy the code
@@ -77,11 +76,11 @@ Commands:
   json
 ```
 Here, `RUNFOLDER_PATH` is the path to the sequencing runfolder for which metadata should be exported.
-Some test data are available under `tests/resources` and extracting metadata to json can be accomplished by:
+Some test data are available under `tests/resources/export` and extracting metadata to json can be accomplished by:
 ```
 $ snpseq_metadata extract runfolder \
   -o /tmp/ \
-  tests/resources/210415_A00001_0123_BXYZ321XY
+  tests/resources/export/210415_A00001_0123_BXYZ321XY
   json
 ```
 This will parse the runfolder into the python NGI models and serialize the models to json, saved under the specified
@@ -108,11 +107,11 @@ Commands:
 ```
 Here, `SNPSEQ_DATA_FILE` is the path to a json-file containing metadata for a flowcell obtained from the
 [snpseq_data](https://gitlab.snpseq.medsci.uu.se/shared/snpseq-data) service. Some test data are available under
-`tests/resources` and extracting metadata to json can be accomplished by:
+`tests/resources/export` and extracting metadata to json can be accomplished by:
 ```
 $ snpseq_metadata extract snpseq-data \
   -o /tmp/ \
-  tests/resources/snpseq_data_XYZ321XY.json
+  tests/resources/export/snpseq_data_XYZ321XY.json
   json
 ```
 This will parse the metadata into the python NGI models and serialize the models to json, saved under the specified
@@ -145,26 +144,29 @@ Here, `RUNFOLDER_DATA` is the path to a json file with serialized NGI runfolder 
 `extract runfolder` subcommand above), for which metadata should be exported and `SNPSEQ_DATA` is the path to a
 json-file with serialized NGI experiment metadata (created with the `extract snpseq-data` subcommand above).
 
-Some test data are available under `tests/resources` and exporting metadata compatible with the SRA XML submission
-format and also to a human-friendly manifest (compatible with SRA submissions) can be accomplished by:
+Some test data are available under `tests/resources/export` and exporting metadata compatible with the SRA XML submission
+format and also to a human-friendly manifest or tsv format can be accomplished by:
 
 ```
 $ snpseq_metadata export \
   -o /tmp/ \
-  tests/resources/210415_A00001_0123_BXYZ321XY.ngi.json \
-  tests/resources/snpseq_data_XYZ321XY.ngi.json \
-  xml manifest
+  tests/resources/export/210415_A00001_0123_BXYZ321XY.ngi.json \
+  tests/resources/export/snpseq_data_XYZ321XY.ngi.json \
+  xml manifest tsv
 ```
-For each unique project, this will export a pair of XML-files representing metadata for the RUN and EXPERIMENT objects
-and one manifest file for each unique experiment. For the test data set, the command above will create:
+For each unique project, this will export one TSV file, a pair of XML-files representing metadata for the RUN and 
+EXPERIMENT objects and one manifest file for each unique experiment. For the test data set, the command above will create:
 ```
 /tmp/
 ├── AB-1234-experiment.xml
 ├── AB-1234-run.xml
+├── AB-1234.metadata.ena.tsv
 ├── CD-5678-experiment.xml
 ├── CD-5678-run.xml
+├── Project_CD-5678.metadata.ena.tsv
 ├── EF-9012-experiment.xml
 ├── EF-9012-run.xml
+├── EF-9012.metadata.ena.tsv
 ├── AB-1234-Sample_AB-1234-SampleA-1-NovaSeq.manifest
 ├── AB-1234-Sample_AB-1234-SampleA-2-NovaSeq.manifest
 ├── AB-1234-Sample_AB-1234-SampleB-NovaSeq.manifest
@@ -173,7 +175,7 @@ and one manifest file for each unique experiment. For the test data set, the com
 └── CD-5678-CD-5678-SampleB-NovaSeq.manifest
 ```
 ## Test data
-As mentioned above, test data is available under `tests/resources` and the package include a pytest suite.
+As mentioned above, test data is available under `tests/resources/export` and the package include a pytest suite.
 If not already installed, first install the test dependencies:
 ```
 source .venv/bin/activate
@@ -197,13 +199,14 @@ against the corresponding schema:
 bash tests/validate_test_data.sh $(pwd) /tmp/test_output
 ```
 ## Package structure
-The code is built around the concept of having a set of classes represent metadata and provide internal logic,
-functionality for serializing and de-serializing etc. Such a set of classes can then represent metadata from a specific
-source (e.g. LIMS, NGI, SRA) and are collected as a separate module under `snpseq_metadata/models/[source]_models`.
+The code is built around the concept of having a set of models that represent metadata and provide internal logic,
+functionality for serializing and de-serializing etc. Such a model can then represent metadata from a specific
+source (e.g. LIMS, NGI, SRA) and the class files are collected as a separate module under 
+`snpseq_metadata/models/[source]_models`.
 
 A conversion layer that provide functionality to convert between metadata models is provided in
-`snpseq_metadata/models/converter.py`, with the help of library mappings from NGI to SRA terminologies in
-`snpseq_metadata/models/ngi_to_sra_library_mapping.py`.
+`snpseq_metadata/models/converter.py`, with the help of mapping utilities for translating e.g. NGI to SRA library 
+terminologies in `snpseq_metadata/models/ngi_to_sra_library_mapping.py`.
 
 ### ENA/SRA XML schema
 [ENA/SRA](https://www.ebi.ac.uk/ena/browser/home) provide 
@@ -227,43 +230,50 @@ $ cd snpseq_metadata/models && \
 ```
 
 ### NGI to SRA library mapping
-The SRA model have a terminology for
+The SRA model has a terminology for
 [Library selection](https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#permitted-values-for-library-selection),
 [Library source](https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#permitted-values-for-library-source) and
 [Library strategy](https://ena-docs.readthedocs.io/en/latest/submit/reads/webin-cli.html#permitted-values-for-library-strategy) that
-is not directly translatable from the fields stored in e.g. Clarity LIMS. Therefore, the file
-`snpseq_metadata/models/ngi_to_sra_library_mapping.py` contains functionality for mapping the NGI terminology to the SRA
-terminology.
+is not directly translatable from the fields stored in e.g. Clarity LIMS. 
 
-To add a new mapping for a application, sample type and sample prep kit, create a class that is a subclass of
-`ApplicationSampleTypeMapping` and has class variables
+Therefore, the information stored in Clarity LIMS have to be mapped to the corresponding SRA/ENA terms. This is done by
+representing the information by the different models and following defined logic to convert from one model to the next
+according to:
 ```
-ngi_application
-ngi_sample_type
-ngi_sample_prep_kit
+Clarity LIMS extract -> lims_models -> ngi_models -> sra_models -> export SRA/ENA terms
 ```
-containing the possible values (in lower case) stored in Clarity LIMS. Use the class variables
-```
-sra_library_strategy
-sra_library_source
-sra_library_source
-```
-to specify the corresponding SRA values.
-Here is an example for bisulfite sequencing libraries:
-```
-class Bisulphite(ApplicationSampleTypeMapping):
-    """
-    Bisulphite sequencing
-    """
 
-    ngi_application = "epigenetics"
-    ngi_sample_type = "gdna"
-    ngi_sample_prep_kit = ["splat", "nebnext enzymatic methyl-seq kit"]
+Each model represents the library construction information in e.g. 
+`snpseq_metadata/models/[source]_models/library_design.py` and contains logic to create corresponding class instances.
+The file `snpseq_metadata/models/ngi_to_sra_mapping.py` contains the logic for mapping the NGI library model to the 
+SRA model representation.
 
-    sra_library_strategy = TypeLibraryStrategy.BISULFITE_SEQ
-    sra_library_source = TypeLibrarySource.GENOMIC
-    sra_library_selection = TypeLibrarySelection.RANDOM
+As an example, consider the representations for mRNA sequencing libraries. The SRA model represents this library type 
+with the class `RNASeq.MRNA`. This class defines the corresponding SRA/ENA terminology that should be used for 
+submissions. In this case:
+- library_source: `TRANSCRIPTOMIC`
+- library_strategy: `RNA-Seq`
+- library_selection: `POLY_A` 
 
-```
-The `ApplicationSampleTypeMapping` class contains logic for finding the
-correct mapping from a NGI model. If needed, this logic can be overridden in the subclass.
+In `snpseq_metadata/models/ngi_to_sra_mapping.py`, it is specified that the NGI model 
+representation that maps to this class is the combination of:
+- `NGISourceClasses.RNA.TOTAL` or `NGISourceClasses.RNA.DEPLETED` or `NGISource`
+- `NGIApplicationClasses.RNASEQ`
+- `NGILibraryKitClasses.TRANSCRIPTOMIC.MRNA` 
+
+In the declaration of each of these classes, it is defined what Clarity terms they correspond to. 
+For example:
+- `NGISourceClasses.RNA.TOTAL`: `total RNA`
+- `NGIApplicationClasses.RNASEQ`: `rna-seq`
+- `NGILibraryKitClasses.TRANSCRIPTOMIC.MRNA`: `truseq stranded mrna sample preparation kit` or 
+`truseq stranded mrna sample preparation kit ht`
+
+Finally, in `lims_models/library_design.py`, it's declared what Clarity LIMS UDFs and values are mapped to which 
+`lims_models` classes:
+- `LIMSApplicationClasses.RNASEQ`: `udf_application`
+  - `rna-seq`
+- `LIMSSampleType.RNA.TOTAL`: `udf_sample_type`
+  - `total RNA`
+- `LIMSLibraryKit.TRANSCRIPTOMIC.MRNA`: `udf_library_preparation_kit`
+  - `truseq stranded mrna sample preparation kit`
+  - `truseq stranded mrna sample preparation kit ht`
