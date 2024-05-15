@@ -70,6 +70,10 @@ class SRAModelConversionException(ModelConversionException):
 
 
 def catch_exception(f):
+    """
+    decorator function that will catch Exceptions raised by the decorated method, log the exception
+    and raise a customized exception
+    """
     @wraps(f)
     def wrapper(*args, **kwargs):
         try:
@@ -125,9 +129,12 @@ class Converter:
         iterate over subclasses to locate a subclass whose ngi_model_class matches the supplied
         ngi_model.
 
-        :param ngi_model: an instance of NGIMetadataModel or any of its subclasses
-        :return: an instance of a subclass of SRAMetadataModel, corresponding to the supplied
-        ngi_model or None if no matching conversion could be made
+        Args:
+            ngi_model: an instance of NGIMetadataModel or any of its subclasses
+
+        Returns:
+            an instance of a subclass of SRAMetadataModel, corresponding to the supplied
+            ngi_model or None if no matching conversion could be made
         """
         # iterate over all subclasses to find one whose ngi_nodel_class variable matches the
         # supplied ngi_model, but only if this is called in the base class
@@ -153,9 +160,13 @@ class Converter:
         will iterate over subclasses to locate a subclass whose lims_model_class matches the
         supplied lims_model.
 
-        :param lims_model: an instance of LIMSMetadataModel or any of its subclasses
-        :return: an instance of a subclass of NGIMetadataModel, corresponding to the supplied
-        lims_model or None if no matching conversion could be made
+        Args:
+            lims_model: an instance of LIMSMetadataModel or any of its subclasses
+
+        Returns:
+            an instance of a subclass of NGIMetadataModel, corresponding to the supplied
+            lims_model or None if no matching conversion could be made
+
         """
         # iterate over all subclasses to find one whose lims_nodel_class variable matches the
         # supplied lims_model, but only if this is called in the base class
@@ -432,15 +443,6 @@ class ConvertExperimentRef(Converter):
         if lims_model:
             sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
             project = ConvertStudyRef.lims_to_ngi(lims_model=lims_model)
-            platform = ConvertSequencingPlatform.lims_to_ngi(lims_model=lims_model)
-            # this alias should ideally be the same regardless if it's created from the LIMS
-            # object or from the NGI object. Currently, it's not straightforward since there's not
-            # enough specific information
-            #alias = f"{project.project_id}-" \
-            #        f"{sample.sample_name}-" \
-            #        f"{sample.sample_library_id}-" \
-            #        f"{sample.sample_library_tag}-" \
-            #        f"{platform.model_name}"
             alias = lims_model.udf_sample_library_id
             return cls.ngi_model_class(
                 alias=alias,
@@ -544,12 +546,13 @@ class ConvertLibrary(Converter):
         cls: Type[T], ngi_model: ngi_model_class
     ) -> Optional[sra_model_class]:
         if ngi_model:
+            # use the ngi_to_sra_mapping.ModelMapper to map the NGI library to the corresponding
+            # SRA library
             sra_library_design = ModelMapper.map_library(
                 source=ngi_model.sample_type,
                 application=ngi_model.application,
                 library_kit=ngi_model.library_kit,
             )
-
             return cls.sra_model_class.create_object(
                 sample=Converter.ngi_to_sra(ngi_model.sample),
                 description=ngi_model.description,
@@ -567,6 +570,9 @@ class ConvertLibrary(Converter):
     ) -> Optional[ngi_model_class]:
         if lims_model:
             sample = ConvertSampleDescriptor.lims_to_ngi(lims_model=lims_model)
+
+            # use the logic defined in ngi_models.library_design.NGIObject to match the Clarity
+            # LIMS UDF values to the corresponding NGI model object
             application = NGIApplication.match(
                 str(lims_model.udf_application)
             )

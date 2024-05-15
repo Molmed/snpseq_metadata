@@ -13,6 +13,7 @@ class SRAMetadataModel(MetadataModel):
     model_object_meta_class: ClassVar[Optional[Type]] = None
     model_object_parent_field: ClassVar[Optional[Tuple[Type, str]]] = None
 
+    # the SRA/ENV TSV fields supplied by NBIS to use for export
     sra_tsv_fields: ClassVar[List[str]] = [
         "study",
         "sample",

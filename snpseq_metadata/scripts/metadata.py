@@ -20,16 +20,19 @@ def common_options(function):
     return function
 
 
+# snpseq_metadata ...
 @click.group()
 def metadata():
     pass
 
 
+# snpseq_metadata extract ...
 @click.group()
 def extract():
     pass
 
 
+# snpseq_metadata extract runfolder ...
 @click.group(chain=True)
 @common_options
 @click.argument("runfolder_path", nargs=1, type=click.Path(exists=True, dir_okay=True))
@@ -37,6 +40,7 @@ def runfolder(outdir, runfolder_path):
     pass
 
 
+# snpseq_metadata extract snpseq_data ...
 @click.group(chain=True)
 @common_options
 @click.argument(
@@ -48,6 +52,7 @@ def snpseq_data(outdir, snpseq_data_file):
 
 @runfolder.result_callback()
 def extract_runfolder(processors, outdir, runfolder_path):
+    # create NGI objects by parsing the supplied runfolder path and save to file
     ngi_flowcell = NGIFlowcell(runfolder_path=runfolder_path)
     outfile_prefix = os.path.join(outdir, ngi_flowcell.runfolder_name)
     for processor in processors:
@@ -57,7 +62,11 @@ def extract_runfolder(processors, outdir, runfolder_path):
 @snpseq_data.result_callback()
 def extract_snpseq_data(processors, outdir, snpseq_data_file):
     with open(snpseq_data_file, "rb") as fh:
+        # create LIMS objects from the supplied JSON file
+        # (extracted from Clarity by snpseq_data service)
         lims_experiments = LIMSSequencingContainer.from_json(json.load(fh))
+
+        # convert the LIMS objects to NGI objects and save to file
         ngi_experiments = ConvertExperimentSet.lims_to_ngi(lims_model=lims_experiments)
     outfile_prefix = os.path.join(
         outdir, ".".join(os.path.basename(snpseq_data_file).split(".")[0:-1])
@@ -66,6 +75,7 @@ def extract_snpseq_data(processors, outdir, snpseq_data_file):
         processor(ngi_experiments, outfile_prefix)
 
 
+# snpseq_metadata extract ... json
 @click.command("json")
 def extract_to_json():
     def processor(ngi_object, outfile_prefix):
@@ -76,6 +86,7 @@ def extract_to_json():
     return processor
 
 
+# snpseq_metadata export ...
 @click.group(chain=True)
 @common_options
 @click.argument("runfolder_data", nargs=1, type=click.File("rb"))
@@ -86,13 +97,25 @@ def export(outdir, runfolder_data, snpseq_data):
 
 @export.result_callback()
 def export_pipeline(processors, outdir, runfolder_data, snpseq_data):
+    # create NGI objects from the supplied JSON files
     ngi_flowcell = NGIFlowcell.from_json(json_obj=json.load(runfolder_data))
     ngi_experiments = NGIExperimentSet.from_json(json_obj=json.load(snpseq_data))
+
+    # convert the NGI objects to SRA objects for export
     sra_run_set = Converter.ngi_to_sra(ngi_model=ngi_flowcell)
     sra_experiment_set = Converter.ngi_to_sra(ngi_experiments)
 
-    projects = list(set(map(lambda exp: exp.study_ref, sra_experiment_set.experiments)))
+    projects = list(
+        set(
+            map(
+                lambda exp: exp.study_ref,
+                sra_experiment_set.experiments
+            )
+        )
+    )
     for project in projects:
+        # restrict the experiment_set and run_set to only include the objects corresponding to the
+        # project. Will also match up the corresponding run and experiment objects
         project_experiment_set = sra_experiment_set.restrict_to_study(
             study_ref=project
         )
@@ -103,6 +126,7 @@ def export_pipeline(processors, outdir, runfolder_data, snpseq_data):
             processor(str(project), project_experiment_set, project_run_set, outdir)
 
 
+# snpseq_metadata export ... xml
 @click.command("xml")
 def to_xml():
     def processor(project_id, experiment_set, run_set, outdir):
@@ -114,6 +138,7 @@ def to_xml():
     return processor
 
 
+# snpseq_metadata export ... json
 @click.command("json")
 def to_json():
     def processor(project_id, experiment_set, run_set, outdir):
@@ -125,6 +150,7 @@ def to_json():
     return processor
 
 
+# snpseq_metadata export ... manifest
 @click.command("manifest")
 def to_manifest():
     def processor(project_id, experiment_set, run_set, outdir):
@@ -140,6 +166,7 @@ def to_manifest():
     return processor
 
 
+# snpseq_metadata export ... tsv
 @click.command("tsv")
 def to_tsv():
     def processor(project_id, experiment_set, run_set, outdir):

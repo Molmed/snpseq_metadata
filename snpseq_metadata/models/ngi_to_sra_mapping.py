@@ -184,6 +184,20 @@ class ModelMapper:
             application: NGIApplication,
             library_kit: NGILibraryKit,
     ) -> SRAObject:
+        """
+        Map a combination of NGISource, NGIApplication and NGILibraryKit objects to the
+        corresponding SRAObject as specified in the ModelMapper.library_mapping list
+
+        Args:
+            source: a NGISource object
+            application: a NGIApplication object
+            library_kit: a NGILibraryKit object
+
+        Returns:
+            a SRAObject corresponding to the combination of input objects or None if no match was
+            found
+
+        """
         for mapping in cls.library_mapping:
             if cls.is_match((
                     source,
@@ -207,6 +221,18 @@ class ModelMapper:
             List[Type[NGILibraryKit]]
         ],
     ) -> bool:
+        """
+        compares a 3-element tuple of objects to a 3-element tuple of lists of object types
+
+        Args:
+            query: a tuple of (NGISource, NGIApplication, NGILibraryKit) objects
+            mapping: a tuple of ([Type[NGISource]], [Type[NGIApplication]], [Type[NGILibraryKit]])
+
+        Returns:
+           True if each of the query objects' type is in the corresponding list of object types
+           False otherwise
+
+        """
         return all(
             [
                 any(
