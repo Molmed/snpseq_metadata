@@ -1,5 +1,8 @@
-from typing import ClassVar, List, Optional, TypeVar, Type, Tuple, Union, Dict
 import datetime
+
+from operator import attrgetter
+from typing import ClassVar, List, Optional, TypeVar, Type, Tuple, Union, Dict
+
 from xsdata.models.datatype import XmlDateTime
 
 from snpseq_metadata.models.sra_models.attribute import SRAAttribute
@@ -22,9 +25,13 @@ class SRARun(SRAMetadataModel):
             return attr
         if item == "fastqfiles":
             attr = getattr(self.model_object, "data_block")
-            return [
-                SRAFastqFile.from_model_object(model_object=file_model)
-                for file_model in attr.files.file]
+            return sorted(
+                [
+                    SRAFastqFile.from_model_object(model_object=file_model)
+                    for file_model in attr.files.file
+                ],
+                key=attrgetter("filename")
+            )
         if item in ["experiment", "experiment_ref"]:
             attr = getattr(self.model_object, "experiment_ref")
             return SRAExperimentRef.from_model_object(model_object=attr) \
