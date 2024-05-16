@@ -1,4 +1,4 @@
-from typing import ClassVar, List, Type, TypeVar, Optional, Tuple, Union
+from typing import ClassVar, List, Type, TypeVar, Optional, Tuple, Union, Dict
 
 from snpseq_metadata.models.sra_models.sequencing_platform import (
     SRASequencingPlatform,
@@ -104,6 +104,16 @@ class SRAExperiment(SRAExperimentBase):
     def get_reference(self) -> SRAExperimentRef:
         return SRAExperimentRef.create_object(experiment_name=self.alias)
 
+    def to_tsv(self) -> List[Dict[str, str]]:
+        tsv_dict = {
+            "library_name": self.alias
+        }
+        for obj in self.project, self.platform, self.library:
+            for obj_dict in obj.to_tsv():
+                tsv_dict.update(obj_dict)
+
+        return [tsv_dict]
+
 
 class SRAExperimentSet(SRAMetadataModel):
     model_object_class: ClassVar[Type] = XSDExperimentSet
@@ -138,3 +148,9 @@ class SRAExperimentSet(SRAMetadataModel):
             filter(lambda exp: study_ref == exp.study_ref, self.experiments)
         )
         return self.create_object(experiments=experiments)
+
+    def to_tsv(self) -> List[Dict[str, str]]:
+        tsv_list = []
+        for experiment in self.experiments:
+            tsv_list += experiment.to_tsv()
+        return tsv_list

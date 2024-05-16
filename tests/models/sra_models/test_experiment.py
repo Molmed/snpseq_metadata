@@ -57,6 +57,9 @@ class TestSRAExperiment:
     def test_to_manifest(self, sra_experiment_obj, sra_experiment_manifest):
         assert sra_experiment_obj.to_manifest() == sra_experiment_manifest
 
+    def test_to_tsv(self, sra_experiment_obj, sra_experiment_tsv):
+        assert sra_experiment_obj.to_tsv() == sra_experiment_tsv
+
     def test_to_xml(self, sra_experiment_obj, sra_experiment_xml):
         assert sra_experiment_obj.to_xml(xml_declaration=False).split() == \
                sra_experiment_xml.split()
@@ -85,6 +88,9 @@ class TestSRAExperimentSet:
 
     def test_to_manifest(self, sra_experiment_set_obj, sra_experiment_set_manifest):
         assert sra_experiment_set_obj.to_manifest() == sra_experiment_set_manifest
+
+    def test_to_tsv(self, sra_experiment_set_obj, sra_experiment_set_tsv):
+        assert sra_experiment_set_obj.to_tsv() == sra_experiment_set_tsv
 
     def test_to_xml(self, sra_experiment_set_obj, sra_experiment_set_xml):
         observed_xml = ignore_xml_namespace_attributes(

@@ -23,6 +23,9 @@ class TestSRAResultFile:
     def test_to_manifest(self, sra_result_file_obj, sra_result_file_manifest):
         assert sra_result_file_obj.to_manifest() == sra_result_file_manifest
 
+    def test_to_tsv(self, sra_result_file_obj, sra_result_file_tsv):
+        assert sra_result_file_obj.to_tsv() == sra_result_file_tsv
+
     def test___getattr__(self, sra_result_file_obj, sra_result_file_json):
         assert sra_result_file_obj.filename == sra_result_file_json["filename"]
         assert sra_result_file_obj.checksum == sra_result_file_json["checksum"]

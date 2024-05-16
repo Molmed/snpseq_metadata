@@ -39,6 +39,15 @@ class SRALibraryLayout(SRAMetadataModel):
         self.fragment_upper = fragment_upper
         self.fragment_lower = fragment_lower
 
+    def __getattr__(self, item: str) -> Union[None, str, int]:
+        attr = super().__getattr__(item)
+        if attr:
+            return attr
+        if item in ["insert_size", "target_insert_size"]:
+            p = getattr(self.model_object, "paired")
+            if p:
+                return p.nominal_length
+
     @classmethod
     def create_object(
         cls: Type[T],
@@ -67,6 +76,13 @@ class SRALibraryLayout(SRAMetadataModel):
 
     def to_manifest(self) -> List[Tuple[str, str]]:
         return []
+
+    def to_tsv(self) -> List[Dict[str, str]]:
+        return [
+            {
+                "insert_size": str(self.target_insert_size or "")
+            }
+        ]
 
 
 class SRALibrary(SRAMetadataModel):
@@ -112,12 +128,14 @@ class SRALibrary(SRAMetadataModel):
         source: str,
         selection: str,
         layout: SRALibraryLayout,
+        library_protocol: Optional[str] = None,
     ) -> T:
         xsdlibrary = LibraryDescriptorType(
             library_layout=layout.model_object,
             library_source=cls.object_from_source(source=source),
             library_selection=cls.object_from_selection(selection=selection),
             library_strategy=cls.object_from_strategy(strategy=strategy),
+            library_construction_protocol=library_protocol,
         )
         model_object = LibraryType(
             design_description=description,
@@ -151,9 +169,34 @@ class SRALibrary(SRAMetadataModel):
         attr = super().__getattr__(item)
         if attr:
             return attr
-        if item in ("library_source", "library_selection", "library_strategy", "library_layout"):
-            library_descriptor = getattr(self.model_object, "library_descriptor")
+        if item in (
+                "library_source",
+                "library_selection",
+                "library_strategy",
+                "library_layout",
+                "library_construction_protocol",
+                "insert_size",
+        ):
+            library_descriptor = getattr(
+                self.model_object,
+                "library_descriptor"
+            )
+            if item == "insert_size":
+                return str(
+                    getattr(
+                        SRALibraryLayout.from_model_object(
+                            getattr(
+                                library_descriptor,
+                                "library_layout"
+                            )
+                        ),
+                        item
+                    ) or ""
+                )
+
             attr = getattr(library_descriptor, item)
+            if item == "library_construction_protocol":
+                return attr
             if item == "library_layout":
                 field = next(filter(lambda x: getattr(attr, x.name), dataclasses.fields(attr)))
                 return field.metadata["name"]
@@ -161,4 +204,21 @@ class SRALibrary(SRAMetadataModel):
         if item == "sample":
             attr = getattr(self.model_object, "sample_descriptor")
             return SRASampleDescriptor.from_model_object(attr)
+        if item == "description":
+            return self.design_description
 
+    def to_tsv(self) -> List[Dict[str, str]]:
+        tsv_dict = {
+            "design_description": self.description or "",
+        }
+        for attr in "library_source", \
+                    "library_selection", \
+                    "library_strategy", \
+                    "library_layout", \
+                    "library_construction_protocol", \
+                    "insert_size":
+            tsv_dict[attr] = self.__getattr__(attr) or ""
+        tsv_dict.update(
+            self.sample.to_tsv()[0]
+        )
+        return [tsv_dict]

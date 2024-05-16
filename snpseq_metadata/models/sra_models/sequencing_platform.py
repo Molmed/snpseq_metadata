@@ -1,5 +1,5 @@
 import dataclasses
-from typing import ClassVar, Optional, Type, TypeVar, List, Tuple
+from typing import ClassVar, Optional, Type, TypeVar, List, Tuple, Dict
 
 from snpseq_metadata.models.xsdata import PlatformType, TypeIlluminaModel
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
@@ -41,6 +41,13 @@ class SRASequencingPlatform(SRAMetadataModel):
 
     def to_manifest(self) -> List[Tuple[str, str]]:
         raise NotImplementedError
+
+    def to_tsv(self) -> List[Dict[str, str]]:
+        return [
+            {
+                "instrument_model": self.instrument_model
+            }
+        ]
 
 
 class SRAIlluminaSequencingPlatform(SRASequencingPlatform):

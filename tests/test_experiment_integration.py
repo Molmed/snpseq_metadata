@@ -6,6 +6,7 @@ from snpseq_metadata.models.sra_models import SRAExperimentSet
 from snpseq_metadata.models.converter import Converter, ConvertExperimentSet
 
 from tests.models.conftest import ignore_xml_namespace_attributes
+from tests.test_runfolder_integration import sra_run_set_from_ngi_flowcell, ngi_flowcell_from_disk
 
 
 @pytest.fixture
@@ -66,7 +67,9 @@ class TestLIMSSequencingContainer:
 
             for udf_name in sample.keys():
                 if udf_name not in ["project", "name"]:
-                    assert getattr(lims_experiment_set_sample, udf_name) == sample[udf_name]
+                    assert \
+                        str(getattr(lims_experiment_set_sample, udf_name)) == \
+                        str(sample[udf_name])
 
     def test_lims_experiment_set_to_json(
         self, lims_experiment_set_from_disk, experiment_set_lims_json
@@ -118,3 +121,44 @@ class TestSRAExperimentSet:
         self, sra_experiment_set_from_ngi, sra_experiment_set_manifest
     ):
         assert sra_experiment_set_from_ngi.to_manifest() == sra_experiment_set_manifest
+
+    def test_to_tsv(self, sra_experiment_set_from_ngi):
+        sra_experiment_set_from_ngi.to_tsv()
+
+
+class TestSRAExperimentSetRunSetLink:
+
+    def test_to_tsv(
+            self,
+            sra_experiment_set_from_ngi,
+            sra_run_set_from_ngi_flowcell,
+            experiment_sra_tsv
+    ):
+
+        projects = list(
+            set(
+                map(
+                    lambda exp: exp.study_ref,
+                    sra_experiment_set_from_ngi.experiments
+                )
+            )
+        )
+        for project in projects:
+            project_tsv_list = []
+            project_experiment_set = sra_experiment_set_from_ngi.restrict_to_study(
+                study_ref=project
+            )
+            project_run_set = sra_run_set_from_ngi_flowcell.restrict_to_experiments(
+                experiments=project_experiment_set
+            )
+            for project_run in project_run_set.runs:
+                run_tsv_list = project_run.to_tsv()
+                experiment_tsv_list = project_run.experiment.to_tsv()
+                for exp_tsv in experiment_tsv_list:
+                    for run_tsv in run_tsv_list or [{}]:
+                        exp_t = exp_tsv.copy()
+                        exp_t.update(run_tsv)
+                        project_tsv_list.append(exp_t)
+
+            if project_run_set.runs:
+                assert project_tsv_list == experiment_sra_tsv[str(project)]

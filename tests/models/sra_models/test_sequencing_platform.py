@@ -27,6 +27,9 @@ class TestSRAIlluminaSequencingPlatform:
         assert sra_sequencing_platform_obj.to_xml(xml_declaration=False).split() == \
                sra_sequencing_platform_xml.split()
 
+    def test_to_tsv(self, sra_sequencing_platform_obj, sra_sequencing_platform_tsv):
+        assert sra_sequencing_platform_obj.to_tsv() == sra_sequencing_platform_tsv
+
     def test_create_object(
         self,
         sra_sequencing_platform_obj,

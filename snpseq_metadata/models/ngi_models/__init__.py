@@ -24,3 +24,8 @@ from snpseq_metadata.models.ngi_models.sequencing_platform import (
 from snpseq_metadata.models.ngi_models.sequencing_run import NGIRun
 from snpseq_metadata.models.ngi_models.sample import NGISampleDescriptor
 from snpseq_metadata.models.ngi_models.study import NGIStudyRef
+from snpseq_metadata.models.ngi_models.library_design import (
+    NGISource,
+    NGIApplication,
+    NGILibraryKit,
+)

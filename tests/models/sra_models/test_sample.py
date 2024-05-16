@@ -9,6 +9,9 @@ class TestSRASampleDescriptor:
     def test_to_json(self, sra_sample_obj, sra_sample_json):
         assert sra_sample_obj.to_json() == sra_sample_json
 
+    def test_to_tsv(self, sra_sample_obj, sra_sample_tsv):
+        assert sra_sample_obj.to_tsv() == sra_sample_tsv
+
     def test_to_manifest(self, sra_sample_obj, sra_sample_manifest):
         assert sra_sample_obj.to_manifest() == sra_sample_manifest
 

@@ -1,5 +1,8 @@
-from typing import ClassVar, List, Optional, TypeVar, Type, Tuple, Union
 import datetime
+
+from operator import attrgetter
+from typing import ClassVar, List, Optional, TypeVar, Type, Tuple, Union, Dict
+
 from xsdata.models.datatype import XmlDateTime
 
 from snpseq_metadata.models.sra_models.attribute import SRAAttribute
@@ -22,9 +25,13 @@ class SRARun(SRAMetadataModel):
             return attr
         if item == "fastqfiles":
             attr = getattr(self.model_object, "data_block")
-            return [
-                SRAFastqFile.from_model_object(model_object=file_model)
-                for file_model in attr.files.file]
+            return sorted(
+                [
+                    SRAFastqFile.from_model_object(model_object=file_model)
+                    for file_model in attr.files.file
+                ],
+                key=attrgetter("filename")
+            )
         if item in ["experiment", "experiment_ref"]:
             attr = getattr(self.model_object, "experiment_ref")
             return SRAExperimentRef.from_model_object(model_object=attr) \
@@ -80,3 +87,17 @@ class SRARun(SRAMetadataModel):
         for run_attribute in self.run_attributes or []:
             if run_attribute.tag == "sample_id":
                 return run_attribute.value == sample_id
+
+    def to_tsv(self) -> List[Dict[str, str]]:
+        # this should return multiple dicts if more than one forward-reverse file pair
+        tsv = []
+        tsv_dict = {}
+        for fastqfile in self.fastqfiles:
+            t = fastqfile.to_tsv()[0]
+            # if header entries have already been seen, add a new dict for values
+            if all(map(lambda k: k in tsv_dict.keys(), t.keys())):
+                tsv.append(tsv_dict)
+                tsv_dict = {}
+            tsv_dict.update(t)
+        tsv.append(tsv_dict)
+        return tsv

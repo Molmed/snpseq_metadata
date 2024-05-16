@@ -1,4 +1,4 @@
-from typing import ClassVar, Optional, Type, TypeVar, List, Tuple
+from typing import ClassVar, Optional, Type, TypeVar, List, Tuple, Dict
 
 from snpseq_metadata.models.sra_models.metadata_model import SRAMetadataModel
 from snpseq_metadata.models.xsdata import Experiment, RefObjectType
@@ -18,6 +18,13 @@ class SRAStudyRef(SRAMetadataModel):
 
     def to_manifest(self) -> List[Tuple[str, str]]:
         return [("STUDY", self.refname)]
+
+    def to_tsv(self) -> List[Dict[str, str]]:
+        return [
+            {
+                "study": self.refname
+            }
+        ]
 
     def __str__(self) -> str:
         return self.refname

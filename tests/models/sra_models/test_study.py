@@ -16,6 +16,9 @@ class TestSRAStudyRef:
         assert sra_study_obj.to_xml(xml_declaration=False).split() == \
                sra_study_xml.split()
 
+    def test_to_tsv(self, sra_study_obj, sra_study_tsv):
+        assert sra_study_obj.to_tsv() == sra_study_tsv
+
     def test___getattr__(self, sra_study_obj, sra_study_json):
         assert sra_study_obj.refname == sra_study_json["refname"]
 

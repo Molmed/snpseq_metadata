@@ -217,17 +217,6 @@ class TestConvertLibrary:
             if attr not in skip_attributes:
                 assert getattr(library, attr) == getattr(ngi_library_obj, attr)
 
-    def test_objects_from_application_info(self, test_values):
-        assert ConvertLibrary.objects_from_application_info(
-            application=test_values["experiment_application"],
-            sample_type=test_values["experiment_sample_type"],
-            library_kit=test_values["experiment_library_kit"],
-        ) == (
-            test_values["experiment_library_selection_value"],
-            test_values["experiment_sample_source"],
-            test_values["experiment_library_strategy_value"],
-        )
-
 
 class TestConvertExperiment:
     def test_ngi_to_sra(self, ngi_experiment_obj, sra_experiment_obj):

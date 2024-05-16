@@ -41,8 +41,8 @@ experiment_library_strategy_key,OTHER
 experiment_library_strategy_value,OTHER
 experiment_sample_type,serum
 experiment_sample_source,OTHER
-experiment_library_selection_key,UNSPECIFIED
-experiment_library_selection_value,unspecified
+experiment_library_selection_key,PADLOCK_PROBES_CAPTURE_METHOD
+experiment_library_selection_value,padlock probes capture method
 experiment_library_kit,olink explore 1536
 
 index_i7,CGTGTCCA

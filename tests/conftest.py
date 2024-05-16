@@ -5,6 +5,7 @@ import os
 import pytest
 import shutil
 import subprocess
+import csv
 
 
 def pytest_sessionstart(session):
@@ -46,6 +47,44 @@ def parse_xml(xml_file):
         return "".join([line for line in fh])
 
 
+def parse_tsv(tsv_file):
+
+    def _parse_int(s):
+        try:
+            return int(s)
+        except ValueError:
+            return s
+
+    tsv_list = []
+    with open(tsv_file, "r") as fh:
+        # read the first line
+        reader = csv.reader(
+            fh,
+            dialect=csv.excel_tab,
+            quoting=csv.QUOTE_MINIMAL,
+        )
+        first_line = next(reader)
+
+        # read the remaining lines, including the header using a DictReader
+        reader = csv.DictReader(
+            fh,
+            restkey=None,
+            restval=None,
+            dialect=csv.excel_tab,
+            quoting=csv.QUOTE_MINIMAL,
+        )
+        for row in reader:
+            tsv_list.append(
+                {
+                    k: str(_parse_int(v))
+                    for k, v in row.items()
+                }
+            )
+            # add the FileType key-value from the first line
+            tsv_list[-1][first_line[0]] = first_line[1]
+        return tsv_list
+
+
 @pytest.fixture
 def test_resources_path():
     return os.path.join("tests", "resources", "export")
@@ -77,7 +116,7 @@ def run_data_csv(sample_data_path):
 
 @pytest.fixture
 def experiment_set_lims_json_file(test_resources_path):
-    return os.path.join(test_resources_path, "snpseq_data_XYZ321XY.snpseq.json")
+    return os.path.join(test_resources_path, "snpseq_data_XYZ321XY.json")
 
 
 @pytest.fixture
@@ -170,8 +209,8 @@ def experiment_set_ngi_json_file(experiment_set_lims_json_file):
     return os.path.join(
         os.path.dirname(experiment_set_lims_json_file),
         os.path.basename(experiment_set_lims_json_file).replace(
-            ".snpseq.",
-            ".ngi."
+            ".json",
+            ".ngi.json"
         )
     )
 
@@ -186,8 +225,8 @@ def experiment_set_sra_json_file(experiment_set_lims_json_file):
     return os.path.join(
         os.path.dirname(experiment_set_lims_json_file),
         os.path.basename(experiment_set_lims_json_file).replace(
-            ".snpseq.",
-            ".sra."
+            ".json",
+            ".sra.json"
         )
     )
 
@@ -211,6 +250,35 @@ def experiment_set_sra_xml_file(experiment_set_sra_json_file):
 @pytest.fixture
 def experiment_set_sra_xml(experiment_set_sra_xml_file):
     return parse_xml(experiment_set_sra_xml_file)
+
+
+@pytest.fixture
+def experiment_set_sra_tsv_files(test_resources_path, experiment_set_lims_json):
+    tsv_files = {}
+    projects = list(
+        set(
+            map(
+                lambda s: s.get("project", ""),
+                experiment_set_lims_json["result"]["samples"]
+            )
+        )
+    )
+    for tsv_file in filter(
+            lambda f: os.path.splitext(f)[1] == ".tsv",
+            os.listdir(test_resources_path)
+    ):
+        fproj = tsv_file.replace("snpseq_data_", "").replace(".sra.tsv", "")
+        project = next(filter(lambda p: fproj in p, projects))
+        tsv_files[project] = os.path.join(test_resources_path, tsv_file)
+    return tsv_files
+
+
+@pytest.fixture
+def experiment_sra_tsv(experiment_set_sra_tsv_files):
+    return {
+        experiment_alias: parse_tsv(tsv_file)
+        for experiment_alias, tsv_file in experiment_set_sra_tsv_files.items()
+    }
 
 
 @pytest.fixture

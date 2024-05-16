@@ -16,6 +16,9 @@ class TestSRARunSet:
     def test_to_json(self, sra_sequencing_run_set_obj, sra_sequencing_run_set_json):
         assert sra_sequencing_run_set_obj.to_json() == sra_sequencing_run_set_json
 
+    def test_to_tsv(self, sra_sequencing_run_set_obj, sra_sequencing_run_set_tsv):
+        assert sra_sequencing_run_set_obj.to_tsv() == sra_sequencing_run_set_tsv
+
     def test_to_manifest(
         self, sra_sequencing_run_set_obj, sra_sequencing_run_set_manifest
     ):

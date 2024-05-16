@@ -6,7 +6,6 @@ import re
 from snpseq_metadata.models.lims_models import *
 from snpseq_metadata.models.ngi_models import *
 from snpseq_metadata.models.sra_models import *
-
 from tests.resources.create_test_data import \
     SnpseqDataExperimentSetObj, \
     SRAExperimentSetObj, \
@@ -102,6 +101,27 @@ def test_values(snpseqdata_experiment_set, sra_experiment_set, sra_run_set):
 @pytest.fixture
 def run_date():
     return datetime.datetime(year=2021, month=8, day=9)
+
+
+@pytest.fixture
+def illumina_model_names():
+    return {
+        "HiSeq2500 High Output": "HiSeq2500",
+        "HiSeq2500 Rapid": "HiSeq2500",
+        "HiSeqX": "HiSeqX",
+        "MiSeq": "MiSeq",
+        "MiSeq Nano": "MiSeq",
+        "More than one type of sequencing instrument(FoU only)": None,
+        "NovaSeq S1": "NovaSeq",
+        "NovaSeq S2": "NovaSeq",
+        "NovaSeq S4": "NovaSeq",
+        "NovaSeq SP": "NovaSeq",
+        "NovaSeq X 10B": "NovaSeqX",
+        "NovaSeq X 25B": "NovaSeqX",
+        "iSeq": "iSeq",
+        "": None,
+        None: None,
+    }
 
 
 @pytest.fixture
@@ -302,11 +322,18 @@ def ngi_library_layout_obj(ngi_library_layout_json):
 def ngi_library_json(test_values, ngi_library_layout_json, ngi_sample_json):
     return {
         "description": test_values["library_description"],
-        "sample_type": test_values["experiment_sample_type"],
-        "application": test_values["experiment_application"],
-        "library_kit": test_values["experiment_library_kit"],
+        "sample_type": {
+            "description": test_values["experiment_sample_type"],
+        },
+        "application": {
+            "description": test_values["experiment_application"],
+        },
+        "library_kit": {
+            "description": test_values["experiment_library_kit"],
+        },
         "layout": ngi_library_layout_json,
         "sample": ngi_sample_json,
+        "library_protocol": test_values["experiment_library_kit"]
     }
 
 
@@ -315,10 +342,11 @@ def ngi_library_obj(ngi_sample_obj, ngi_library_layout_obj, ngi_library_json):
     return NGILibrary(
         sample=ngi_sample_obj,
         description=ngi_library_json["description"],
-        sample_type=ngi_library_json["sample_type"],
-        application=ngi_library_json["application"],
-        library_kit=ngi_library_json["library_kit"],
+        sample_type=NGISource.match(ngi_library_json["sample_type"]["description"]),
+        application=NGIApplication.match(ngi_library_json["application"]["description"]),
+        library_kit=NGILibraryKit.match(ngi_library_json["library_kit"]["description"]),
         layout=ngi_library_layout_obj,
+        library_protocol=ngi_library_json["library_protocol"],
     )
 
 
@@ -527,6 +555,22 @@ def sra_experiment_manifest(
 
 
 @pytest.fixture
+def sra_experiment_tsv(
+    sra_experiment_json,
+    sra_study_tsv,
+    sra_sequencing_platform_tsv,
+    sra_library_tsv,
+):
+    tsv_dict = {
+        "library_name": sra_experiment_json["alias"],
+    }
+    tsv_dict.update(sra_study_tsv[0])
+    tsv_dict.update(sra_sequencing_platform_tsv[0])
+    tsv_dict.update(sra_library_tsv[0])
+    return [tsv_dict]
+
+
+@pytest.fixture
 def sra_experiment_xml(
     sra_experiment_json, sra_study_xml, sra_sequencing_platform_xml, sra_library_xml
 ):
@@ -568,6 +612,11 @@ def sra_experiment_set_json(sra_experiment_json):
 
 
 @pytest.fixture
+def sra_experiment_set_tsv(sra_experiment_tsv):
+    return sra_experiment_tsv
+
+
+@pytest.fixture
 def sra_experiment_set_manifest(sra_experiment_manifest):
     return sra_experiment_manifest
 
@@ -591,6 +640,13 @@ def sra_library_layout_json(test_values):
             "NOMINAL_LENGTH": test_values.get("udf_insert_size_bp")
         }
     }
+
+
+@pytest.fixture
+def sra_library_layout_tsv(test_values):
+    return [{
+        "insert_size": str(test_values.get("udf_insert_size_bp"))
+        }]
 
 
 @pytest.fixture
@@ -636,6 +692,7 @@ def sra_library_json(test_values, sra_library_layout_json, sra_sample_json):
             "LIBRARY_SOURCE": test_values["experiment_sra_library_source"],
             "LIBRARY_SELECTION": test_values["experiment_sra_library_selection"],
             "LIBRARY_LAYOUT": sra_library_layout_json,
+            "LIBRARY_CONSTRUCTION_PROTOCOL": test_values["experiment_library_kit"]
         },
     }
 
@@ -649,7 +706,23 @@ def sra_library_obj(sra_library_json, sra_library_layout_obj, sra_sample_obj):
         source=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SOURCE"],
         selection=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SELECTION"],
         layout=sra_library_layout_obj,
+        library_protocol=sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_CONSTRUCTION_PROTOCOL"]
     )
+
+
+@pytest.fixture
+def sra_library_tsv(test_values, sra_library_layout_tsv, sra_sample_tsv):
+    tsv = {
+        "design_description": test_values["library_description"],
+        "library_source": test_values["experiment_sra_library_source"],
+        "library_selection": test_values["experiment_sra_library_selection"].upper(),
+        "library_strategy": test_values["experiment_sra_library_strategy"],
+        "library_layout": "PAIRED",
+        "library_construction_protocol": test_values["experiment_library_kit"],
+    }
+    tsv.update(sra_library_layout_tsv[0])
+    tsv.update(sra_sample_tsv[0])
+    return [tsv]
 
 
 @pytest.fixture
@@ -677,6 +750,7 @@ def sra_library_xml(sra_library_json, sra_library_layout_xml, sra_sample_xml):
         <LIBRARY_SOURCE>{sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SOURCE"]}</LIBRARY_SOURCE>
         <LIBRARY_SELECTION>{sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_SELECTION"]}</LIBRARY_SELECTION>
         {sra_library_layout_xml}
+        <LIBRARY_CONSTRUCTION_PROTOCOL>{sra_library_json["LIBRARY_DESCRIPTOR"]["LIBRARY_CONSTRUCTION_PROTOCOL"]}</LIBRARY_CONSTRUCTION_PROTOCOL>
       </LIBRARY_DESCRIPTOR>
     </LIBRARYTYPE>"""
 
@@ -714,8 +788,24 @@ def sra_result_file_manifest(sra_result_file_json):
 
 
 @pytest.fixture
+def sra_result_file_tsv(sra_result_file_json):
+    return [
+        {
+            "FileType": sra_result_file_json["filetype"],
+            "_file_name": sra_result_file_json["filename"],
+            "_file_md5": sra_result_file_json["checksum"],
+        }
+    ]
+
+
+@pytest.fixture
 def sra_sample_json(test_values):
     return {"refname": test_values["sample_name"]}
+
+
+@pytest.fixture
+def sra_sample_tsv(sra_sample_json):
+    return [{"sample": sra_sample_json["refname"]}]
 
 
 @pytest.fixture
@@ -773,6 +863,14 @@ def sra_sequencing_platform_xml(sra_sequencing_platform_json):
 
 
 @pytest.fixture
+def sra_sequencing_platform_tsv(sra_sequencing_platform_json):
+    platform = list(sra_sequencing_platform_json.keys())[0]
+    return [{
+        "instrument_model": sra_sequencing_platform_json[platform]["INSTRUMENT_MODEL"]
+    }]
+
+
+@pytest.fixture
 def sra_sequencing_run_json(
         test_values, sra_experiment_ref_json, sra_result_file_json, sra_attribute_json):
     return {
@@ -784,6 +882,11 @@ def sra_sequencing_run_json(
         "run_center": test_values["sequencing_run_center"],
         "center_name": test_values["sequencing_run_center"],
     }
+
+
+@pytest.fixture
+def sra_sequencing_run_tsv(sra_result_file_tsv):
+    return sra_result_file_tsv
 
 
 @pytest.fixture
@@ -829,6 +932,11 @@ def sra_sequencing_run_set_json(sra_sequencing_run_json):
 
 
 @pytest.fixture
+def sra_sequencing_run_set_tsv(sra_sequencing_run_tsv):
+    return sra_sequencing_run_tsv
+
+
+@pytest.fixture
 def sra_sequencing_run_set_manifest(sra_sequencing_run_manifest):
     return sra_sequencing_run_manifest
 
@@ -852,6 +960,11 @@ def sra_study_json(test_values):
 @pytest.fixture
 def sra_study_manifest(sra_study_json):
     return [("STUDY", sra_study_json["refname"])]
+
+
+@pytest.fixture
+def sra_study_tsv(sra_study_json):
+    return [{"study": sra_study_json["refname"]}]
 
 
 @pytest.fixture

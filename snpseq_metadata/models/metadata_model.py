@@ -1,4 +1,4 @@
-from typing import Dict, TypeVar, Type, Union, Iterable
+from typing import Dict, TypeVar, Type, Union, Iterable, List
 import datetime
 
 from snpseq_metadata.exceptions import SomethingNotRecognizedException

@@ -1,6 +1,8 @@
 from typing import Dict, Optional, Type, TypeVar
 
 from snpseq_metadata.models.lims_models.metadata_model import LIMSMetadataModel
+from snpseq_metadata.models.lims_models.library_design import LIMSLibraryObject
+
 
 L = TypeVar("L", bound="LIMSSample")
 
@@ -13,12 +15,28 @@ class LIMSSample(LIMSMetadataModel):
         "project_id": "project"
     }
 
-    def __init__(self, sample_name: str, sample_id: str, project_id: str, **udf: str):
+    def __init__(
+            self,
+            sample_name: str,
+            sample_id: str,
+            project_id: str,
+            **udf: str
+    ):
         self.sample_name = sample_name
         self.sample_id = sample_id
         self.project_id = project_id
         for udf_name, udf_value in udf.items():
             setattr(self, udf_name, udf_value)
+
+        # create library design objects
+        for lib_class in LIMSLibraryObject.__subclasses__():
+            udf_name = lib_class.library_object_type
+            if udf_name in udf:
+                setattr(
+                    self,
+                    udf_name,
+                    lib_class.match(udf[udf_name]) or ""
+                )
 
     def __str__(self) -> str:
         return f"LIMSSample: '{self.sample_name}'"
@@ -77,15 +95,12 @@ class LIMSSample(LIMSMetadataModel):
         )
 
     def to_json(self) -> Dict:
-        json_obj = {
-            v: self.__getattribute__(k)
-            for k, v in self.non_udf_fields.items()
-        }
-        json_obj.update(
-            {
-                k: v
-                for k, v in vars(self).items()
-                if k not in self.non_udf_fields.keys()
-            }
-        )
+        json_obj = {}
+        for k, v in vars(self).items():
+            if isinstance(v, LIMSLibraryObject):
+                json_obj.update(v.to_json())
+            else:
+                # if k is in non_udf_fields, replace k with non_udf_fields[k], else keep k
+                k = self.non_udf_fields.get(k, k)
+                json_obj[k] = v
         return json_obj
